@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "project"
 version = "0.1.0"
-description = ""
+description = "Python library implementing the Philote MDO standard."
 authors = ["Christopher Lupp <christopherlupp@gmail.com>"]
 readme = "README.md"
 
