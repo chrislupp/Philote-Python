@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "project"
+name = "philote-mdo"
 version = "0.1.0"
 description = "Python library implementing the Philote MDO standard."
 authors = ["Christopher Lupp <christopherlupp@gmail.com>"]
@@ -8,8 +8,9 @@ readme = "README.md"
 [tool.poetry.dependencies]
 python = "^3.7"
 grpcio = "^1.51.3"
-grpcio-tools = "^1.51.3"
 
+[tool.poetry.group.dev.dependencies]
+grpcio-tools = "^1.51.3"
 
 [build-system]
 requires = ["poetry-core"]
