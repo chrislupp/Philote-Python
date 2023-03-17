@@ -1,3 +1,10 @@
+philote-mdo/utils/array_pb2.py
+philote-mdo/utils/array_pb2.pyi
+philote-mdo/utils/array_pb2_grpc.py
+philote-mdo/utils/explicit_pb2.py
+philote-mdo/utils/explicit_pb2.pyi
+philote-mdo/utils/explicit_pb2_grpc.py
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
