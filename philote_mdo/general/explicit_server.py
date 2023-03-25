@@ -36,6 +36,8 @@ class ExplicitServer(explicit_pb2_grpc.ExplicitComponentServicer):
         # discrete outputs (names, shapes, units)
         self._discrete_funcs = []
 
+        return explicit_pb2_grpc.Empty()
+
     def Setup(self, request, context):
         """
         Transmits setup information about the analysis discipline to the client.
