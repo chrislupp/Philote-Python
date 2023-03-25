@@ -1,4 +1,8 @@
 import numpy as np
+import grpc
+import explicit_pb2
+import explicit_pb2_grpc
+import options_pb2
 
 
 class ExplicitClient():
@@ -7,6 +11,12 @@ class ExplicitClient():
     """
 
     def __init__(self):
+        # host name
+        self.host = ""
+
+        # grpc options
+        self.grpc_options = []
+
         # continuous inputs (names, shapes, units)
         self._vars = []
 
@@ -18,6 +28,14 @@ class ExplicitClient():
 
         # discrete outputs (names, shapes, units)
         self._discrete_func = []
+
+    def setup_connection(self):
+        self.channel = grpc.insecure_channel(self.host, options=self.options)
+        self.stub = explicit_pb2.ExplicitComponentStub(self.channel)
+
+    def remote_initialize(self):
+        options = options_pb2.Options(num_double=1, num_int=1)
+        response = self.stub.SetStreamOptions(options)
 
     def remote_setup(self):
         messages = []
