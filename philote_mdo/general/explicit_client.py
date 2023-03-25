@@ -3,6 +3,7 @@ import grpc
 import explicit_pb2
 import explicit_pb2_grpc
 import options_pb2
+import array_pb2
 
 
 class ExplicitClient():
@@ -29,18 +30,24 @@ class ExplicitClient():
         # discrete outputs (names, shapes, units)
         self._discrete_funcs = []
 
-    def setup_connection(self):
+        # maximum number of double values transmitted in one data message
+        self.num_double = 100
+
+        # maximum number of integer values transmitted in one data message
+        self.num_int = 100
+
+    def _setup_connection(self):
         self.channel = grpc.insecure_channel(self.host, options=self.options)
         self.stub = explicit_pb2_grpc.ExplicitComponentStub(self.channel)
 
-    def transmit_stream_options(self):
+    def _stream_options(self):
         """
         Transmits the stream options for the remote analysis to the server.
         """
         options = options_pb2.Options(num_double=1, num_int=1)
         response = self.stub.SetStreamOptions(options)
 
-    def remote_setup(self):
+    def _setup(self):
         """
         Requests the input and output metadata from the server.
         """
@@ -65,12 +72,64 @@ class ExplicitClient():
                                     "shape": message.shape,
                                     "units": message.units}
 
-    def remote_compute(self, inputs, outputs):
-        array = np.array([])
-        shape = list(array.shape)
-        data = array.flatten().tolist()
+    def _compute(self, inputs, outputs):
+        """
+        Requests and receives the function evaluation from the analysis server
+        for a set of inputs (sent to the server).
+        """
+        # array of messages used for the send command
+        messages = []
 
-    def remote_partials(self, inputs, jacobian):
-        array = np.array([])
-        shape = list(array.shape)
-        data = array.flatten().tolist()
+        # iterate through all continuous inputs in the dictionary
+        for input_name, value in inputs.items():
+            # iterate through all chunks needed for the current input
+            for i in range(value.size() // self.num_double):
+                # create the chunked data
+                messages += [array_pb2.Array(name=input_name,
+                                             start=0,
+                                             end=0,
+                                             continuous=value[0])]
+
+        # iterate through all discrete inputs in the dictionary
+        for input_name, value in inputs.items():
+            # iterate through all chunks needed for the current input
+            for i in range(value.size() // self.num_double):
+                # create the chunked data
+                messages += [array_pb2.Array(name=input_name,
+                                             start=0,
+                                             end=0,
+                                             continuous=value[0])]
+
+        # stream the messages to the server and receive the stream of results
+        results = self.stub.Compute(iter(messages))
+
+    def _compute_partials(self, inputs, jacobian):
+        """
+        Requests and receives the gradient evaluation from the analysis server
+        for a set of inputs (sent to the server).
+        """
+        # array of messages used for the send command
+        messages = []
+
+        # iterate through all continuous inputs in the dictionary
+        for input_name, value in inputs.items():
+            # iterate through all chunks needed for the current input
+            for i in range(value.size() // self.num_double):
+                # create the chunked data
+                messages += [array_pb2.Array(name=input_name,
+                                             start=0,
+                                             end=0,
+                                             continuous=value[0])]
+
+        # iterate through all discrete inputs in the dictionary
+        for input_name, value in inputs.items():
+            # iterate through all chunks needed for the current input
+            for i in range(value.size() // self.num_double):
+                # create the chunked data
+                messages += [array_pb2.Array(name=input_name,
+                                             start=0,
+                                             end=0,
+                                             continuous=value[0])]
+
+        # stream the messages to the server and receive the stream of results
+        results = self.stub.ComputePartials(iter(messages))
