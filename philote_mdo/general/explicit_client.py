@@ -24,46 +24,46 @@ class ExplicitClient():
         self._discrete_vars = []
 
         # continous outputs (names, shapes, units)
-        self._func = []
+        self._funcs = []
 
         # discrete outputs (names, shapes, units)
-        self._discrete_func = []
+        self._discrete_funcs = []
 
     def setup_connection(self):
         self.channel = grpc.insecure_channel(self.host, options=self.options)
         self.stub = explicit_pb2_grpc.ExplicitComponentStub(self.channel)
 
     def transmit_stream_options(self):
+        """
+        Transmits the stream options for the remote analysis to the server.
+        """
         options = options_pb2.Options(num_double=1, num_int=1)
         response = self.stub.SetStreamOptions(options)
 
     def remote_setup(self):
-        messages = []
-        input = True
-        discrete = True
-        name = ""
-        shape = (1,)
-        units = ""
-
-        for m in messages:
-            if input:
-                if discrete:
-                    self._discrete_vars += {"name": name,
-                                            "shape": shape,
-                                            "units": units}
+        """
+        Requests the input and output metadata from the server.
+        """
+        # stream back the metadata
+        for message in self.stub.Setup(explicit_pb2_grpc.Empty()):
+            if message.input:
+                if message.discrete:
+                    self._discrete_vars += {"name": message.name,
+                                            "shape": message.shape,
+                                            "units": message.units}
                 else:
-                    self._vars += {"name": name,
-                                   "shape": shape,
-                                   "units": units}
+                    self._vars += {"name": message.name,
+                                   "shape": message.shape,
+                                   "units": message.units}
             else:
-                if discrete:
-                    self._discrete_funcs += {"name": name,
-                                             "shape": shape,
-                                             "units": units}
+                if message.discrete:
+                    self._discrete_funcs += {"name": message.name,
+                                             "shape": message.shape,
+                                             "units": message.units}
                 else:
-                    self._funcs += {"name": name,
-                                    "shape": shape,
-                                    "units": units}
+                    self._funcs += {"name": message.name,
+                                    "shape": message.shape,
+                                    "units": message.units}
 
     def remote_compute(self, inputs, outputs):
         array = np.array([])
