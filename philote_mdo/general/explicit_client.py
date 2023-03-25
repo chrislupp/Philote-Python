@@ -31,9 +31,9 @@ class ExplicitClient():
 
     def setup_connection(self):
         self.channel = grpc.insecure_channel(self.host, options=self.options)
-        self.stub = explicit_pb2.ExplicitComponentStub(self.channel)
+        self.stub = explicit_pb2_grpc.ExplicitComponentStub(self.channel)
 
-    def remote_initialize(self):
+    def transmit_stream_options(self):
         options = options_pb2.Options(num_double=1, num_int=1)
         response = self.stub.SetStreamOptions(options)
 
@@ -43,7 +43,7 @@ class ExplicitClient():
         discrete = True
         name = ""
         shape = (1,)
-        units = ''
+        units = ""
 
         for m in messages:
             if input:
