@@ -2,6 +2,7 @@ import grpc
 import explicit_pb2
 import explicit_pb2_grpc
 import metadata_pb2
+import array_pb2
 
 
 class ExplicitServer(explicit_pb2_grpc.ExplicitComponentServicer):
@@ -75,7 +76,50 @@ class ExplicitServer(explicit_pb2_grpc.ExplicitComponentServicer):
         """
         Computes the function evaluation and sends the result to the client.
         """
-        pass
+        # inputs and outputs
+        inputs = {}
+        discrete_inputs = {}
+        outputs = {}
+        discrete_outputs = {}
+
+        # process inputs
+        for message in request_iterator:
+            # start and end indices for the array chunk
+            start = message.start
+            end = message.end
+
+            # assign either continuous or discrete data
+            if message.continous:
+                inputs[message.name][start:end] = message.continuous
+            elif message.discrete:
+                discrete_inputs[message.name][start:end] = message.discrete
+            else:
+                raise ValueError('Expected continuous or discrete variables, '
+                                 'but arrays were empty.')
+
+        # call the user-defined compute function
+        self.compute(inputs, discrete_inputs, outputs, discrete_outputs)
+
+        # send outputs to the client
+        # iterate through all continuous outputs in the dictionary
+        for output_name, value in outputs.items():
+            # iterate through all chunks needed for the current input
+            for i in range(value.size() // self.num_double):
+                # create and send the chunked data
+                yield array_pb2.Array(name=output_name,
+                                      start=0,
+                                      end=0,
+                                      continuous=value.ravel[0:0])
+
+        # iterate through all discrete outputs in the dictionary
+        for output_name, value in discrete_outputs.items():
+            # iterate through all chunks needed for the current input
+            for i in range(value.size() // self.num_double):
+                # create and send the chunked data
+                yield array_pb2.Array(name=output_name,
+                                      start=0,
+                                      end=0,
+                                      discrete=value.ravel[0:0])
 
     def ComputePartials(self, request_iterator, context):
         """

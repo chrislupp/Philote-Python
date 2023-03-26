@@ -72,7 +72,7 @@ class ExplicitClient():
                                     "shape": message.shape,
                                     "units": message.units}
 
-    def _compute(self, inputs, outputs):
+    def _compute(self, inputs, discrete_inputs, outputs, discrete_outputs):
         """
         Requests and receives the function evaluation from the analysis server
         for a set of inputs (sent to the server).
@@ -88,22 +88,22 @@ class ExplicitClient():
                 messages += [array_pb2.Array(name=input_name,
                                              start=0,
                                              end=0,
-                                             continuous=value[0])]
+                                             continuous=value.ravel[0:0])]
 
         # iterate through all discrete inputs in the dictionary
-        for input_name, value in inputs.items():
+        for input_name, value in discrete_inputs.items():
             # iterate through all chunks needed for the current input
             for i in range(value.size() // self.num_double):
                 # create the chunked data
                 messages += [array_pb2.Array(name=input_name,
                                              start=0,
                                              end=0,
-                                             continuous=value[0])]
+                                             continuous=value.ravel[0:0])]
 
         # stream the messages to the server and receive the stream of results
         results = self.stub.Compute(iter(messages))
 
-    def _compute_partials(self, inputs, jacobian):
+    def _compute_partials(self, inputs, discrete_inputs, jacobian):
         """
         Requests and receives the gradient evaluation from the analysis server
         for a set of inputs (sent to the server).
@@ -119,7 +119,7 @@ class ExplicitClient():
                 messages += [array_pb2.Array(name=input_name,
                                              start=0,
                                              end=0,
-                                             continuous=value[0])]
+                                             continuous=value.ravel[0:0])]
 
         # iterate through all discrete inputs in the dictionary
         for input_name, value in inputs.items():
@@ -129,7 +129,7 @@ class ExplicitClient():
                 messages += [array_pb2.Array(name=input_name,
                                              start=0,
                                              end=0,
-                                             continuous=value[0])]
+                                             continuous=value.ravel[0:0])]
 
         # stream the messages to the server and receive the stream of results
         results = self.stub.ComputePartials(iter(messages))
