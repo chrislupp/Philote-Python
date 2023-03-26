@@ -1,9 +1,8 @@
 import numpy as np
 import grpc
-import explicit_pb2
-import explicit_pb2_grpc
-import options_pb2
-import array_pb2
+import philote_mdo.generated.explicit_pb2_grpc as explicit_pb2_grpc
+import philote_mdo.generated.options_pb2 as options_pb2
+import philote_mdo.generated.array_pb2 as array_pb2
 
 
 class ExplicitClient():

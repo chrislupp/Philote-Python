@@ -1,9 +1,8 @@
 import numpy as np
 import grpc
-import explicit_pb2
-import explicit_pb2_grpc
-import metadata_pb2
-import array_pb2
+import philote_mdo.generated.metadata_pb2 as metadata_pb2
+import philote_mdo.generated.explicit_pb2_grpc as explicit_pb2_grpc
+import philote_mdo.generated.array_pb2 as array_pb2
 
 
 class ExplicitServer(explicit_pb2_grpc.ExplicitComponentServicer):
