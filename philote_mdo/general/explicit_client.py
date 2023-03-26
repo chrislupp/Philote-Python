@@ -82,26 +82,36 @@ class ExplicitClient():
 
         # iterate through all continuous inputs in the dictionary
         for input_name, value in inputs.items():
+            # get the beginning and end indices of the chunked arrays
+            beg = np.arange(0, value.size(), self.num_double)
+            end = beg[1:]
+
             # iterate through all chunks needed for the current input
-            for i in range(value.size() // self.num_double):
+            for array in range(value.size() // self.num_double):
                 # create the chunked data
                 messages += [array_pb2.Array(name=input_name,
-                                             start=0,
-                                             end=0,
-                                             continuous=value.ravel[0:0])]
+                                             start=beg,
+                                             end=end,
+                                             continuous=value.ravel()[beg:end])]
 
         # iterate through all discrete inputs in the dictionary
         for input_name, value in discrete_inputs.items():
+            # get the beginning and end indices of the chunked arrays
+            beg = np.arange(0, value.size(), self.num_double)
+            end = beg[1:]
+
             # iterate through all chunks needed for the current input
-            for i in range(value.size() // self.num_double):
+            for array in range(value.size() // self.num_double):
                 # create the chunked data
                 messages += [array_pb2.Array(name=input_name,
-                                             start=0,
-                                             end=0,
-                                             continuous=value.ravel[0:0])]
+                                             start=beg,
+                                             end=end,
+                                             discrete=value.ravel()[beg:end])]
 
         # stream the messages to the server and receive the stream of results
         results = self.stub.Compute(iter(messages))
+
+        # iterate through the results
 
     def _compute_partials(self, inputs, discrete_inputs, jacobian):
         """
@@ -113,23 +123,33 @@ class ExplicitClient():
 
         # iterate through all continuous inputs in the dictionary
         for input_name, value in inputs.items():
+            # get the beginning and end indices of the chunked arrays
+            beg = np.arange(0, value.size(), self.num_double)
+            end = beg[1:]
+
             # iterate through all chunks needed for the current input
-            for i in range(value.size() // self.num_double):
+            for array in range(value.size() // self.num_double):
                 # create the chunked data
                 messages += [array_pb2.Array(name=input_name,
-                                             start=0,
-                                             end=0,
-                                             continuous=value.ravel[0:0])]
+                                             start=beg,
+                                             end=end,
+                                             continuous=value.ravel()[beg:end])]
 
         # iterate through all discrete inputs in the dictionary
-        for input_name, value in inputs.items():
+        for input_name, value in discrete_inputs.items():
+            # get the beginning and end indices of the chunked arrays
+            beg = np.arange(0, value.size(), self.num_double)
+            end = beg[1:]
+
             # iterate through all chunks needed for the current input
-            for i in range(value.size() // self.num_double):
+            for array in range(value.size() // self.num_double):
                 # create the chunked data
                 messages += [array_pb2.Array(name=input_name,
-                                             start=0,
-                                             end=0,
-                                             continuous=value.ravel[0:0])]
+                                             start=beg,
+                                             end=end,
+                                             discrete=value.ravel()[beg:end])]
 
         # stream the messages to the server and receive the stream of results
         results = self.stub.ComputePartials(iter(messages))
+
+        # iterate through the results
