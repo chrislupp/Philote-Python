@@ -98,7 +98,7 @@ class ExplicitServer(explicit_pb2_grpc.ExplicitComponentServicer):
                                  'but arrays were empty.')
 
         # call the user-defined compute function
-        self.compute(inputs, discrete_inputs, outputs, discrete_outputs)
+        self.compute(inputs, outputs, discrete_inputs, discrete_outputs)
 
         # send outputs to the client
         # iterate through all continuous outputs in the dictionary
@@ -125,13 +125,46 @@ class ExplicitServer(explicit_pb2_grpc.ExplicitComponentServicer):
         """
         Computes the gradient evaluation and sends the result to the client.
         """
-        pass
+        # inputs and outputs
+        inputs = {}
+        discrete_inputs = {}
+        jacobian = {}
+
+        # process inputs
+        for message in request_iterator:
+            # start and end indices for the array chunk
+            start = message.start
+            end = message.end
+
+            # assign either continuous or discrete data
+            if message.continous:
+                inputs[message.name][start:end] = message.continuous
+            elif message.discrete:
+                discrete_inputs[message.name][start:end] = message.discrete
+            else:
+                raise ValueError('Expected continuous or discrete variables, '
+                                 'but arrays were empty.')
+
+        # call the user-defined compute_partials function
+        self.compute_partials(inputs, discrete_inputs, jacobian)
+
+        # send outputs to the client
+        # iterate through all continuous outputs in the dictionary
+        for output_name, value in jacobian.items():
+            # iterate through all chunks needed for the current input
+            for i in range(value.size() // self.num_double):
+                # create and send the chunked data
+                yield array_pb2.Array(name=output_name,
+                                      start=0,
+                                      end=0,
+                                      continuous=value.ravel[0:0])
 
     def setup(self):
         pass
 
-    def compute(self):
+    def compute(self, inputs, outputs, discrete_inputs=None,
+                discrete_outputs=None):
         pass
 
-    def compute_partials(self):
+    def compute_partials(self, inputs, jacobian, discrete_inputs=None):
         pass
