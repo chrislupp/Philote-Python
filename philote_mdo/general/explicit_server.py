@@ -1,3 +1,4 @@
+import numpy as np
 import grpc
 import explicit_pb2
 import explicit_pb2_grpc
@@ -100,26 +101,33 @@ class ExplicitServer(explicit_pb2_grpc.ExplicitComponentServicer):
         # call the user-defined compute function
         self.compute(inputs, outputs, discrete_inputs, discrete_outputs)
 
-        # send outputs to the client
         # iterate through all continuous outputs in the dictionary
-        for output_name, value in outputs.items():
+        for input_name, value in outputs.items():
+            # get the beginning and end indices of the chunked arrays
+            beg = np.arange(0, value.size(), self.num_double)
+            end = beg[1:]
+
             # iterate through all chunks needed for the current input
-            for i in range(value.size() // self.num_double):
-                # create and send the chunked data
-                yield array_pb2.Array(name=output_name,
-                                      start=0,
-                                      end=0,
-                                      continuous=value.ravel[0:0])
+            for beg, end in zip(beg, end):
+                # create the chunked data
+                messages += [array_pb2.Array(name=input_name,
+                                             start=beg,
+                                             end=end,
+                                             continuous=value.ravel()[beg:end])]
 
         # iterate through all discrete outputs in the dictionary
-        for output_name, value in discrete_outputs.items():
+        for input_name, value in discrete_outputs.items():
+            # get the beginning and end indices of the chunked arrays
+            beg = np.arange(0, value.size(), self.num_double)
+            end = beg[1:]
+
             # iterate through all chunks needed for the current input
-            for i in range(value.size() // self.num_double):
-                # create and send the chunked data
-                yield array_pb2.Array(name=output_name,
-                                      start=0,
-                                      end=0,
-                                      discrete=value.ravel[0:0])
+            for beg, end in zip(beg, end):
+                # create the chunked data
+                messages += [array_pb2.Array(name=input_name,
+                                             start=beg,
+                                             end=end,
+                                             discrete=value.ravel()[beg:end])]
 
     def ComputePartials(self, request_iterator, context):
         """

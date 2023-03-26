@@ -87,7 +87,7 @@ class ExplicitClient():
             end = beg[1:]
 
             # iterate through all chunks needed for the current input
-            for array in range(value.size() // self.num_double):
+            for beg, end in zip(beg, end):
                 # create the chunked data
                 messages += [array_pb2.Array(name=input_name,
                                              start=beg,
@@ -101,7 +101,7 @@ class ExplicitClient():
             end = beg[1:]
 
             # iterate through all chunks needed for the current input
-            for array in range(value.size() // self.num_double):
+            for beg, end in zip(beg, end):
                 # create the chunked data
                 messages += [array_pb2.Array(name=input_name,
                                              start=beg,
@@ -128,7 +128,7 @@ class ExplicitClient():
             end = beg[1:]
 
             # iterate through all chunks needed for the current input
-            for array in range(value.size() // self.num_double):
+            for beg, end in zip(beg, end):
                 # create the chunked data
                 messages += [array_pb2.Array(name=input_name,
                                              start=beg,
@@ -142,7 +142,7 @@ class ExplicitClient():
             end = beg[1:]
 
             # iterate through all chunks needed for the current input
-            for array in range(value.size() // self.num_double):
+            for beg, end in zip(beg, end):
                 # create the chunked data
                 messages += [array_pb2.Array(name=input_name,
                                              start=beg,
