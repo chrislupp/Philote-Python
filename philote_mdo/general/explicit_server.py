@@ -11,6 +11,7 @@ class ExplicitServer(explicit_pb2_grpc.ExplicitComponentServicer):
     """
 
     def __init__(self):
+        self.verbose = False
         self.num_double = 100
         self.num_int = 100
 

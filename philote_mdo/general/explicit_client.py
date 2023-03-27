@@ -111,11 +111,14 @@ class ExplicitClient():
             else:
                 print("    None")
 
-    def _compute(self, inputs, discrete_inputs, outputs, discrete_outputs):
+    def _compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         """
         Requests and receives the function evaluation from the analysis server
         for a set of inputs (sent to the server).
         """
+        if self.verbose:
+            print("Started compute method.", end="    ")
+
         # array of messages used for the send command
         messages = []
 
@@ -151,19 +154,24 @@ class ExplicitClient():
         results = self.stub.Compute(iter(messages))
 
         # iterate through the results
+        if self.verbose:
+            print("[Complete]")
 
     def _compute_partials(self, inputs, discrete_inputs, jacobian):
         """
         Requests and receives the gradient evaluation from the analysis server
         for a set of inputs (sent to the server).
         """
+        if self.verbose:
+            print("Started compute partials method.", end="    ")
+
         # array of messages used for the send command
         messages = []
 
         # iterate through all continuous inputs in the dictionary
         for input_name, value in inputs.items():
             # get the beginning and end indices of the chunked arrays
-            beg = np.arange(0, value.size(), self.num_double)
+            beg = np.arange(0, value.size, self.num_double)
             end = beg[1:]
 
             # iterate through all chunks needed for the current input
@@ -192,3 +200,6 @@ class ExplicitClient():
         results = self.stub.ComputePartials(iter(messages))
 
         # iterate through the results
+
+        if self.verbose:
+            print("[Complete]")
