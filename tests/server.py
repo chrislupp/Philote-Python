@@ -1,21 +1,20 @@
 
-from philote_mdo import run_server
-from philote_mdo.general import ExplicitServer
-import philote_mdo.general as pmdo
-import grpc
-from concurrent import futures
-import philote_mdo.generated.explicit_pb2_grpc as explicit_pb2_grpc
+import philote_mdo as pmdo
 
 
-class Analysis(pmdo.ExplicitServer):
+class RemoteParabaloid(pmdo.general.ExplicitServer):
 
     def setup(self):
-        self._vars = [{'name': 'test1', 'shape': (1,), 'units': 'm'},
-                      {'name': 'test12', 'shape': (1,), 'units': 'm'}]
-        self._discrete_vars = [{'name': 'test2', 'shape': (2,), 'units': 'm2'}]
-        self._funcs = [{'name': 'test3', 'shape': (3,), 'units': 'm3'}]
-        self._discrete_funcs = [
-            {'name': 'test4', 'shape': (4,), 'units': 'm4'}]
+        self._vars = [{'name': 'x', 'shape': (1,), 'units': 'm'},
+                      {'name': 'y', 'shape': (1,), 'units': 'm'}]
+
+        self._funcs = [{'name': 'f_xy', 'shape': (1,), 'units': 'm**2'}]
+
+    def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
+        x = inputs['x']
+        y = inputs['y']
+
+        outputs['f_xy'] = (x - 3.0)**2 + x * y + (y + 4.0)**2 - 3.0
 
 
-run_server(Analysis())
+pmdo.run_server(RemoteParabaloid())
