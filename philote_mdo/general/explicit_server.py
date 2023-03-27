@@ -43,6 +43,8 @@ class ExplicitServer(explicit_pb2_grpc.ExplicitComponentServicer):
         """
         Transmits setup information about the analysis discipline to the client.
         """
+        self.initialize()
+
         # transmit the continuous input metadata
         for var in self._vars:
             yield metadata_pb2.VariableMetaData(discrete=False,
@@ -165,6 +167,9 @@ class ExplicitServer(explicit_pb2_grpc.ExplicitComponentServicer):
                                       start=0,
                                       end=0,
                                       continuous=value.ravel[0:0])
+
+    def initialize(self):
+        pass
 
     def setup(self):
         pass

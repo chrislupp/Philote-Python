@@ -14,8 +14,8 @@ def run_server(service, port='50051', max_workers=10):
         explicit_pb2_grpc.add_ExplicitComponentServicer_to_server(
             service, server)
     else:
-        raise ValueError(
-            'Unexpected object type provided for variable "service".')
+        raise ValueError('Unexpected object type provided for variable '
+                         '"service".')
 
     server.add_insecure_port('[::]:' + port)
     server.start()

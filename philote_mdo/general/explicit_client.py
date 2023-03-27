@@ -66,20 +66,20 @@ class ExplicitClient():
             if message.input:
                 if message.discrete:
                     self._discrete_vars += [{"name": message.name,
-                                            "shape": message.shape,
+                                            "shape": tuple(message.shape),
                                              "units": message.units}]
                 else:
                     self._vars += [{"name": message.name,
-                                   "shape": message.shape,
+                                   "shape": tuple(message.shape),
                                     "units": message.units}]
             else:
                 if message.discrete:
                     self._discrete_funcs += [{"name": message.name,
-                                             "shape": message.shape,
+                                             "shape": tuple(message.shape),
                                               "units": message.units}]
                 else:
                     self._funcs += [{"name": message.name,
-                                    "shape": message.shape,
+                                    "shape": tuple(message.shape),
                                      "units": message.units}]
 
         if self.verbose:
