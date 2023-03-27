@@ -1,5 +1,5 @@
 import numpy as np
-import grpc
+from google.protobuf.empty_pb2 import Empty
 import philote_mdo.generated.metadata_pb2 as metadata_pb2
 import philote_mdo.generated.explicit_pb2_grpc as explicit_pb2_grpc
 import philote_mdo.generated.array_pb2 as array_pb2
@@ -37,7 +37,7 @@ class ExplicitServer(explicit_pb2_grpc.ExplicitComponentServicer):
         # discrete outputs (names, shapes, units)
         self._discrete_funcs = []
 
-        return explicit_pb2_grpc.Empty()
+        return Empty()
 
     def Setup(self, request, context):
         """
