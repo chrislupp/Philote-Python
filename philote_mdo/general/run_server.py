@@ -19,5 +19,15 @@ def run_server(service, port='50051', max_workers=10):
 
     server.add_insecure_port('[::]:' + port)
     server.start()
-    print("Started server...")
-    server.wait_for_termination()
+    print("Started server. Press 'q' and hit enter to stop the server.")
+
+    try:
+        while True:
+            user_input = input()
+            if user_input == 'q':
+                break
+    except KeyboardInterrupt:
+        pass
+
+    print("Stopping the server...")
+    server.stop(0)
