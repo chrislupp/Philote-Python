@@ -11,15 +11,13 @@ from google.protobuf import symbol_database as _symbol_database
 _sym_db = _symbol_database.Default()
 
 
-
-
 DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0b\x61rray.proto\"\x87\x01\n\x05\x41rray\x12\x11\n\x04name\x18\x01 \x01(\tH\x00\x88\x01\x01\x12\x14\n\x07subname\x18\x02 \x01(\tH\x01\x88\x01\x01\x12\r\n\x05start\x18\x03 \x01(\x03\x12\x0b\n\x03\x65nd\x18\x04 \x01(\x03\x12\x12\n\ncontinuous\x18\x05 \x03(\x01\x12\x10\n\x08\x64iscrete\x18\x06 \x03(\x01\x42\x07\n\x05_nameB\n\n\x08_subnameb\x06proto3')
 
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, globals())
 _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'array_pb2', globals())
 if _descriptor._USE_C_DESCRIPTORS == False:
 
-  DESCRIPTOR._options = None
-  _ARRAY._serialized_start=16
-  _ARRAY._serialized_end=151
+    DESCRIPTOR._options = None
+    _ARRAY._serialized_start = 16
+    _ARRAY._serialized_end = 151
 # @@protoc_insertion_point(module_scope)
