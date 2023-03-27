@@ -85,17 +85,23 @@ class ExplicitServer(explicit_pb2_grpc.ExplicitComponentServicer):
         outputs = {}
         discrete_outputs = {}
 
+        # preallocate the input and discrete input arrays
+        for var in self._vars:
+            inputs[var['name']] = np.zeros(var['shape'])
+        for dvar in self._discrete_vars:
+            discrete_inputs[dvar['name']] = np.zeros(dvar['shape'])
+
         # process inputs
         for message in request_iterator:
             # start and end indices for the array chunk
-            start = message.start
-            end = message.end
+            b = message.start
+            e = message.end
 
             # assign either continuous or discrete data
-            if message.continous:
-                inputs[message.name][start:end] = message.continuous
-            elif message.discrete:
-                discrete_inputs[message.name][start:end] = message.discrete
+            if len(message.continuous) > 0:
+                inputs[message.name][b:e] = message.continuous
+            elif len(message.discrete) > 0:
+                discrete_inputs[message.name][b:e] = message.discrete
             else:
                 raise ValueError('Expected continuous or discrete variables, '
                                  'but arrays were empty.')
@@ -104,32 +110,38 @@ class ExplicitServer(explicit_pb2_grpc.ExplicitComponentServicer):
         self.compute(inputs, outputs, discrete_inputs, discrete_outputs)
 
         # iterate through all continuous outputs in the dictionary
-        for input_name, value in outputs.items():
+        for output_name, value in outputs.items():
             # get the beginning and end indices of the chunked arrays
-            beg = np.arange(0, value.size(), self.num_double)
-            end = beg[1:]
+            beg_i = np.arange(0, value.size, self.num_double)
+            if beg_i.size == 1:
+                end_i = [value.size]
+            else:
+                end_i = beg_i[1:]
 
             # iterate through all chunks needed for the current input
-            for beg, end in zip(beg, end):
+            for b, e in zip(beg_i, end_i):
                 # create the chunked data
-                messages += [array_pb2.Array(name=input_name,
-                                             start=beg,
-                                             end=end,
-                                             continuous=value.ravel()[beg:end])]
+                yield array_pb2.Array(name=output_name,
+                                      start=b,
+                                      end=e,
+                                      continuous=value.ravel()[b:e])
 
         # iterate through all discrete outputs in the dictionary
-        for input_name, value in discrete_outputs.items():
+        for doutput_name, value in discrete_outputs.items():
             # get the beginning and end indices of the chunked arrays
-            beg = np.arange(0, value.size(), self.num_double)
-            end = beg[1:]
+            beg_i = np.arange(0, value.size, self.num_double)
+            if beg_i.size == 1:
+                end_i = [value.size]
+            else:
+                end_i = beg_i[1:]
 
             # iterate through all chunks needed for the current input
-            for beg, end in zip(beg, end):
+            for b, e in zip(beg_i, end_i):
                 # create the chunked data
-                messages += [array_pb2.Array(name=input_name,
-                                             start=beg,
-                                             end=end,
-                                             discrete=value.ravel()[beg:end])]
+                yield array_pb2.Array(name=doutput_name,
+                                      start=b,
+                                      end=e,
+                                      discrete=value.ravel()[b:e])
 
     def ComputePartials(self, request_iterator, context):
         """
@@ -148,9 +160,9 @@ class ExplicitServer(explicit_pb2_grpc.ExplicitComponentServicer):
 
             # assign either continuous or discrete data
             if message.continous:
-                inputs[message.name][start:end] = message.continuous
+                inputs[message.name][start: end] = message.continuous
             elif message.discrete:
-                discrete_inputs[message.name][start:end] = message.discrete
+                discrete_inputs[message.name][start: end] = message.discrete
             else:
                 raise ValueError('Expected continuous or discrete variables, '
                                  'but arrays were empty.')

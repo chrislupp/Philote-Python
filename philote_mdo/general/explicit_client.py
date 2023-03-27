@@ -125,35 +125,64 @@ class ExplicitClient():
         # iterate through all continuous inputs in the dictionary
         for input_name, value in inputs.items():
             # get the beginning and end indices of the chunked arrays
-            beg = np.arange(0, value.size(), self.num_double)
-            end = beg[1:]
+            beg_i = np.arange(0, value.size, self.num_double)
+
+            if beg_i.size == 1:
+                end_i = [value.size]
+            else:
+                end_i = beg_i[1:]
 
             # iterate through all chunks needed for the current input
-            for beg, end in zip(beg, end):
+            for b, e in zip(beg_i, end_i):
                 # create the chunked data
                 messages += [array_pb2.Array(name=input_name,
-                                             start=beg,
-                                             end=end,
-                                             continuous=value.ravel()[beg:end])]
+                                             start=b,
+                                             end=e,
+                                             continuous=value.ravel()[b:e])]
 
         # iterate through all discrete inputs in the dictionary
-        for input_name, value in discrete_inputs.items():
-            # get the beginning and end indices of the chunked arrays
-            beg = np.arange(0, value.size(), self.num_double)
-            end = beg[1:]
+        if discrete_inputs:
+            for input_name, value in discrete_inputs.items():
+                # get the beginning and end indices of the chunked arrays
+                beg_i = np.arange(0, value.size, self.num_double)
 
-            # iterate through all chunks needed for the current input
-            for beg, end in zip(beg, end):
-                # create the chunked data
-                messages += [array_pb2.Array(name=input_name,
-                                             start=beg,
-                                             end=end,
-                                             discrete=value.ravel()[beg:end])]
+                if beg_i.size == 1:
+                    end_i = [value.size]
+                else:
+                    end_i = beg_i[1:]
+
+                # iterate through all chunks needed for the current input
+                for b, e in zip(beg_i, end_i):
+                    # create the chunked data
+                    messages += [array_pb2.Array(name=input_name,
+                                                 start=b,
+                                                 end=e,
+                                                 discrete=value.ravel()[b:e])]
 
         # stream the messages to the server and receive the stream of results
-        results = self.stub.Compute(iter(messages))
+        responses = self.stub.Compute(iter(messages))
+
+        # preallocate outputs and discrete output arrays
+        for out in self._funcs:
+            outputs[out['name']] = np.zeros(out['shape'])
+        for dout in self._discrete_funcs:
+            discrete_outputs[dout['name']] = np.zeros(dout['shape'])
 
         # iterate through the results
+        for message in responses:
+            # start and end indices for the array chunk
+            b = message.start
+            e = message.end
+
+            # assign either continuous or discrete data
+            if len(message.continuous) > 0:
+                outputs[message.name][b:e] = message.continuous
+            elif len(message.discrete) > 0:
+                discrete_outputs[message.name][b:e] = message.discrete
+            else:
+                raise ValueError('Expected continuous or discrete variables, '
+                                 'but arrays were empty.')
+
         if self.verbose:
             print("[Complete]")
 
@@ -183,18 +212,19 @@ class ExplicitClient():
                                              continuous=value.ravel()[beg:end])]
 
         # iterate through all discrete inputs in the dictionary
-        for input_name, value in discrete_inputs.items():
-            # get the beginning and end indices of the chunked arrays
-            beg = np.arange(0, value.size(), self.num_double)
-            end = beg[1:]
+        if discrete_inputs:
+            for input_name, value in discrete_inputs.items():
+                # get the beginning and end indices of the chunked arrays
+                beg = np.arange(0, value.size, self.num_double)
+                end = beg[1:]
 
-            # iterate through all chunks needed for the current input
-            for beg, end in zip(beg, end):
-                # create the chunked data
-                messages += [array_pb2.Array(name=input_name,
-                                             start=beg,
-                                             end=end,
-                                             discrete=value.ravel()[beg:end])]
+                # iterate through all chunks needed for the current input
+                for beg, end in zip(beg, end):
+                    # create the chunked data
+                    messages += [array_pb2.Array(name=input_name,
+                                                 start=beg,
+                                                 end=end,
+                                                 discrete=value.ravel()[beg:end])]
 
         # stream the messages to the server and receive the stream of results
         results = self.stub.ComputePartials(iter(messages))
