@@ -43,7 +43,7 @@ class ExplicitServer(explicit_pb2_grpc.ExplicitComponentServicer):
         """
         Transmits setup information about the analysis discipline to the client.
         """
-        self.initialize()
+        self.setup()
 
         # transmit the continuous input metadata
         for var in self._vars:

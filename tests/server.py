@@ -9,8 +9,9 @@ import philote_mdo.generated.explicit_pb2_grpc as explicit_pb2_grpc
 
 class Analysis(pmdo.ExplicitServer):
 
-    def initialize(self):
-        self._vars = [{'name': 'test1', 'shape': (1,), 'units': 'm'}]
+    def setup(self):
+        self._vars = [{'name': 'test1', 'shape': (1,), 'units': 'm'},
+                      {'name': 'test12', 'shape': (1,), 'units': 'm'}]
         self._discrete_vars = [{'name': 'test2', 'shape': (2,), 'units': 'm2'}]
         self._funcs = [{'name': 'test3', 'shape': (3,), 'units': 'm3'}]
         self._discrete_funcs = [
