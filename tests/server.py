@@ -16,5 +16,12 @@ class RemoteParabaloid(pmdo.general.ExplicitServer):
 
         outputs['f_xy'] = (x - 3.0)**2 + x * y + (y + 4.0)**2 - 3.0
 
+    def compute_partials(self, inputs, partials, discrete_inputs=None):
+        x = inputs['x']
+        y = inputs['y']
+
+        partials['f_xy', 'x'] = 2.0*x - 6.0 + y
+        partials['f_xy', 'y'] = 2.0*y + 8.0 + x
+
 
 pmdo.run_server(RemoteParabaloid())
