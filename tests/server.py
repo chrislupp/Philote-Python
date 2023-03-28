@@ -14,14 +14,17 @@
 
 import philote_mdo as pmdo
 
+\
 
 class RemoteParabaloid(pmdo.general.ExplicitServer):
 
     def setup(self):
-        self._vars = [{'name': 'x', 'shape': (1,), 'units': 'm'},
-                      {'name': 'y', 'shape': (1,), 'units': 'm'}]
+        self.define_input('x', shape=(1,), units='m')
+        self.define_input('y', shape=(1,), units='m')
 
-        self._funcs = [{'name': 'f_xy', 'shape': (1,), 'units': 'm**2'}]
+        self.define_output('f_xy', shape=(1,), units='m**2')
+
+        self.define_partials('f_xy', '*')
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         x = inputs['x']

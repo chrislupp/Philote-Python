@@ -17,6 +17,7 @@ from google.protobuf.empty_pb2 import Empty
 import philote_mdo.generated.metadata_pb2 as metadata_pb2
 import philote_mdo.generated.explicit_pb2_grpc as explicit_pb2_grpc
 import philote_mdo.generated.array_pb2 as array_pb2
+from philote_mdo.utils import PairDict
 
 
 class ExplicitServer(explicit_pb2_grpc.ExplicitComponentServicer):
@@ -28,17 +29,6 @@ class ExplicitServer(explicit_pb2_grpc.ExplicitComponentServicer):
         self.verbose = False
         self.num_double = 100
         self.num_int = 100
-
-    def SetStreamOptions(self, request, context):
-        """
-        Receives options from the client on how data will be transmitted to and
-        received from the client. The options are stores locally for use in the
-        compute routines.
-        """
-        # set the maximum size of arrays that will be sent over the wire in one
-        # chunk
-        self.num_double = request.num_double
-        self.num_int = request.num_int
 
         # continuous inputs (names, shapes, units)
         self._vars = []
@@ -52,7 +42,55 @@ class ExplicitServer(explicit_pb2_grpc.ExplicitComponentServicer):
         # discrete outputs (names, shapes, units)
         self._discrete_funcs = []
 
+        # list of all defined partials
+        self._partials = []
+
+    def SetStreamOptions(self, request, context):
+        """
+        Receives options from the client on how data will be transmitted to and
+        received from the client. The options are stores locally for use in the
+        compute routines.
+        """
+        # set the maximum size of arrays that will be sent over the wire in one
+        # chunk
+        self.num_double = request.num_double
+        self.num_int = request.num_int
+
         return Empty()
+
+    def define_input(self, name, shape=(1,), units=''):
+        if {'name': name, 'shape': shape, 'units': units} not in self._vars:
+            self._vars += [{'name': name, 'shape': shape, 'units': units}]
+
+    def define_discrete_input(self, name, shape=(1,), units=''):
+        if {'name': name, 'shape': shape, 'units': units} not in self._discrete_vars:
+            self._discrete_vars += [{'name': name,
+                                     'shape': shape,
+                                     'units': units}]
+
+    def define_output(self, name, shape=(1,), units=''):
+        if {'name': name, 'shape': shape, 'units': units} not in self._funcs:
+            self._funcs += [{'name': name, 'shape': shape, 'units': units}]
+
+    def define_discrete_output(self, name, shape=(1,), units=''):
+        if {'name': name, 'shape': shape, 'units': units} not in self._discrete_funcs:
+            self._discrete_funcs += [{'name': name,
+                                     'shape': shape,
+                                      'units': units}]
+
+    def define_partials(self, func, var):
+
+        if isinstance(var, list):
+            for val in var:
+                if (func, val) not in self._partials:
+                    self._partials += [(func, val['name'])]
+        elif var == '*':
+            for val in self._vars:
+                if (func, val) not in self._partials:
+                    self._partials += [(func, val['name'])]
+        else:
+            if (func, var) not in self._partials:
+                self._partials += [(func, var)]
 
     def Setup(self, request, context):
         """

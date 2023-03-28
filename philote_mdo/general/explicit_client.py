@@ -20,7 +20,7 @@ import philote_mdo.generated.options_pb2 as options_pb2
 import philote_mdo.generated.array_pb2 as array_pb2
 
 
-class ExplicitClient():
+class ExplicitClient:
     """
     Client for calling explicit analysis discipline servers.
     """
@@ -46,6 +46,9 @@ class ExplicitClient():
 
         # discrete outputs (names, shapes, units)
         self._discrete_funcs = []
+
+        # list of all defined partials
+        self._partials = []
 
         # maximum number of double values transmitted in one data message
         self.num_double = 100
