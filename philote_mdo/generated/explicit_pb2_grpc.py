@@ -28,6 +28,11 @@ class ExplicitComponentStub(object):
             request_serializer=google_dot_protobuf_dot_empty__pb2.Empty.SerializeToString,
             response_deserializer=metadata__pb2.VariableMetaData.FromString,
         )
+        self.SetupPartials = channel.unary_stream(
+            '/ExplicitComponent/SetupPartials',
+            request_serializer=google_dot_protobuf_dot_empty__pb2.Empty.SerializeToString,
+            response_deserializer=metadata__pb2.PartialsMetaData.FromString,
+        )
         self.Compute = channel.stream_stream(
             '/ExplicitComponent/Compute',
             request_serializer=array__pb2.Array.SerializeToString,
@@ -53,6 +58,13 @@ class ExplicitComponentServicer(object):
 
     def Setup(self, request, context):
         """Sets up the component
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def SetupPartials(self, request, context):
+        """Sets up the component partials
         """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -84,6 +96,11 @@ def add_ExplicitComponentServicer_to_server(servicer, server):
             servicer.Setup,
             request_deserializer=google_dot_protobuf_dot_empty__pb2.Empty.FromString,
             response_serializer=metadata__pb2.VariableMetaData.SerializeToString,
+        ),
+        'SetupPartials': grpc.unary_stream_rpc_method_handler(
+            servicer.SetupPartials,
+            request_deserializer=google_dot_protobuf_dot_empty__pb2.Empty.FromString,
+            response_serializer=metadata__pb2.PartialsMetaData.SerializeToString,
         ),
         'Compute': grpc.stream_stream_rpc_method_handler(
             servicer.Compute,
@@ -138,6 +155,23 @@ class ExplicitComponent(object):
         return grpc.experimental.unary_stream(request, target, '/ExplicitComponent/Setup',
                                               google_dot_protobuf_dot_empty__pb2.Empty.SerializeToString,
                                               metadata__pb2.VariableMetaData.FromString,
+                                              options, channel_credentials,
+                                              insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def SetupPartials(request,
+                      target,
+                      options=(),
+                      channel_credentials=None,
+                      call_credentials=None,
+                      insecure=False,
+                      compression=None,
+                      wait_for_ready=None,
+                      timeout=None,
+                      metadata=None):
+        return grpc.experimental.unary_stream(request, target, '/ExplicitComponent/SetupPartials',
+                                              google_dot_protobuf_dot_empty__pb2.Empty.SerializeToString,
+                                              metadata__pb2.PartialsMetaData.FromString,
                                               options, channel_credentials,
                                               insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 

@@ -14,7 +14,7 @@
 
 import numpy as np
 from philote_mdo.general import ExplicitClient
-
+from philote_mdo.utils import PairDict
 
 client = ExplicitClient()
 client.host = 'localhost:50051'
@@ -35,6 +35,12 @@ inputs = {
 }
 outputs = {}
 
+# run a function evaluation
 client._compute(inputs, outputs)
 
 print(outputs)
+
+# run a gradient evaluation
+partials = PairDict()
+client._setup_partials()
+client._compute_partials(inputs, partials)

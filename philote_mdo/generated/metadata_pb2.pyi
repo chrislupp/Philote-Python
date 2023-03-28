@@ -5,6 +5,14 @@ from typing import ClassVar as _ClassVar, Iterable as _Iterable, Optional as _Op
 
 DESCRIPTOR: _descriptor.FileDescriptor
 
+class PartialsMetaData(_message.Message):
+    __slots__ = ["name", "subname"]
+    NAME_FIELD_NUMBER: _ClassVar[int]
+    SUBNAME_FIELD_NUMBER: _ClassVar[int]
+    name: str
+    subname: str
+    def __init__(self, name: _Optional[str] = ..., subname: _Optional[str] = ...) -> None: ...
+
 class VariableMetaData(_message.Message):
     __slots__ = ["discrete", "input", "name", "shape", "units"]
     DISCRETE_FIELD_NUMBER: _ClassVar[int]
