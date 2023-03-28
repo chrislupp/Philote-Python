@@ -18,6 +18,7 @@ from google.protobuf.empty_pb2 import Empty
 import philote_mdo.generated.explicit_pb2_grpc as explicit_pb2_grpc
 import philote_mdo.generated.options_pb2 as options_pb2
 import philote_mdo.generated.array_pb2 as array_pb2
+from philote_mdo.utils import PairDict
 
 
 class ExplicitClient:
@@ -128,6 +129,14 @@ class ExplicitClient:
             else:
                 print("    None")
 
+    def _setup_partials(self):
+        """
+        Requests metadata information on the partials from the analysis server.
+        """
+        for message in self.stub.SetupPartials(Empty()):
+            if (message.name, message.subname) not in self._partials:
+                self._partials += [(message.name, message.subname)]
+
     def _compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         """
         Requests and receives the function evaluation from the analysis server
@@ -203,7 +212,7 @@ class ExplicitClient:
         if self.verbose:
             print("[Complete]")
 
-    def _compute_partials(self, inputs, discrete_inputs, jacobian):
+    def _compute_partials(self, inputs, jacobian, discrete_inputs=None):
         """
         Requests and receives the gradient evaluation from the analysis server
         for a set of inputs (sent to the server).
@@ -217,36 +226,65 @@ class ExplicitClient:
         # iterate through all continuous inputs in the dictionary
         for input_name, value in inputs.items():
             # get the beginning and end indices of the chunked arrays
-            beg = np.arange(0, value.size, self.num_double)
-            end = beg[1:]
+            beg_i = np.arange(0, value.size, self.num_double)
+
+            if beg_i.size == 1:
+                end_i = [value.size]
+            else:
+                end_i = beg_i[1:]
 
             # iterate through all chunks needed for the current input
-            for beg, end in zip(beg, end):
+            for b, e in zip(beg_i, end_i):
                 # create the chunked data
                 messages += [array_pb2.Array(name=input_name,
-                                             start=beg,
-                                             end=end,
-                                             continuous=value.ravel()[beg:end])]
+                                             start=b,
+                                             end=e,
+                                             continuous=value.ravel()[b:e])]
 
         # iterate through all discrete inputs in the dictionary
         if discrete_inputs:
             for input_name, value in discrete_inputs.items():
                 # get the beginning and end indices of the chunked arrays
-                beg = np.arange(0, value.size, self.num_double)
-                end = beg[1:]
+                beg_i = np.arange(0, value.size, self.num_double)
+
+                if beg_i.size == 1:
+                    end_i = [value.size]
+                else:
+                    end_i = beg_i[1:]
 
                 # iterate through all chunks needed for the current input
-                for beg, end in zip(beg, end):
+                for b, e in zip(beg_i, end_i):
                     # create the chunked data
                     messages += [array_pb2.Array(name=input_name,
-                                                 start=beg,
-                                                 end=end,
-                                                 discrete=value.ravel()[beg:end])]
+                                                 start=b,
+                                                 end=e,
+                                                 discrete=value.ravel()[b:e])]
 
         # stream the messages to the server and receive the stream of results
-        results = self.stub.ComputePartials(iter(messages))
+        responses = self.stub.ComputePartials(iter(messages))
+
+        # preallocate the partials
+        partials = PairDict()
+
+        for pair in self._partials:
+            shape = [d['shape']
+                     for d in self._funcs if d['name'] == pair[0]]
+            shape += [d['shape']
+                      for d in self._vars if d['name'] == pair[1]]
+            partials[pair] = np.zeros(shape)
 
         # iterate through the results
+        # for message in responses:
+        #     # start and end indices for the array chunk
+        #     b = message.start
+        #     e = message.end
+
+        # assign either continuous or discrete data
+        # if len(message.continuous) > 0:
+        #     partials[message.name, message.subname][b:e] = message.continuous
+        # else:
+        #     raise ValueError('Expected continuous outputs for the partials,'
+        #                      ' but arrays were empty.')
 
         if self.verbose:
             print("[Complete]")

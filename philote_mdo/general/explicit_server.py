@@ -45,6 +45,54 @@ class ExplicitServer(explicit_pb2_grpc.ExplicitComponentServicer):
         # list of all defined partials
         self._partials = []
 
+    def define_input(self, name, shape=(1,), units=''):
+        """
+        Define a continuous input.
+        """
+        if {'name': name, 'shape': shape, 'units': units} not in self._vars:
+            self._vars += [{'name': name, 'shape': shape, 'units': units}]
+
+    def define_discrete_input(self, name, shape=(1,), units=''):
+        """
+        Define a discrete input.
+        """
+        if {'name': name, 'shape': shape, 'units': units} not in self._discrete_vars:
+            self._discrete_vars += [{'name': name,
+                                     'shape': shape,
+                                     'units': units}]
+
+    def define_output(self, name, shape=(1,), units=''):
+        """
+        Defines a continuous output.
+        """
+        if {'name': name, 'shape': shape, 'units': units} not in self._funcs:
+            self._funcs += [{'name': name, 'shape': shape, 'units': units}]
+
+    def define_discrete_output(self, name, shape=(1,), units=''):
+        """
+        Defines a discrete output.
+        """
+        if {'name': name, 'shape': shape, 'units': units} not in self._discrete_funcs:
+            self._discrete_funcs += [{'name': name,
+                                     'shape': shape,
+                                      'units': units}]
+
+    def define_partials(self, func, var):
+        """
+        Defines partials that will be determined using the analysis server.
+        """
+        if isinstance(var, list):
+            for val in var:
+                if (func, val) not in self._partials:
+                    self._partials += [(func, val['name'])]
+        elif var == '*':
+            for val in self._vars:
+                if (func, val) not in self._partials:
+                    self._partials += [(func, val['name'])]
+        else:
+            if (func, var) not in self._partials:
+                self._partials += [(func, var)]
+
     def SetStreamOptions(self, request, context):
         """
         Receives options from the client on how data will be transmitted to and
@@ -57,40 +105,6 @@ class ExplicitServer(explicit_pb2_grpc.ExplicitComponentServicer):
         self.num_int = request.num_int
 
         return Empty()
-
-    def define_input(self, name, shape=(1,), units=''):
-        if {'name': name, 'shape': shape, 'units': units} not in self._vars:
-            self._vars += [{'name': name, 'shape': shape, 'units': units}]
-
-    def define_discrete_input(self, name, shape=(1,), units=''):
-        if {'name': name, 'shape': shape, 'units': units} not in self._discrete_vars:
-            self._discrete_vars += [{'name': name,
-                                     'shape': shape,
-                                     'units': units}]
-
-    def define_output(self, name, shape=(1,), units=''):
-        if {'name': name, 'shape': shape, 'units': units} not in self._funcs:
-            self._funcs += [{'name': name, 'shape': shape, 'units': units}]
-
-    def define_discrete_output(self, name, shape=(1,), units=''):
-        if {'name': name, 'shape': shape, 'units': units} not in self._discrete_funcs:
-            self._discrete_funcs += [{'name': name,
-                                     'shape': shape,
-                                      'units': units}]
-
-    def define_partials(self, func, var):
-
-        if isinstance(var, list):
-            for val in var:
-                if (func, val) not in self._partials:
-                    self._partials += [(func, val['name'])]
-        elif var == '*':
-            for val in self._vars:
-                if (func, val) not in self._partials:
-                    self._partials += [(func, val['name'])]
-        else:
-            if (func, var) not in self._partials:
-                self._partials += [(func, var)]
 
     def Setup(self, request, context):
         """
@@ -126,6 +140,15 @@ class ExplicitServer(explicit_pb2_grpc.ExplicitComponentServicer):
                                                 name=func['name'],
                                                 shape=func['shape'],
                                                 units=func['units'])
+
+    def SetupPartials(self, request, context):
+        self._partials = []
+
+        self.setup_partials()
+
+        # transmit the continuous input metadata
+        for jac in self._partials:
+            yield metadata_pb2.PartialsMetaData(name=jac[0], subname=jac[1])
 
     def Compute(self, request_iterator, context):
         """
@@ -202,36 +225,58 @@ class ExplicitServer(explicit_pb2_grpc.ExplicitComponentServicer):
         # inputs and outputs
         inputs = {}
         discrete_inputs = {}
-        jacobian = {}
+
+        # preallocate the input and discrete input arrays
+        for var in self._vars:
+            inputs[var['name']] = np.zeros(var['shape'])
+        for dvar in self._discrete_vars:
+            discrete_inputs[dvar['name']] = np.zeros(dvar['shape'])
 
         # process inputs
         for message in request_iterator:
             # start and end indices for the array chunk
-            start = message.start
-            end = message.end
+            b = message.start
+            e = message.end
 
             # assign either continuous or discrete data
-            if message.continous:
-                inputs[message.name][start: end] = message.continuous
-            elif message.discrete:
-                discrete_inputs[message.name][start: end] = message.discrete
+            if len(message.continuous) > 0:
+                inputs[message.name][b:e] = message.continuous
+            elif len(message.discrete) > 0:
+                discrete_inputs[message.name][b:e] = message.discrete
             else:
                 raise ValueError('Expected continuous or discrete variables, '
                                  'but arrays were empty.')
 
-        # call the user-defined compute_partials function
-        self.compute_partials(inputs, discrete_inputs, jacobian)
+        # preallocate the partials
+        partials = PairDict()
 
-        # send outputs to the client
+        for pair in self._partials:
+            shape = [d['shape']
+                     for d in self._funcs if d['name'] == pair[0]]
+            shape += [d['shape']
+                      for d in self._vars if d['name'] == pair[1]]
+            partials[pair] = np.zeros(shape)
+
+        # call the user-defined compute_partials function
+        self.compute_partials(inputs, discrete_inputs, partials)
+
         # iterate through all continuous outputs in the dictionary
-        for output_name, value in jacobian.items():
+        for jac, value in partials.items():
+            # get the beginning and end indices of the chunked arrays
+            beg_i = np.arange(0, value.size, self.num_double)
+            if beg_i.size == 1:
+                end_i = [value.size]
+            else:
+                end_i = beg_i[1:]
+
             # iterate through all chunks needed for the current input
-            for i in range(value.size() // self.num_double):
+            for b, e in zip(beg_i, end_i):
                 # create and send the chunked data
-                yield array_pb2.Array(name=output_name,
-                                      start=0,
-                                      end=0,
-                                      continuous=value.ravel[0:0])
+                yield array_pb2.Array(name=jac[0],
+                                      subname=jac[1],
+                                      start=b,
+                                      end=e,
+                                      continuous=value.ravel()[b:e])
 
     def initialize(self):
         pass
