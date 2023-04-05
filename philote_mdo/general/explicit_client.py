@@ -267,11 +267,14 @@ class ExplicitClient:
         partials = PairDict()
 
         for pair in self._partials:
-            shape = [d['shape']
-                     for d in self._funcs if d['name'] == pair[0]]
-            shape += [d['shape']
-                      for d in self._vars if d['name'] == pair[1]]
+            shape = tuple([d['shape']
+                           for d in self._funcs if d['name'] == pair[0]])[0]
+            shape += tuple([d['shape']
+                            for d in self._vars if d['name'] == pair[1]])[0]
+            print(pair, shape)
             partials[pair] = np.zeros(shape)
+
+        print(partials)
 
         # iterate through the results
         # for message in responses:
