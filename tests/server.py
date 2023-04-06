@@ -26,8 +26,6 @@ class RemoteParabaloid(pmdo.general.ExplicitServer):
     def setup_partials(self):
         self.define_partials('f_xy', '*')
 
-        print(self._partials)
-
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         x = inputs['x']
         y = inputs['y']

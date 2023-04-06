@@ -248,20 +248,20 @@ class ExplicitServer(explicit_pb2_grpc.ExplicitComponentServicer):
                                  'but arrays were empty.')
 
         # preallocate the partials
-        partials = PairDict()
+        jac = PairDict()
 
         for pair in self._partials:
-            shape = [d['shape']
-                     for d in self._funcs if d['name'] == pair[0]]
-            shape += [d['shape']
-                      for d in self._vars if d['name'] == pair[1]]
-            partials[pair] = np.zeros(shape)
+            shape = tuple([d['shape']
+                           for d in self._funcs if d['name'] == pair[0]])[0]
+            shape += tuple([d['shape']
+                            for d in self._vars if d['name'] == pair[1]])[0]
+            jac[pair] = np.zeros(shape)
 
         # call the user-defined compute_partials function
-        self.compute_partials(inputs, discrete_inputs, partials)
+        self.compute_partials(inputs, jac, discrete_inputs)
 
         # iterate through all continuous outputs in the dictionary
-        for jac, value in partials.items():
+        for jac, value in jac.items():
             # get the beginning and end indices of the chunked arrays
             beg_i = np.arange(0, value.size, self.num_double)
             if beg_i.size == 1:
@@ -288,5 +288,5 @@ class ExplicitServer(explicit_pb2_grpc.ExplicitComponentServicer):
                 discrete_outputs=None):
         pass
 
-    def compute_partials(self, inputs, jacobian, discrete_inputs=None):
+    def compute_partials(self, inputs, partials, discrete_inputs=None):
         pass

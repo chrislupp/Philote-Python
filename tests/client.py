@@ -36,11 +36,13 @@ inputs = {
 outputs = {}
 
 # run a function evaluation
-client._compute(inputs, outputs)
+outputs, discrete_outputs = client._compute(inputs)
 
 print(outputs)
 
 # run a gradient evaluation
-partials = PairDict()
+# partials = PairDict()
 client._setup_partials()
-client._compute_partials(inputs, partials)
+partials = client._compute_partials(inputs)
+
+print(partials)

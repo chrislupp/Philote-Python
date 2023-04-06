@@ -137,7 +137,7 @@ class ExplicitClient:
             if (message.name, message.subname) not in self._partials:
                 self._partials += [(message.name, message.subname)]
 
-    def _compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
+    def _compute(self, inputs, discrete_inputs=None):
         """
         Requests and receives the function evaluation from the analysis server
         for a set of inputs (sent to the server).
@@ -188,6 +188,9 @@ class ExplicitClient:
         # stream the messages to the server and receive the stream of results
         responses = self.stub.Compute(iter(messages))
 
+        outputs = {}
+        discrete_outputs = None
+
         # preallocate outputs and discrete output arrays
         for out in self._funcs:
             outputs[out['name']] = np.zeros(out['shape'])
@@ -212,7 +215,9 @@ class ExplicitClient:
         if self.verbose:
             print("[Complete]")
 
-    def _compute_partials(self, inputs, jacobian, discrete_inputs=None):
+        return outputs, discrete_outputs
+
+    def _compute_partials(self, inputs, discrete_inputs=None):
         """
         Requests and receives the gradient evaluation from the analysis server
         for a set of inputs (sent to the server).
@@ -271,23 +276,22 @@ class ExplicitClient:
                            for d in self._funcs if d['name'] == pair[0]])[0]
             shape += tuple([d['shape']
                             for d in self._vars if d['name'] == pair[1]])[0]
-            print(pair, shape)
             partials[pair] = np.zeros(shape)
 
-        print(partials)
-
         # iterate through the results
-        # for message in responses:
-        #     # start and end indices for the array chunk
-        #     b = message.start
-        #     e = message.end
+        for message in responses:
+            # start and end indices for the array chunk
+            b = message.start
+            e = message.end
 
-        # assign either continuous or discrete data
-        # if len(message.continuous) > 0:
-        #     partials[message.name, message.subname][b:e] = message.continuous
-        # else:
-        #     raise ValueError('Expected continuous outputs for the partials,'
-        #                      ' but arrays were empty.')
+            # assign either continuous or discrete data
+            if len(message.continuous) > 0:
+                partials[message.name, message.subname][b:e] = message.continuous
+            else:
+                raise ValueError('Expected continuous outputs for the partials,'
+                                 ' but arrays were empty.')
 
         if self.verbose:
             print("[Complete]")
+
+        return partials
