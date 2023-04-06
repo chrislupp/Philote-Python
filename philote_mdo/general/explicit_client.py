@@ -31,7 +31,7 @@ class ExplicitClient:
         self.verbose = True
 
         # host name
-        self.host = ""
+        self._host = ""
 
         # grpc options
         self.grpc_options = []
@@ -57,8 +57,8 @@ class ExplicitClient:
         # maximum number of integer values transmitted in one data message
         self.num_int = 100
 
-    def _setup_connection(self):
-        self.channel = grpc.insecure_channel(self.host)
+    def _connect_host(self):
+        self.channel = grpc.insecure_channel(self._host)
         self.stub = explicit_pb2_grpc.ExplicitComponentStub(self.channel)
 
         if self.verbose:
@@ -75,7 +75,7 @@ class ExplicitClient:
         if self.verbose:
             print("Streaming options sent to server.")
 
-    def _setup(self):
+    def _remote_setup(self):
         """
         Requests the input and output metadata from the server.
         """
@@ -129,7 +129,7 @@ class ExplicitClient:
             else:
                 print("    None")
 
-    def _setup_partials(self):
+    def _setup_remote_partials(self):
         """
         Requests metadata information on the partials from the analysis server.
         """
@@ -137,7 +137,7 @@ class ExplicitClient:
             if (message.name, message.subname) not in self._partials:
                 self._partials += [(message.name, message.subname)]
 
-    def _compute(self, inputs, discrete_inputs=None):
+    def _remote_compute(self, inputs, discrete_inputs=None):
         """
         Requests and receives the function evaluation from the analysis server
         for a set of inputs (sent to the server).
@@ -217,7 +217,7 @@ class ExplicitClient:
 
         return outputs, discrete_outputs
 
-    def _compute_partials(self, inputs, discrete_inputs=None):
+    def _remote_compute_partials(self, inputs, discrete_inputs=None):
         """
         Requests and receives the gradient evaluation from the analysis server
         for a set of inputs (sent to the server).
