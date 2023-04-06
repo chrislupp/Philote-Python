@@ -1,4 +1,4 @@
-# Copyright 2015 gRPC authors.
+# Copyright 2022-2023 Christopher A. Lupp
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -11,28 +11,38 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""The Python implementation of the GRPC helloworld.Greeter client."""
 
-from __future__ import print_function
+import numpy as np
+from philote_mdo.general import ExplicitClient
+from philote_mdo.utils import PairDict
 
-import logging
+client = ExplicitClient()
+client.host = 'localhost:50051'
 
-import grpc
-import helloworld_pb2
-import helloworld_pb2_grpc
+# connect to the server
+client._setup_connection()
 
+# transfer the stream options to the server
+client._stream_options()
 
-def run():
-    # NOTE(gRPC Python Team): .close() is possible on a channel and should be
-    # used in circumstances in which the with statement does not fit the needs
-    # of the code.
-    print("Will try to greet world ...")
-    with grpc.insecure_channel('localhost:50051') as channel:
-        stub = helloworld_pb2_grpc.GreeterStub(channel)
-        response = stub.SayHello(helloworld_pb2.HelloRequest(name='you'))
-    print("Greeter client received: " + response.message)
+# run setup
+client._setup()
 
+# define some inputs
+inputs = {
+    "x": np.array([1.0]),
+    "y": np.array([2.0])
+}
+outputs = {}
 
-if __name__ == '__main__':
-    logging.basicConfig()
-    run()
+# run a function evaluation
+outputs, discrete_outputs = client._compute(inputs)
+
+print(outputs)
+
+# run a gradient evaluation
+# partials = PairDict()
+client._setup_partials()
+partials = client._compute_partials(inputs)
+
+print(partials)

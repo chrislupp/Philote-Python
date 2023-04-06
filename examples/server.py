@@ -1,4 +1,4 @@
-# Copyright 2015 gRPC authors.
+# Copyright 2022-2023 Christopher A. Lupp
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -11,32 +11,33 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""The Python implementation of the GRPC helloworld.Greeter server."""
 
-from concurrent import futures
-import logging
-
-import grpc
-import helloworld_pb2
-import helloworld_pb2_grpc
+import philote_mdo as pmdo
 
 
-class Greeter(helloworld_pb2_grpc.GreeterServicer):
+class RemoteParabaloid(pmdo.general.ExplicitServer):
 
-    def SayHello(self, request, context):
-        return helloworld_pb2.HelloReply(message='Hello, %s!' % request.name)
+    def setup(self):
+        self.define_input('x', shape=(1,), units='m')
+        self.define_input('y', shape=(1,), units='m')
+
+        self.define_output('f_xy', shape=(1,), units='m**2')
+
+    def setup_partials(self):
+        self.define_partials('f_xy', '*')
+
+    def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
+        x = inputs['x']
+        y = inputs['y']
+
+        outputs['f_xy'] = (x - 3.0)**2 + x * y + (y + 4.0)**2 - 3.0
+
+    def compute_partials(self, inputs, partials, discrete_inputs=None):
+        x = inputs['x']
+        y = inputs['y']
+
+        partials['f_xy', 'x'] = 2.0 * x - 6.0 + y
+        partials['f_xy', 'y'] = 2.0 * y + 8.0 + x
 
 
-def serve():
-    port = '50051'
-    server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
-    helloworld_pb2_grpc.add_GreeterServicer_to_server(Greeter(), server)
-    server.add_insecure_port('[::]:' + port)
-    server.start()
-    print("Server started, listening on " + port)
-    server.wait_for_termination()
-
-
-if __name__ == '__main__':
-    logging.basicConfig()
-    serve()
+pmdo.run_server(RemoteParabaloid())
