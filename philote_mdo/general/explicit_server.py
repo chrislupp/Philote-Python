@@ -20,7 +20,7 @@ import philote_mdo.generated.array_pb2 as array_pb2
 from philote_mdo.utils import PairDict
 
 
-class ExplicitServer(explicit_pb2_grpc.ExplicitComponentServicer):
+class ExplicitServer(explicit_pb2_grpc.ExplicitDisciplineServicer):
     """
     Base class for remote explicit components.
     """
@@ -106,7 +106,7 @@ class ExplicitServer(explicit_pb2_grpc.ExplicitComponentServicer):
 
         return Empty()
 
-    def Setup(self, request, context):
+    def DefineVariables(self, request, context):
         """
         Transmits setup information about the analysis discipline to the client.
         """
@@ -141,7 +141,7 @@ class ExplicitServer(explicit_pb2_grpc.ExplicitComponentServicer):
                                                 shape=func['shape'],
                                                 units=func['units'])
 
-    def SetupPartials(self, request, context):
+    def DefinePartials(self, request, context):
         self._partials = []
 
         self.setup_partials()
@@ -150,7 +150,7 @@ class ExplicitServer(explicit_pb2_grpc.ExplicitComponentServicer):
         for jac in self._partials:
             yield metadata_pb2.PartialsMetaData(name=jac[0], subname=jac[1])
 
-    def Compute(self, request_iterator, context):
+    def Functions(self, request_iterator, context):
         """
         Computes the function evaluation and sends the result to the client.
         """
@@ -218,7 +218,7 @@ class ExplicitServer(explicit_pb2_grpc.ExplicitComponentServicer):
                                       end=e,
                                       discrete=value.ravel()[b:e])
 
-    def ComputePartials(self, request_iterator, context):
+    def Gradient(self, request_iterator, context):
         """
         Computes the gradient evaluation and sends the result to the client.
         """

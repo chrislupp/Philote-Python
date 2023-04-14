@@ -59,7 +59,7 @@ class ExplicitClient:
 
     def _connect_host(self):
         self.channel = grpc.insecure_channel(self._host)
-        self.stub = explicit_pb2_grpc.ExplicitComponentStub(self.channel)
+        self.stub = explicit_pb2_grpc.ExplicitDisciplineStub(self.channel)
 
         if self.verbose:
             print("Set up connection.")
@@ -80,7 +80,7 @@ class ExplicitClient:
         Requests the input and output metadata from the server.
         """
         # stream back the metadata
-        for message in self.stub.Setup(Empty()):
+        for message in self.stub.DefineVariables(Empty()):
             if message.input:
                 if message.discrete:
                     self._discrete_vars += [{"name": message.name,
@@ -133,7 +133,7 @@ class ExplicitClient:
         """
         Requests metadata information on the partials from the analysis server.
         """
-        for message in self.stub.SetupPartials(Empty()):
+        for message in self.stub.DefinePartials(Empty()):
             if (message.name, message.subname) not in self._partials:
                 self._partials += [(message.name, message.subname)]
 
@@ -186,7 +186,7 @@ class ExplicitClient:
                                                  discrete=value.ravel()[b:e])]
 
         # stream the messages to the server and receive the stream of results
-        responses = self.stub.Compute(iter(messages))
+        responses = self.stub.Functions(iter(messages))
 
         outputs = {}
         discrete_outputs = None
@@ -266,7 +266,7 @@ class ExplicitClient:
                                                  discrete=value.ravel()[b:e])]
 
         # stream the messages to the server and receive the stream of results
-        responses = self.stub.ComputePartials(iter(messages))
+        responses = self.stub.Gradient(iter(messages))
 
         # preallocate the partials
         partials = PairDict()
