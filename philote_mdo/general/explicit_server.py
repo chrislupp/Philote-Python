@@ -156,15 +156,19 @@ class ExplicitServer(explicit_pb2_grpc.ExplicitDisciplineServicer):
         """
         # inputs and outputs
         inputs = {}
+        flat_inputs = {}
         discrete_inputs = {}
+        flat_disc = {}
         outputs = {}
         discrete_outputs = {}
 
         # preallocate the input and discrete input arrays
         for var in self._vars:
             inputs[var['name']] = np.zeros(var['shape'])
+            flat_inputs[var['name']] = inputs[var['name']].flatten()
         for dvar in self._discrete_vars:
             discrete_inputs[dvar['name']] = np.zeros(dvar['shape'])
+            flat_disc[dvar['name']] = discrete_inputs[dvar['name']].flatten()
 
         # process inputs
         for message in request_iterator:
@@ -174,9 +178,9 @@ class ExplicitServer(explicit_pb2_grpc.ExplicitDisciplineServicer):
 
             # assign either continuous or discrete data
             if len(message.continuous) > 0:
-                inputs[message.name][b:e] = message.continuous
+                flat_inputs[message.name][b:e] = message.continuous
             elif len(message.discrete) > 0:
-                discrete_inputs[message.name][b:e] = message.discrete
+                flat_disc[message.name][b:e] = message.discrete
             else:
                 raise ValueError('Expected continuous or discrete variables, '
                                  'but arrays were empty.')
@@ -224,13 +228,19 @@ class ExplicitServer(explicit_pb2_grpc.ExplicitDisciplineServicer):
         """
         # inputs and outputs
         inputs = {}
+        flat_inputs = {}
         discrete_inputs = {}
+        flat_disc = {}
+        outputs = {}
+        discrete_outputs = {}
 
         # preallocate the input and discrete input arrays
         for var in self._vars:
             inputs[var['name']] = np.zeros(var['shape'])
+            flat_inputs[var['name']] = inputs[var['name']].flatten()
         for dvar in self._discrete_vars:
             discrete_inputs[dvar['name']] = np.zeros(dvar['shape'])
+            flat_disc[dvar['name']] = discrete_inputs[dvar['name']].flatten()
 
         # process inputs
         for message in request_iterator:
@@ -240,9 +250,9 @@ class ExplicitServer(explicit_pb2_grpc.ExplicitDisciplineServicer):
 
             # assign either continuous or discrete data
             if len(message.continuous) > 0:
-                inputs[message.name][b:e] = message.continuous
+                flat_inputs[message.name][b:e] = message.continuous
             elif len(message.discrete) > 0:
-                discrete_inputs[message.name][b:e] = message.discrete
+                flat_disc[message.name][b:e] = message.discrete
             else:
                 raise ValueError('Expected continuous or discrete variables, '
                                  'but arrays were empty.')
