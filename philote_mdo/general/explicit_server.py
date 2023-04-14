@@ -17,7 +17,7 @@ from google.protobuf.empty_pb2 import Empty
 import philote_mdo.generated.metadata_pb2 as metadata_pb2
 import philote_mdo.generated.explicit_pb2_grpc as explicit_pb2_grpc
 import philote_mdo.generated.array_pb2 as array_pb2
-from philote_mdo.utils import PairDict
+from philote_mdo.utils import PairDict, get_chunk_indicies, get_flattened_view
 
 
 class ExplicitServer(explicit_pb2_grpc.ExplicitDisciplineServicer):
@@ -165,10 +165,10 @@ class ExplicitServer(explicit_pb2_grpc.ExplicitDisciplineServicer):
         # preallocate the input and discrete input arrays
         for var in self._vars:
             inputs[var['name']] = np.zeros(var['shape'])
-            flat_inputs[var['name']] = inputs[var['name']].flatten()
+            flat_inputs[var['name']] = get_flattened_view(inputs[var['name']])
         for dvar in self._discrete_vars:
             discrete_inputs[dvar['name']] = np.zeros(dvar['shape'])
-            flat_disc[dvar['name']] = discrete_inputs[dvar['name']].flatten()
+            flat_disc[dvar['name']] = get_flattened_view(discrete_inputs[dvar['name']])
 
         # process inputs
         for message in request_iterator:
@@ -190,15 +190,9 @@ class ExplicitServer(explicit_pb2_grpc.ExplicitDisciplineServicer):
 
         # iterate through all continuous outputs in the dictionary
         for output_name, value in outputs.items():
-            # get the beginning and end indices of the chunked arrays
-            beg_i = np.arange(0, value.size, self.num_double)
-            if beg_i.size == 1:
-                end_i = [value.size]
-            else:
-                end_i = beg_i[1:]
 
             # iterate through all chunks needed for the current input
-            for b, e in zip(beg_i, end_i):
+            for b, e in get_chunk_indicies(value.size, self.num_double):
                 # create the chunked data
                 yield array_pb2.Array(name=output_name,
                                       start=b,
@@ -207,15 +201,9 @@ class ExplicitServer(explicit_pb2_grpc.ExplicitDisciplineServicer):
 
         # iterate through all discrete outputs in the dictionary
         for doutput_name, value in discrete_outputs.items():
-            # get the beginning and end indices of the chunked arrays
-            beg_i = np.arange(0, value.size, self.num_double)
-            if beg_i.size == 1:
-                end_i = [value.size]
-            else:
-                end_i = beg_i[1:]
 
             # iterate through all chunks needed for the current input
-            for b, e in zip(beg_i, end_i):
+            for b, e in get_chunk_indicies(value.size, self.num_double):
                 # create the chunked data
                 yield array_pb2.Array(name=doutput_name,
                                       start=b,
@@ -237,10 +225,10 @@ class ExplicitServer(explicit_pb2_grpc.ExplicitDisciplineServicer):
         # preallocate the input and discrete input arrays
         for var in self._vars:
             inputs[var['name']] = np.zeros(var['shape'])
-            flat_inputs[var['name']] = inputs[var['name']].flatten()
+            flat_inputs[var['name']] = get_flattened_view(inputs[var['name']])
         for dvar in self._discrete_vars:
             discrete_inputs[dvar['name']] = np.zeros(dvar['shape'])
-            flat_disc[dvar['name']] = discrete_inputs[dvar['name']].flatten()
+            flat_disc[dvar['name']] = get_flattened_view(discrete_inputs[dvar['name']])
 
         # process inputs
         for message in request_iterator:
@@ -272,15 +260,9 @@ class ExplicitServer(explicit_pb2_grpc.ExplicitDisciplineServicer):
 
         # iterate through all continuous outputs in the dictionary
         for jac, value in jac.items():
-            # get the beginning and end indices of the chunked arrays
-            beg_i = np.arange(0, value.size, self.num_double)
-            if beg_i.size == 1:
-                end_i = [value.size]
-            else:
-                end_i = beg_i[1:]
 
             # iterate through all chunks needed for the current input
-            for b, e in zip(beg_i, end_i):
+            for b, e in get_chunk_indicies(value.size, self.num_double):
                 # create and send the chunked data
                 yield array_pb2.Array(name=jac[0],
                                       subname=jac[1],
