@@ -59,7 +59,7 @@ class ExplicitClient:
 
     def _connect_host(self):
         self.channel = grpc.insecure_channel(self._host)
-        self.stub = explicit_pb2_grpc.ExplicitComponentStub(self.channel)
+        self.stub = explicit_pb2_grpc.ExplicitDisciplineStub(self.channel)
 
         if self.verbose:
             print("Set up connection.")
@@ -80,7 +80,7 @@ class ExplicitClient:
         Requests the input and output metadata from the server.
         """
         # stream back the metadata
-        for message in self.stub.Setup(Empty()):
+        for message in self.stub.DefineVariables(Empty()):
             if message.input:
                 if message.discrete:
                     self._discrete_vars += [{"name": message.name,
@@ -133,7 +133,7 @@ class ExplicitClient:
         """
         Requests metadata information on the partials from the analysis server.
         """
-        for message in self.stub.SetupPartials(Empty()):
+        for message in self.stub.DefinePartials(Empty()):
             if (message.name, message.subname) not in self._partials:
                 self._partials += [(message.name, message.subname)]
 
@@ -186,16 +186,22 @@ class ExplicitClient:
                                                  discrete=value.ravel()[b:e])]
 
         # stream the messages to the server and receive the stream of results
-        responses = self.stub.Compute(iter(messages))
+        responses = self.stub.Functions(iter(messages))
 
         outputs = {}
+        flat_outputs = {}
+
         discrete_outputs = None
+        flat_disc = None
 
         # preallocate outputs and discrete output arrays
         for out in self._funcs:
             outputs[out['name']] = np.zeros(out['shape'])
+            flat_outputs[out['name']] = outputs[out['name']].flatten()
+
         for dout in self._discrete_funcs:
             discrete_outputs[dout['name']] = np.zeros(dout['shape'])
+            flat_disc[dout['name']] = discrete_outputs[dout['name']].flatten()
 
         # iterate through the results
         for message in responses:
@@ -205,9 +211,9 @@ class ExplicitClient:
 
             # assign either continuous or discrete data
             if len(message.continuous) > 0:
-                outputs[message.name][b:e] = message.continuous
+                flat_outputs[message.name][b:e] = message.continuous
             elif len(message.discrete) > 0:
-                discrete_outputs[message.name][b:e] = message.discrete
+                flat_disc[message.name][b:e] = message.discrete
             else:
                 raise ValueError('Expected continuous or discrete variables, '
                                  'but arrays were empty.')
@@ -266,10 +272,11 @@ class ExplicitClient:
                                                  discrete=value.ravel()[b:e])]
 
         # stream the messages to the server and receive the stream of results
-        responses = self.stub.ComputePartials(iter(messages))
+        responses = self.stub.Gradient(iter(messages))
 
         # preallocate the partials
         partials = PairDict()
+        flat_p = PairDict()
 
         for pair in self._partials:
             shape = tuple([d['shape']
@@ -277,6 +284,7 @@ class ExplicitClient:
             shape += tuple([d['shape']
                             for d in self._vars if d['name'] == pair[1]])[0]
             partials[pair] = np.zeros(shape)
+            flat_p[pair] = partials[pair].flatten()
 
         # iterate through the results
         for message in responses:
@@ -286,7 +294,7 @@ class ExplicitClient:
 
             # assign either continuous or discrete data
             if len(message.continuous) > 0:
-                partials[message.name, message.subname][b:e] = message.continuous
+                flat_p[message.name, message.subname][b:e] = message.continuous
             else:
                 raise ValueError('Expected continuous outputs for the partials,'
                                  ' but arrays were empty.')

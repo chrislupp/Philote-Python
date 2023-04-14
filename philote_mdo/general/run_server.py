@@ -24,8 +24,8 @@ def run_server(service, port='50051', max_workers=10):
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=max_workers))
 
     # add an explicit or implicit server
-    if isinstance(service, explicit_pb2_grpc.ExplicitComponentServicer):
-        explicit_pb2_grpc.add_ExplicitComponentServicer_to_server(
+    if isinstance(service, explicit_pb2_grpc.ExplicitDisciplineServicer):
+        explicit_pb2_grpc.add_ExplicitDisciplineServicer_to_server(
             service, server)
     else:
         raise ValueError('Unexpected object type provided for variable '

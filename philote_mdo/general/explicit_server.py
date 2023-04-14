@@ -20,7 +20,7 @@ import philote_mdo.generated.array_pb2 as array_pb2
 from philote_mdo.utils import PairDict
 
 
-class ExplicitServer(explicit_pb2_grpc.ExplicitComponentServicer):
+class ExplicitServer(explicit_pb2_grpc.ExplicitDisciplineServicer):
     """
     Base class for remote explicit components.
     """
@@ -106,7 +106,7 @@ class ExplicitServer(explicit_pb2_grpc.ExplicitComponentServicer):
 
         return Empty()
 
-    def Setup(self, request, context):
+    def DefineVariables(self, request, context):
         """
         Transmits setup information about the analysis discipline to the client.
         """
@@ -141,7 +141,7 @@ class ExplicitServer(explicit_pb2_grpc.ExplicitComponentServicer):
                                                 shape=func['shape'],
                                                 units=func['units'])
 
-    def SetupPartials(self, request, context):
+    def DefinePartials(self, request, context):
         self._partials = []
 
         self.setup_partials()
@@ -150,21 +150,25 @@ class ExplicitServer(explicit_pb2_grpc.ExplicitComponentServicer):
         for jac in self._partials:
             yield metadata_pb2.PartialsMetaData(name=jac[0], subname=jac[1])
 
-    def Compute(self, request_iterator, context):
+    def Functions(self, request_iterator, context):
         """
         Computes the function evaluation and sends the result to the client.
         """
         # inputs and outputs
         inputs = {}
+        flat_inputs = {}
         discrete_inputs = {}
+        flat_disc = {}
         outputs = {}
         discrete_outputs = {}
 
         # preallocate the input and discrete input arrays
         for var in self._vars:
             inputs[var['name']] = np.zeros(var['shape'])
+            flat_inputs[var['name']] = inputs[var['name']].flatten()
         for dvar in self._discrete_vars:
             discrete_inputs[dvar['name']] = np.zeros(dvar['shape'])
+            flat_disc[dvar['name']] = discrete_inputs[dvar['name']].flatten()
 
         # process inputs
         for message in request_iterator:
@@ -174,9 +178,9 @@ class ExplicitServer(explicit_pb2_grpc.ExplicitComponentServicer):
 
             # assign either continuous or discrete data
             if len(message.continuous) > 0:
-                inputs[message.name][b:e] = message.continuous
+                flat_inputs[message.name][b:e] = message.continuous
             elif len(message.discrete) > 0:
-                discrete_inputs[message.name][b:e] = message.discrete
+                flat_disc[message.name][b:e] = message.discrete
             else:
                 raise ValueError('Expected continuous or discrete variables, '
                                  'but arrays were empty.')
@@ -218,19 +222,25 @@ class ExplicitServer(explicit_pb2_grpc.ExplicitComponentServicer):
                                       end=e,
                                       discrete=value.ravel()[b:e])
 
-    def ComputePartials(self, request_iterator, context):
+    def Gradient(self, request_iterator, context):
         """
         Computes the gradient evaluation and sends the result to the client.
         """
         # inputs and outputs
         inputs = {}
+        flat_inputs = {}
         discrete_inputs = {}
+        flat_disc = {}
+        outputs = {}
+        discrete_outputs = {}
 
         # preallocate the input and discrete input arrays
         for var in self._vars:
             inputs[var['name']] = np.zeros(var['shape'])
+            flat_inputs[var['name']] = inputs[var['name']].flatten()
         for dvar in self._discrete_vars:
             discrete_inputs[dvar['name']] = np.zeros(dvar['shape'])
+            flat_disc[dvar['name']] = discrete_inputs[dvar['name']].flatten()
 
         # process inputs
         for message in request_iterator:
@@ -240,9 +250,9 @@ class ExplicitServer(explicit_pb2_grpc.ExplicitComponentServicer):
 
             # assign either continuous or discrete data
             if len(message.continuous) > 0:
-                inputs[message.name][b:e] = message.continuous
+                flat_inputs[message.name][b:e] = message.continuous
             elif len(message.discrete) > 0:
-                discrete_inputs[message.name][b:e] = message.discrete
+                flat_disc[message.name][b:e] = message.discrete
             else:
                 raise ValueError('Expected continuous or discrete variables, '
                                  'but arrays were empty.')

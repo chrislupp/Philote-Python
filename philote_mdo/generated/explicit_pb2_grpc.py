@@ -8,7 +8,7 @@ from . import metadata_pb2 as metadata__pb2
 from . import options_pb2 as options__pb2
 
 
-class ExplicitComponentStub(object):
+class ExplicitDisciplineStub(object):
     """Definition of the generic Explicit Component RPC
     """
 
@@ -19,33 +19,33 @@ class ExplicitComponentStub(object):
             channel: A grpc.Channel.
         """
         self.SetStreamOptions = channel.unary_unary(
-            '/ExplicitComponent/SetStreamOptions',
+            '/ExplicitDiscipline/SetStreamOptions',
             request_serializer=options__pb2.Options.SerializeToString,
             response_deserializer=google_dot_protobuf_dot_empty__pb2.Empty.FromString,
         )
-        self.Setup = channel.unary_stream(
-            '/ExplicitComponent/Setup',
+        self.DefineVariables = channel.unary_stream(
+            '/ExplicitDiscipline/DefineVariables',
             request_serializer=google_dot_protobuf_dot_empty__pb2.Empty.SerializeToString,
             response_deserializer=metadata__pb2.VariableMetaData.FromString,
         )
-        self.SetupPartials = channel.unary_stream(
-            '/ExplicitComponent/SetupPartials',
+        self.DefinePartials = channel.unary_stream(
+            '/ExplicitDiscipline/DefinePartials',
             request_serializer=google_dot_protobuf_dot_empty__pb2.Empty.SerializeToString,
             response_deserializer=metadata__pb2.PartialsMetaData.FromString,
         )
-        self.Compute = channel.stream_stream(
-            '/ExplicitComponent/Compute',
+        self.Functions = channel.stream_stream(
+            '/ExplicitDiscipline/Functions',
             request_serializer=array__pb2.Array.SerializeToString,
             response_deserializer=array__pb2.Array.FromString,
         )
-        self.ComputePartials = channel.stream_stream(
-            '/ExplicitComponent/ComputePartials',
+        self.Gradient = channel.stream_stream(
+            '/ExplicitDiscipline/Gradient',
             request_serializer=array__pb2.Array.SerializeToString,
             response_deserializer=array__pb2.Array.FromString,
         )
 
 
-class ExplicitComponentServicer(object):
+class ExplicitDisciplineServicer(object):
     """Definition of the generic Explicit Component RPC
     """
 
@@ -56,28 +56,28 @@ class ExplicitComponentServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
-    def Setup(self, request, context):
+    def DefineVariables(self, request, context):
         """Sets up the component
         """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
-    def SetupPartials(self, request, context):
+    def DefinePartials(self, request, context):
         """Sets up the component partials
         """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
-    def Compute(self, request_iterator, context):
+    def Functions(self, request_iterator, context):
         """Calls the component Compute function
         """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
-    def ComputePartials(self, request_iterator, context):
+    def Gradient(self, request_iterator, context):
         """Calls the component ComputePartials function
         """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
@@ -85,42 +85,42 @@ class ExplicitComponentServicer(object):
         raise NotImplementedError('Method not implemented!')
 
 
-def add_ExplicitComponentServicer_to_server(servicer, server):
+def add_ExplicitDisciplineServicer_to_server(servicer, server):
     rpc_method_handlers = {
         'SetStreamOptions': grpc.unary_unary_rpc_method_handler(
             servicer.SetStreamOptions,
             request_deserializer=options__pb2.Options.FromString,
             response_serializer=google_dot_protobuf_dot_empty__pb2.Empty.SerializeToString,
         ),
-        'Setup': grpc.unary_stream_rpc_method_handler(
-            servicer.Setup,
+        'DefineVariables': grpc.unary_stream_rpc_method_handler(
+            servicer.DefineVariables,
             request_deserializer=google_dot_protobuf_dot_empty__pb2.Empty.FromString,
             response_serializer=metadata__pb2.VariableMetaData.SerializeToString,
         ),
-        'SetupPartials': grpc.unary_stream_rpc_method_handler(
-            servicer.SetupPartials,
+        'DefinePartials': grpc.unary_stream_rpc_method_handler(
+            servicer.DefinePartials,
             request_deserializer=google_dot_protobuf_dot_empty__pb2.Empty.FromString,
             response_serializer=metadata__pb2.PartialsMetaData.SerializeToString,
         ),
-        'Compute': grpc.stream_stream_rpc_method_handler(
-            servicer.Compute,
+        'Functions': grpc.stream_stream_rpc_method_handler(
+            servicer.Functions,
             request_deserializer=array__pb2.Array.FromString,
             response_serializer=array__pb2.Array.SerializeToString,
         ),
-        'ComputePartials': grpc.stream_stream_rpc_method_handler(
-            servicer.ComputePartials,
+        'Gradient': grpc.stream_stream_rpc_method_handler(
+            servicer.Gradient,
             request_deserializer=array__pb2.Array.FromString,
             response_serializer=array__pb2.Array.SerializeToString,
         ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
-        'ExplicitComponent', rpc_method_handlers)
+        'ExplicitDiscipline', rpc_method_handlers)
     server.add_generic_rpc_handlers((generic_handler,))
 
  # This class is part of an EXPERIMENTAL API.
 
 
-class ExplicitComponent(object):
+class ExplicitDiscipline(object):
     """Definition of the generic Explicit Component RPC
     """
 
@@ -135,65 +135,14 @@ class ExplicitComponent(object):
                          wait_for_ready=None,
                          timeout=None,
                          metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/ExplicitComponent/SetStreamOptions',
+        return grpc.experimental.unary_unary(request, target, '/ExplicitDiscipline/SetStreamOptions',
                                              options__pb2.Options.SerializeToString,
                                              google_dot_protobuf_dot_empty__pb2.Empty.FromString,
                                              options, channel_credentials,
                                              insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
     @staticmethod
-    def Setup(request,
-              target,
-              options=(),
-              channel_credentials=None,
-              call_credentials=None,
-              insecure=False,
-              compression=None,
-              wait_for_ready=None,
-              timeout=None,
-              metadata=None):
-        return grpc.experimental.unary_stream(request, target, '/ExplicitComponent/Setup',
-                                              google_dot_protobuf_dot_empty__pb2.Empty.SerializeToString,
-                                              metadata__pb2.VariableMetaData.FromString,
-                                              options, channel_credentials,
-                                              insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
-
-    @staticmethod
-    def SetupPartials(request,
-                      target,
-                      options=(),
-                      channel_credentials=None,
-                      call_credentials=None,
-                      insecure=False,
-                      compression=None,
-                      wait_for_ready=None,
-                      timeout=None,
-                      metadata=None):
-        return grpc.experimental.unary_stream(request, target, '/ExplicitComponent/SetupPartials',
-                                              google_dot_protobuf_dot_empty__pb2.Empty.SerializeToString,
-                                              metadata__pb2.PartialsMetaData.FromString,
-                                              options, channel_credentials,
-                                              insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
-
-    @staticmethod
-    def Compute(request_iterator,
-                target,
-                options=(),
-                channel_credentials=None,
-                call_credentials=None,
-                insecure=False,
-                compression=None,
-                wait_for_ready=None,
-                timeout=None,
-                metadata=None):
-        return grpc.experimental.stream_stream(request_iterator, target, '/ExplicitComponent/Compute',
-                                               array__pb2.Array.SerializeToString,
-                                               array__pb2.Array.FromString,
-                                               options, channel_credentials,
-                                               insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
-
-    @staticmethod
-    def ComputePartials(request_iterator,
+    def DefineVariables(request,
                         target,
                         options=(),
                         channel_credentials=None,
@@ -203,7 +152,58 @@ class ExplicitComponent(object):
                         wait_for_ready=None,
                         timeout=None,
                         metadata=None):
-        return grpc.experimental.stream_stream(request_iterator, target, '/ExplicitComponent/ComputePartials',
+        return grpc.experimental.unary_stream(request, target, '/ExplicitDiscipline/DefineVariables',
+                                              google_dot_protobuf_dot_empty__pb2.Empty.SerializeToString,
+                                              metadata__pb2.VariableMetaData.FromString,
+                                              options, channel_credentials,
+                                              insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def DefinePartials(request,
+                       target,
+                       options=(),
+                       channel_credentials=None,
+                       call_credentials=None,
+                       insecure=False,
+                       compression=None,
+                       wait_for_ready=None,
+                       timeout=None,
+                       metadata=None):
+        return grpc.experimental.unary_stream(request, target, '/ExplicitDiscipline/DefinePartials',
+                                              google_dot_protobuf_dot_empty__pb2.Empty.SerializeToString,
+                                              metadata__pb2.PartialsMetaData.FromString,
+                                              options, channel_credentials,
+                                              insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def Functions(request_iterator,
+                  target,
+                  options=(),
+                  channel_credentials=None,
+                  call_credentials=None,
+                  insecure=False,
+                  compression=None,
+                  wait_for_ready=None,
+                  timeout=None,
+                  metadata=None):
+        return grpc.experimental.stream_stream(request_iterator, target, '/ExplicitDiscipline/Functions',
+                                               array__pb2.Array.SerializeToString,
+                                               array__pb2.Array.FromString,
+                                               options, channel_credentials,
+                                               insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def Gradient(request_iterator,
+                 target,
+                 options=(),
+                 channel_credentials=None,
+                 call_credentials=None,
+                 insecure=False,
+                 compression=None,
+                 wait_for_ready=None,
+                 timeout=None,
+                 metadata=None):
+        return grpc.experimental.stream_stream(request_iterator, target, '/ExplicitDiscipline/Gradient',
                                                array__pb2.Array.SerializeToString,
                                                array__pb2.Array.FromString,
                                                options, channel_credentials,
