@@ -18,8 +18,7 @@ from google.protobuf.empty_pb2 import Empty
 import philote_mdo.generated.explicit_pb2_grpc as explicit_pb2_grpc
 import philote_mdo.generated.options_pb2 as options_pb2
 import philote_mdo.generated.array_pb2 as array_pb2
-from philote_mdo.utils import PairDict
-
+from philote_mdo.utils import PairDict, get_chunk_indicies, get_flattened_view
 
 class ExplicitClient:
     """
@@ -69,7 +68,7 @@ class ExplicitClient:
         Transmits the stream options for the remote analysis to the server.
         """
         # send the options
-        options = options_pb2.Options(num_double=1, num_int=1)
+        options = options_pb2.Options(num_double=self.num_double, num_int=self.num_int)
         response = self.stub.SetStreamOptions(options)
 
         if self.verbose:
@@ -150,16 +149,9 @@ class ExplicitClient:
 
         # iterate through all continuous inputs in the dictionary
         for input_name, value in inputs.items():
-            # get the beginning and end indices of the chunked arrays
-            beg_i = np.arange(0, value.size, self.num_double)
-
-            if beg_i.size == 1:
-                end_i = [value.size]
-            else:
-                end_i = beg_i[1:]
 
             # iterate through all chunks needed for the current input
-            for b, e in zip(beg_i, end_i):
+            for b, e in get_chunk_indicies(value.size, self.num_double):
                 # create the chunked data
                 messages += [array_pb2.Array(name=input_name,
                                              start=b,
@@ -169,16 +161,9 @@ class ExplicitClient:
         # iterate through all discrete inputs in the dictionary
         if discrete_inputs:
             for input_name, value in discrete_inputs.items():
-                # get the beginning and end indices of the chunked arrays
-                beg_i = np.arange(0, value.size, self.num_double)
-
-                if beg_i.size == 1:
-                    end_i = [value.size]
-                else:
-                    end_i = beg_i[1:]
 
                 # iterate through all chunks needed for the current input
-                for b, e in zip(beg_i, end_i):
+                for b, e in get_chunk_indicies(value.size, self.num_double):
                     # create the chunked data
                     messages += [array_pb2.Array(name=input_name,
                                                  start=b,
@@ -197,11 +182,11 @@ class ExplicitClient:
         # preallocate outputs and discrete output arrays
         for out in self._funcs:
             outputs[out['name']] = np.zeros(out['shape'])
-            flat_outputs[out['name']] = outputs[out['name']].flatten()
+            flat_outputs[out['name']] = get_flattened_view(outputs[out['name']])
 
         for dout in self._discrete_funcs:
             discrete_outputs[dout['name']] = np.zeros(dout['shape'])
-            flat_disc[dout['name']] = discrete_outputs[dout['name']].flatten()
+            flat_disc[dvar['name']] = get_flattened_view(discrete_outputs[dout['name']])
 
         # iterate through the results
         for message in responses:
@@ -236,16 +221,9 @@ class ExplicitClient:
 
         # iterate through all continuous inputs in the dictionary
         for input_name, value in inputs.items():
-            # get the beginning and end indices of the chunked arrays
-            beg_i = np.arange(0, value.size, self.num_double)
-
-            if beg_i.size == 1:
-                end_i = [value.size]
-            else:
-                end_i = beg_i[1:]
 
             # iterate through all chunks needed for the current input
-            for b, e in zip(beg_i, end_i):
+            for b, e in get_chunk_indicies(value.size, self.num_double):
                 # create the chunked data
                 messages += [array_pb2.Array(name=input_name,
                                              start=b,
@@ -255,16 +233,9 @@ class ExplicitClient:
         # iterate through all discrete inputs in the dictionary
         if discrete_inputs:
             for input_name, value in discrete_inputs.items():
-                # get the beginning and end indices of the chunked arrays
-                beg_i = np.arange(0, value.size, self.num_double)
-
-                if beg_i.size == 1:
-                    end_i = [value.size]
-                else:
-                    end_i = beg_i[1:]
 
                 # iterate through all chunks needed for the current input
-                for b, e in zip(beg_i, end_i):
+                for b, e in get_chunk_indicies(value.size, self.num_double):
                     # create the chunked data
                     messages += [array_pb2.Array(name=input_name,
                                                  start=b,
@@ -284,7 +255,8 @@ class ExplicitClient:
             shape += tuple([d['shape']
                             for d in self._vars if d['name'] == pair[1]])[0]
             partials[pair] = np.zeros(shape)
-            flat_p[pair] = partials[pair].flatten()
+            flat_p[pair] = get_flattened_view(partials[pair])
+
 
         # iterate through the results
         for message in responses:

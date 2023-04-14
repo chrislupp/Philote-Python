@@ -13,3 +13,4 @@
 # limitations under the License.
 
 from .pair_dict import PairDict
+from .helper import get_chunk_indicies, get_flattened_view
