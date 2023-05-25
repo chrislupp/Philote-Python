@@ -14,6 +14,64 @@
 
 
 class ImplicitServer():
+    """
+    Base class for creating an implicit discipline server.
+    """
 
-    def __init__():
+    def __init__(self):
+        """
+        """
+        pass
+
+    def Residuals(self, request_iterator, context):
+        """
+        """
+        pass
+
+    def Solve(self, request_iterator, context):
+        """
+        """
+        pass
+
+    def ResidualGradients(self, request_iterator, context):
+        """
+        """
+        pass
+
+    # user defined functions (will be overloaded)
+
+    def initialize(self):
+        """
+        """
+        pass
+
+    def setup(self):
+        """
+        """
+        pass
+
+    def setup_partials(self):
+        """
+        """
+        pass
+
+    def apply_nonlinear(self, inputs, outputs, residuals):
+        """
+        """
+        pass
+
+    def solve_nonlinear(self, inputs, outputs):
+        """
+        """
+        pass
+
+    def linearize(self, inputs, outputs, partials):
+        """
+        """
+        pass
+
+    def apply_linear(self, inputs, outputs,
+                     d_inputs, d_outputs, d_residuals, mode):
+        """
+        """
         pass

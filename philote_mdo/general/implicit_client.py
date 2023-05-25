@@ -14,6 +14,26 @@
 
 
 class ImplicitClient():
+    """
+    Python client for implicit Philote discipline servers. 
+    """
 
     def __init__():
+        """
+        """
+        pass
+
+    def apply_nonlinear(self):
+        """
+        """
+        pass
+
+    def solve_nonlinear(self):
+        """
+        """
+        pass
+
+    def linearize(self):
+        """
+        """
         pass
