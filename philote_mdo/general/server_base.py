@@ -11,13 +11,10 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 import numpy as np
 from google.protobuf.empty_pb2 import Empty
 import philote_mdo.generated.metadata_pb2 as metadata_pb2
-import philote_mdo.generated.explicit_pb2_grpc as explicit_pb2_grpc
-import philote_mdo.generated.array_pb2 as array_pb2
-from philote_mdo.utils import PairDict, get_chunk_indicies, get_flattened_view
+from philote_mdo.utils import PairDict, get_flattened_view
 
 
 class ServerBase:
@@ -151,6 +148,35 @@ class ServerBase:
         # transmit the continuous input metadata
         for jac in self._partials:
             yield metadata_pb2.PartialsMetaData(name=jac[0], subname=jac[1])
+
+    def preallocate_inputs(self, inputs, flat_inputs,
+                           discrete_inputs={}, flat_disc={}):
+        """
+        Preallocates the inputs before receiving data from the client.
+        """
+        # preallocate the input and discrete input arrays
+        for var in self._vars:
+            inputs[var['name']] = np.zeros(var['shape'])
+            flat_inputs[var['name']] = get_flattened_view(inputs[var['name']])
+        for dvar in self._discrete_vars:
+            discrete_inputs[dvar['name']] = np.zeros(dvar['shape'])
+            flat_disc[dvar['name']] = get_flattened_view(
+                discrete_inputs[dvar['name']])
+
+    def preallocate_partials(self):
+        """
+        preallocate the partials
+        """
+        jac = PairDict()
+
+        for pair in self._partials:
+            shape = tuple([d['shape']
+                           for d in self._funcs if d['name'] == pair[0]])[0]
+            shape += tuple([d['shape']
+                            for d in self._vars if d['name'] == pair[1]])[0]
+            jac[pair] = np.zeros(shape)
+
+        return jac
 
     def process_inputs(self, request_iterator, flat_inputs, flat_disc):
         """

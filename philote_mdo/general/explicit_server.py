@@ -11,144 +11,19 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
-import numpy as np
-from google.protobuf.empty_pb2 import Empty
-import philote_mdo.generated.metadata_pb2 as metadata_pb2
 import philote_mdo.generated.explicit_pb2_grpc as explicit_pb2_grpc
 import philote_mdo.generated.array_pb2 as array_pb2
-from philote_mdo.utils import PairDict, get_chunk_indicies, get_flattened_view
+from philote_mdo.general.server_base import ServerBase
+from philote_mdo.utils import get_chunk_indicies
 
 
-class ExplicitServer(explicit_pb2_grpc.ExplicitDisciplineServicer):
+class ExplicitServer(ServerBase, explicit_pb2_grpc.ExplicitDisciplineServicer):
     """
     Base class for remote explicit components.
     """
 
     def __init__(self):
-        self.verbose = False
-        self.num_double = 100
-        self.num_int = 100
-
-        # continuous inputs (names, shapes, units)
-        self._vars = []
-
-        # discrete inputs (names, shapes, units)
-        self._discrete_vars = []
-
-        # continous outputs (names, shapes, units)
-        self._funcs = []
-
-        # discrete outputs (names, shapes, units)
-        self._discrete_funcs = []
-
-        # list of all defined partials
-        self._partials = []
-
-    def define_input(self, name, shape=(1,), units=''):
-        """
-        Define a continuous input.
-        """
-        if {'name': name, 'shape': shape, 'units': units} not in self._vars:
-            self._vars += [{'name': name, 'shape': shape, 'units': units}]
-
-    def define_discrete_input(self, name, shape=(1,), units=''):
-        """
-        Define a discrete input.
-        """
-        if {'name': name, 'shape': shape, 'units': units} not in self._discrete_vars:
-            self._discrete_vars += [{'name': name,
-                                     'shape': shape,
-                                     'units': units}]
-
-    def define_output(self, name, shape=(1,), units=''):
-        """
-        Defines a continuous output.
-        """
-        if {'name': name, 'shape': shape, 'units': units} not in self._funcs:
-            self._funcs += [{'name': name, 'shape': shape, 'units': units}]
-
-    def define_discrete_output(self, name, shape=(1,), units=''):
-        """
-        Defines a discrete output.
-        """
-        if {'name': name, 'shape': shape, 'units': units} not in self._discrete_funcs:
-            self._discrete_funcs += [{'name': name,
-                                     'shape': shape,
-                                      'units': units}]
-
-    def define_partials(self, func, var):
-        """
-        Defines partials that will be determined using the analysis server.
-        """
-        if isinstance(var, list):
-            for val in var:
-                if (func, val) not in self._partials:
-                    self._partials += [(func, val['name'])]
-        elif var == '*':
-            for val in self._vars:
-                if (func, val) not in self._partials:
-                    self._partials += [(func, val['name'])]
-        else:
-            if (func, var) not in self._partials:
-                self._partials += [(func, var)]
-
-    def SetStreamOptions(self, request, context):
-        """
-        Receives options from the client on how data will be transmitted to and
-        received from the client. The options are stores locally for use in the
-        compute routines.
-        """
-        # set the maximum size of arrays that will be sent over the wire in one
-        # chunk
-        self.num_double = request.num_double
-        self.num_int = request.num_int
-
-        return Empty()
-
-    def DefineVariables(self, request, context):
-        """
-        Transmits setup information about the analysis discipline to the client.
-        """
-        self.setup()
-
-        # transmit the continuous input metadata
-        for var in self._vars:
-            yield metadata_pb2.VariableMetaData(discrete=False,
-                                                input=True,
-                                                name=var['name'],
-                                                shape=var['shape'],
-                                                units=var['units'])
-        # transmit the discrete input metadata
-        for var in self._discrete_vars:
-            yield metadata_pb2.VariableMetaData(discrete=True,
-                                                input=True,
-                                                name=var['name'],
-                                                shape=var['shape'],
-                                                units=var['units'])
-        # transmit the continuous output metadata
-        for func in self._funcs:
-            yield metadata_pb2.VariableMetaData(discrete=False,
-                                                input=False,
-                                                name=func['name'],
-                                                shape=func['shape'],
-                                                units=func['units'])
-        # transmit the discrete output metadata
-        for func in self._discrete_funcs:
-            yield metadata_pb2.VariableMetaData(discrete=True,
-                                                input=False,
-                                                name=func['name'],
-                                                shape=func['shape'],
-                                                units=func['units'])
-
-    def DefinePartials(self, request, context):
-        self._partials = []
-
-        self.setup_partials()
-
-        # transmit the continuous input metadata
-        for jac in self._partials:
-            yield metadata_pb2.PartialsMetaData(name=jac[0], subname=jac[1])
+        pass
 
     def Functions(self, request_iterator, context):
         """
@@ -163,27 +38,11 @@ class ExplicitServer(explicit_pb2_grpc.ExplicitDisciplineServicer):
         discrete_outputs = {}
 
         # preallocate the input and discrete input arrays
-        for var in self._vars:
-            inputs[var['name']] = np.zeros(var['shape'])
-            flat_inputs[var['name']] = get_flattened_view(inputs[var['name']])
-        for dvar in self._discrete_vars:
-            discrete_inputs[dvar['name']] = np.zeros(dvar['shape'])
-            flat_disc[dvar['name']] = get_flattened_view(discrete_inputs[dvar['name']])
+        self.preallocate_inputs(inputs, flat_inputs,
+                                discrete_inputs, flat_disc)
 
         # process inputs
-        for message in request_iterator:
-            # start and end indices for the array chunk
-            b = message.start
-            e = message.end
-
-            # assign either continuous or discrete data
-            if len(message.continuous) > 0:
-                flat_inputs[message.name][b:e] = message.continuous
-            elif len(message.discrete) > 0:
-                flat_disc[message.name][b:e] = message.discrete
-            else:
-                raise ValueError('Expected continuous or discrete variables, '
-                                 'but arrays were empty.')
+        self.process_inputs(request_iterator, flat_inputs, flat_disc)
 
         # call the user-defined compute function
         self.compute(inputs, outputs, discrete_inputs, discrete_outputs)
@@ -219,41 +78,16 @@ class ExplicitServer(explicit_pb2_grpc.ExplicitDisciplineServicer):
         flat_inputs = {}
         discrete_inputs = {}
         flat_disc = {}
-        outputs = {}
-        discrete_outputs = {}
 
         # preallocate the input and discrete input arrays
-        for var in self._vars:
-            inputs[var['name']] = np.zeros(var['shape'])
-            flat_inputs[var['name']] = get_flattened_view(inputs[var['name']])
-        for dvar in self._discrete_vars:
-            discrete_inputs[dvar['name']] = np.zeros(dvar['shape'])
-            flat_disc[dvar['name']] = get_flattened_view(discrete_inputs[dvar['name']])
-
-        # process inputs
-        for message in request_iterator:
-            # start and end indices for the array chunk
-            b = message.start
-            e = message.end
-
-            # assign either continuous or discrete data
-            if len(message.continuous) > 0:
-                flat_inputs[message.name][b:e] = message.continuous
-            elif len(message.discrete) > 0:
-                flat_disc[message.name][b:e] = message.discrete
-            else:
-                raise ValueError('Expected continuous or discrete variables, '
-                                 'but arrays were empty.')
+        self.preallocate_inputs(inputs, flat_inputs,
+                                discrete_inputs, flat_disc)
 
         # preallocate the partials
-        jac = PairDict()
+        jac = self.preallocate_partials()
 
-        for pair in self._partials:
-            shape = tuple([d['shape']
-                           for d in self._funcs if d['name'] == pair[0]])[0]
-            shape += tuple([d['shape']
-                            for d in self._vars if d['name'] == pair[1]])[0]
-            jac[pair] = np.zeros(shape)
+        # process inputs
+        self.process_inputs(request_iterator, flat_inputs, flat_disc)
 
         # call the user-defined compute_partials function
         self.compute_partials(inputs, jac, discrete_inputs)
