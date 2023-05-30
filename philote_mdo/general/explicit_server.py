@@ -23,7 +23,7 @@ class ExplicitServer(ServerBase, explicit_pb2_grpc.ExplicitDisciplineServicer):
     """
 
     def __init__(self):
-        pass
+        super().__init__()
 
     def Functions(self, request_iterator, context):
         """
