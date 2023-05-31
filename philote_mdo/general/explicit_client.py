@@ -11,8 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
-import numpy as np
 import grpc
 import philote_mdo.generated.explicit_pb2_grpc as explicit_pb2_grpc
 from philote_mdo.general.client_base import ClientBase

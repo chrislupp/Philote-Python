@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 import numpy as np
 from google.protobuf.empty_pb2 import Empty
 import philote_mdo.generated.options_pb2 as options_pb2
@@ -225,3 +224,5 @@ class ClientBase:
             else:
                 raise ValueError('Expected continuous outputs for the partials,'
                                  ' but arrays were empty.')
+
+        return partials
