@@ -53,6 +53,19 @@ class CompileProto(Command):
 setup(
     name=__name__,
     version=__version__,
+    author="Christopher A. Lupp",
+    author_email="christopherlupp@gmail.com",
+    license="Apache License 2.0",
+    keywords=["mdo", "optimization", "rpc"],
+    classifiers=[
+        "License :: OSI Approved :: Apache Software License",
+        "Programming Language :: Python :: 3",
+        "Operating System :: OS Independent",
+    ],
+    install_requires=[
+        "numpy",
+        "grpc",
+    ],
     packages=['philote_mdo'],
 
     cmdclass={
