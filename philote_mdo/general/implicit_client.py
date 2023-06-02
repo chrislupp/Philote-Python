@@ -11,6 +11,9 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import grpc
+from philote_mdo.general.client_base import ClientBase
+import philote_mdo.generated.implicit_pb2_grpc as implicit_pb2_grpc
 
 
 class ImplicitClient():
@@ -21,7 +24,14 @@ class ImplicitClient():
     def __init__():
         """
         """
-        pass
+        super().__init__()
+
+    def connect_host(self):
+        self.channel = grpc.insecure_channel(self._host)
+        self.stub = implicit_pb2_grpc.ImplicitDisciplineStub(self.channel)
+
+        if self.verbose:
+            print("Set up connection.")
 
     def apply_nonlinear(self):
         """

@@ -223,6 +223,6 @@ class ClientBase:
                 flat_p[message.name, message.subname][b:e] = message.continuous
             else:
                 raise ValueError('Expected continuous outputs for the partials,'
-                                 ' but arrays were empty.')
+                                 ' but array was empty.')
 
         return partials

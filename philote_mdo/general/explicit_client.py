@@ -12,8 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import grpc
-import philote_mdo.generated.explicit_pb2_grpc as explicit_pb2_grpc
 from philote_mdo.general.client_base import ClientBase
+import philote_mdo.generated.explicit_pb2_grpc as explicit_pb2_grpc
 
 
 class ExplicitClient(ClientBase):
