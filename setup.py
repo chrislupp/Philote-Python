@@ -1,8 +1,9 @@
+import pathlib
 from setuptools import setup, Command
-import pkg_resources
+import importlib.resources as resources
 
 __name__ = 'philote-mdo'
-__version__ = '0.2.0'
+__version__ = '0.3.0'
 
 
 class CompileProto(Command):
@@ -17,8 +18,16 @@ class CompileProto(Command):
 
     def run(self):
         import grpc_tools.protoc
+        import grpc_tools._proto
+        resource_path = resources.path(grpc_tools._proto, '')
+        proto_include = str(pathlib.Path(resource_path))
 
-        proto_include = pkg_resources.resource_filename('grpc_tools', '_proto')
+        # proto files
+        proto_files = ['array.proto',
+                       'explicit.proto',
+                       'implicit.proto',
+                       'metadata.proto',
+                       'options.proto']
 
         # compile the proto files for use in python
         grpc_tools.protoc.main([
@@ -27,13 +36,8 @@ class CompileProto(Command):
             '-I{}'.format("./proto"),
             '--python_out=./philote_mdo/generated/',
             '--pyi_out=./philote_mdo/generated/',
-            '--grpc_python_out=./philote_mdo/generated/',
-            'array.proto',
-            'explicit.proto',
-            'implicit.proto',
-            'metadata.proto',
-            'options.proto'
-        ])
+            '--grpc_python_out=./philote_mdo/generated/'
+        ] + proto_files)
 
         import protoletariat.__main__ as protol
 
@@ -43,13 +47,7 @@ class CompileProto(Command):
             '--dont-create-package',
             '--python-out=./philote_mdo/generated/',
             'protoc',
-            '--proto-path=./proto',
-            'array.proto',
-            'explicit.proto',
-            'implicit.proto',
-            'metadata.proto',
-            'options.proto'
-        ])
+            '--proto-path=./proto'] + proto_files)
 
 
 setup(
