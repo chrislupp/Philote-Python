@@ -32,65 +32,68 @@ class ImplicitServer(ServerBase, implicit_pb2_grpc.ImplicitDisciplineServicer):
         # inputs and outputs
         inputs = {}
         flat_inputs = {}
-        discrete_inputs = {}
-        flat_disc = {}
         outputs = {}
+        flat_outputs = {}
+        discrete_inputs = {}
+        flat_disc_in = {}
         discrete_outputs = {}
+        flat_disc_out = {}
+        residuals = {}
 
-        # preallocate the input and discrete input arrays
+        # preallocate the inputs for the implicit discipline
         self.preallocate_inputs(inputs, flat_inputs,
-                                discrete_inputs, flat_disc)
+                                discrete_inputs, flat_disc_in,
+                                outputs, flat_outputs,
+                                discrete_outputs, flat_disc_out)
 
         # process inputs
-        self.process_inputs(request_iterator, flat_inputs, flat_disc)
+        self.process_inputs(request_iterator, flat_inputs, flat_disc_in,
+                            flat_outputs, flat_disc_out)
 
         # call the user-defined compute function
-        self.apply_nonlinear(
-            inputs, outputs, discrete_inputs, discrete_outputs)
+        self.apply_nonlinear(inputs, outputs,
+                             residuals,
+                             discrete_inputs, discrete_outputs)
 
         # iterate through all continuous outputs in the dictionary
-        for output_name, value in outputs.items():
+        for res_name, value in residuals.items():
 
             # iterate through all chunks needed for the current input
             for b, e in get_chunk_indicies(value.size, self.num_double):
                 # create the chunked data
-                yield array_pb2.Array(name=output_name,
+                yield array_pb2.Array(name=res_name,
                                       start=b,
                                       end=e,
                                       continuous=value.ravel()[b:e])
 
-        # iterate through all discrete outputs in the dictionary
-        for doutput_name, value in discrete_outputs.items():
-
-            # iterate through all chunks needed for the current input
-            for b, e in get_chunk_indicies(value.size, self.num_double):
-                # create the chunked data
-                yield array_pb2.Array(name=doutput_name,
-                                      start=b,
-                                      end=e,
-                                      discrete=value.ravel()[b:e])
-
     def Solve(self, request_iterator, context):
         """
+        Solves the implicit discipline so that the residuals are driven to zero.
         """
         # inputs and outputs
         inputs = {}
         flat_inputs = {}
-        discrete_inputs = {}
-        flat_disc = {}
         outputs = {}
+        flat_outputs = {}
+        discrete_inputs = {}
+        flat_disc_in = {}
         discrete_outputs = {}
+        flat_disc_out = {}
+        residuals = {}
 
-        # preallocate the input and discrete input arrays
+        # preallocate the inputs for the implicit discipline
         self.preallocate_inputs(inputs, flat_inputs,
-                                discrete_inputs, flat_disc)
+                                discrete_inputs, flat_disc_in,
+                                outputs, flat_outputs,
+                                discrete_outputs, flat_disc_out)
 
         # process inputs
-        self.process_inputs(request_iterator, flat_inputs, flat_disc)
+        self.process_inputs(request_iterator, flat_inputs, flat_disc_in,
+                            flat_outputs, flat_disc_out)
 
         # call the user-defined compute function
-        self.solve_nonlinear(
-            inputs, outputs, discrete_inputs, discrete_outputs)
+        self.solve_nonlinear(inputs, outputs,
+                             discrete_inputs, discrete_outputs)
 
         # iterate through all continuous outputs in the dictionary
         for output_name, value in outputs.items():
@@ -134,6 +137,9 @@ class ImplicitServer(ServerBase, implicit_pb2_grpc.ImplicitDisciplineServicer):
         # process inputs
         self.process_inputs(request_iterator, flat_inputs, flat_disc)
 
+        # process outputs (which are inputs for an implicit discipline)
+        self.process_outputs(request_iterator, flat_inputs, flat_disc)
+
         # call the user-defined compute_partials function
         self.linearize(inputs, jac, discrete_inputs)
 
@@ -171,7 +177,8 @@ class ImplicitServer(ServerBase, implicit_pb2_grpc.ImplicitDisciplineServicer):
         """
         pass
 
-    def apply_nonlinear(self, inputs, outputs, residuals):
+    def apply_nonlinear(self, inputs, outputs, residuals,
+                        discrete_inputs=None, discrete_outputs=None):
         """
         """
         pass

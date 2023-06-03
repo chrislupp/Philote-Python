@@ -150,9 +150,13 @@ class ServerBase:
             yield metadata_pb2.PartialsMetaData(name=jac[0], subname=jac[1])
 
     def preallocate_inputs(self, inputs, flat_inputs,
-                           discrete_inputs={}, flat_disc={}):
+                           discrete_inputs={}, flat_disc={},
+                           outputs={}, flat_outputs={}):
         """
         Preallocates the inputs before receiving data from the client.
+
+        Note: for implicit disciplines, the function values are considered
+        inputs to evaluate the residuals and the partials of the residuals.
         """
         # preallocate the input and discrete input arrays
         for var in self._vars:
@@ -163,9 +167,18 @@ class ServerBase:
             flat_disc[dvar['name']] = get_flattened_view(
                 discrete_inputs[dvar['name']])
 
+        # preallocate the output and discrete output arrays
+        for out in self._funcs:
+            inputs[out['name']] = np.zeros(var['shape'])
+            flat_inputs[out['name']] = get_flattened_view(inputs[out['name']])
+        for dout in self._discrete_funcs:
+            discrete_inputs[dout['name']] = np.zeros(dout['shape'])
+            flat_disc[dout['name']] = get_flattened_view(
+                discrete_inputs[dout['name']])
+
     def preallocate_partials(self):
         """
-        preallocate the partials
+        Preallocates the partials
         """
         jac = PairDict()
 
@@ -178,9 +191,13 @@ class ServerBase:
 
         return jac
 
-    def process_inputs(self, request_iterator, flat_inputs, flat_disc):
+    def process_inputs(self, request_iterator, flat_inputs, flat_disc_in,
+                       flat_outputs={}, flat_disc_out={}):
         """
         Processes the message inputs from a gRPC stream.
+
+        Note: for implicit disciplines, the function values are considered
+        inputs to evaluate the residuals and the partials of the residuals.
         """
         # process inputs
         for message in request_iterator:
@@ -190,9 +207,15 @@ class ServerBase:
 
             # assign either continuous or discrete data
             if len(message.continuous) > 0:
-                flat_inputs[message.name][b:e] = message.continuous
+                if message.name in self._vars:
+                    flat_inputs[message.name][b:e] = message.continuous
+                elif message.name in self._funcs:
+                    flat_outputs[message.name][b:e] = message.continuous
             elif len(message.discrete) > 0:
-                flat_disc[message.name][b:e] = message.discrete
+                if message.name in self._discrete_vars:
+                    flat_disc_in[message.name][b:e] = message.discrete
+                elif message.name in self._discrete_funcs:
+                    flat_disc_out[message.name][b:e] = message.discrete
             else:
                 raise ValueError('Expected continuous or discrete variables, '
                                  'but arrays were empty for variable %s.' %
