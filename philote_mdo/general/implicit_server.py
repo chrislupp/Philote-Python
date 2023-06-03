@@ -79,7 +79,6 @@ class ImplicitServer(ServerBase, implicit_pb2_grpc.ImplicitDisciplineServicer):
         flat_disc_in = {}
         discrete_outputs = {}
         flat_disc_out = {}
-        residuals = {}
 
         # preallocate the inputs for the implicit discipline
         self.preallocate_inputs(inputs, flat_inputs,
@@ -87,7 +86,7 @@ class ImplicitServer(ServerBase, implicit_pb2_grpc.ImplicitDisciplineServicer):
                                 outputs, flat_outputs,
                                 discrete_outputs, flat_disc_out)
 
-        # process inputs
+        # process inputs for the implicit discipline
         self.process_inputs(request_iterator, flat_inputs, flat_disc_in,
                             flat_outputs, flat_disc_out)
 

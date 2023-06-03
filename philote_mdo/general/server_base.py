@@ -207,14 +207,15 @@ class ServerBase:
 
             # assign either continuous or discrete data
             if len(message.continuous) > 0:
-                if message.name in self._vars:
+                # check if the variable name is in the inputs or outputs
+                if [dictionary for dictionary in self._vars if dictionary.get("name") == message.name]:
                     flat_inputs[message.name][b:e] = message.continuous
-                elif message.name in self._funcs:
+                elif [dictionary for dictionary in self._funcs if dictionary.get("name") == message.name]:
                     flat_outputs[message.name][b:e] = message.continuous
             elif len(message.discrete) > 0:
-                if message.name in self._discrete_vars:
+                if [dictionary for dictionary in self._discrete_vars if dictionary.get("name") == message.name]:
                     flat_disc_in[message.name][b:e] = message.discrete
-                elif message.name in self._discrete_funcs:
+                elif [dictionary for dictionary in self._discrete_funcs if dictionary.get("name") == message.name]:
                     flat_disc_out[message.name][b:e] = message.discrete
             else:
                 raise ValueError('Expected continuous or discrete variables, '
