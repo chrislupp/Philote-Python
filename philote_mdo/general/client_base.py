@@ -13,6 +13,7 @@
 # limitations under the License.
 import numpy as np
 from google.protobuf.empty_pb2 import Empty
+import philote_mdo.generated.metadata_pb2 as metadata_pb2
 import philote_mdo.generated.options_pb2 as options_pb2
 import philote_mdo.generated.array_pb2 as array_pb2
 from philote_mdo.utils import PairDict, get_chunk_indicies, get_flattened_view
@@ -41,6 +42,9 @@ class ClientBase:
 
         # continous outputs (names, shapes, units)
         self._funcs = []
+
+        # residuals (names, shapes, units)
+        self._res = []
 
         # discrete outputs (names, shapes, units)
         self._discrete_funcs = []
@@ -72,24 +76,29 @@ class ClientBase:
         """
         # stream back the metadata
         for message in self.stub.DefineVariables(Empty()):
-            if message.input:
-                if message.discrete:
-                    self._discrete_vars += [{"name": message.name,
-                                            "shape": tuple(message.shape),
-                                             "units": message.units}]
-                else:
-                    self._vars += [{"name": message.name,
-                                   "shape": tuple(message.shape),
-                                    "units": message.units}]
-            else:
-                if message.discrete:
-                    self._discrete_funcs += [{"name": message.name,
-                                             "shape": tuple(message.shape),
-                                              "units": message.units}]
-                else:
-                    self._funcs += [{"name": message.name,
-                                    "shape": tuple(message.shape),
-                                     "units": message.units}]
+            if message.type == metadata_pb2.VariableType.kInput:
+                self._vars += [{"name": message.name,
+                                "shape": tuple(message.shape),
+                                "units": message.units}]
+
+            if message.type == metadata_pb2.VariableType.kDiscreteInput:
+                self._discrete_vars += [{"name": message.name,
+                                         "shape": tuple(message.shape),
+                                         "units": message.units}]
+
+            if message.type == metadata_pb2.VariableType.kOutput:
+                self._funcs += [{"name": message.name,
+                                 "shape": tuple(message.shape),
+                                 "units": message.units}]
+
+                self._res += [{"name": message.name,
+                               "shape": tuple(message.shape),
+                               "units": message.units}]
+
+            if message.type == metadata_pb2.VariableType.kDiscreteOutput:
+                self._discrete_funcs += [{"name": message.name,
+                                          "shape": tuple(message.shape),
+                                          "units": message.units}]
 
         if self.verbose:
             print("Variable metadata received from server.")
@@ -128,7 +137,8 @@ class ClientBase:
             if (message.name, message.subname) not in self._partials:
                 self._partials += [(message.name, message.subname)]
 
-    def assemble_input_messages(self, inputs, discrete_inputs=None):
+    def assemble_input_messages(self, inputs, discrete_inputs=None,
+                                outputs=None, discrete_outputs=None):
         """
         Assembles the messages for transmitting the input variables to the
         server.
@@ -138,25 +148,49 @@ class ClientBase:
 
         # iterate through all continuous inputs in the dictionary
         for input_name, value in inputs.items():
-
             # iterate through all chunks needed for the current input
             for b, e in get_chunk_indicies(value.size, self.num_double):
                 # create the chunked data
                 messages += [array_pb2.Array(name=input_name,
                                              start=b,
                                              end=e,
+                                             type=metadata_pb2.VariableType.kInput,
                                              continuous=value.ravel()[b:e])]
 
         # iterate through all discrete inputs in the dictionary
         if discrete_inputs:
             for input_name, value in discrete_inputs.items():
-
                 # iterate through all chunks needed for the current input
                 for b, e in get_chunk_indicies(value.size, self.num_double):
                     # create the chunked data
                     messages += [array_pb2.Array(name=input_name,
                                                  start=b,
                                                  end=e,
+                                                 type=metadata_pb2.VariableType.kDiscreteInput,
+                                                 discrete=value.ravel()[b:e])]
+
+        # iterate through all continuous outputs in the dictionary
+        if outputs:
+            for output_name, value in outputs.items():
+                # iterate through all chunks needed for the current input
+                for b, e in get_chunk_indicies(value.size, self.num_double):
+                    # create the chunked data
+                    messages += [array_pb2.Array(name=output_name,
+                                                 start=b,
+                                                 end=e,
+                                                 type=metadata_pb2.VariableType.kOutput,
+                                                 continuous=value.ravel()[b:e])]
+
+        # iterate through all discrete outputs in the dictionary
+        if discrete_outputs:
+            for output_name, value in discrete_outputs.items():
+                # iterate through all chunks needed for the current input
+                for b, e in get_chunk_indicies(value.size, self.num_double):
+                    # create the chunked data
+                    messages += [array_pb2.Array(name=output_name,
+                                                 start=b,
+                                                 end=e,
+                                                 type=metadata_pb2.VariableType.kDiscreteOutput,
                                                  discrete=value.ravel()[b:e])]
 
         return messages
@@ -198,6 +232,34 @@ class ClientBase:
                                  'but arrays were empty.')
 
         return outputs, discrete_outputs
+
+    def recover_residuals(self, responses):
+        """
+        Recovers the residuals from the stream of responses.
+        """
+        residuals = {}
+        flat_residuals = {}
+
+        # preallocate outputs and discrete output arrays
+        for res in self._res:
+            residuals[res['name']] = np.zeros(res['shape'])
+            flat_residuals[res['name']] = get_flattened_view(
+                residuals[res['name']])
+
+        # iterate through the results
+        for message in responses:
+            # start and end indices for the array chunk
+            b = message.start
+            e = message.end
+
+            # assign either continuous or discrete data
+            if len(message.continuous) > 0:
+                flat_residuals[message.name][b:e] = message.continuous
+            else:
+                raise ValueError('Expected continuous variables for residuals, '
+                                 'but arrays were empty.')
+
+        return residuals
 
     def recover_partials(self, responses):
         # preallocate the partials

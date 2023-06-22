@@ -57,13 +57,13 @@ class ImplicitServer(ServerBase, implicit_pb2_grpc.ImplicitDisciplineServicer):
 
         # iterate through all continuous outputs in the dictionary
         for res_name, value in residuals.items():
-
             # iterate through all chunks needed for the current input
             for b, e in get_chunk_indicies(value.size, self.num_double):
                 # create the chunked data
                 yield array_pb2.Array(name=res_name,
                                       start=b,
                                       end=e,
+                                      input=False,
                                       continuous=value.ravel()[b:e])
 
     def Solve(self, request_iterator, context):

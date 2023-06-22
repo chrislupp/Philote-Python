@@ -38,6 +38,9 @@ class ServerBase:
         # continous outputs (names, shapes, units)
         self._funcs = []
 
+        # residuals (names, shapes, units)
+        self._res = []
+
         # discrete outputs (names, shapes, units)
         self._discrete_funcs = []
 
@@ -66,6 +69,7 @@ class ServerBase:
         """
         if {'name': name, 'shape': shape, 'units': units} not in self._funcs:
             self._funcs += [{'name': name, 'shape': shape, 'units': units}]
+            self._res += [{'name': name, 'shape': shape, 'units': units}]
 
     def define_discrete_output(self, name, shape=(1,), units=''):
         """
@@ -113,29 +117,25 @@ class ServerBase:
 
         # transmit the continuous input metadata
         for var in self._vars:
-            yield metadata_pb2.VariableMetaData(discrete=False,
-                                                input=True,
+            yield metadata_pb2.VariableMetaData(type=metadata_pb2.VariableType.kInput,
                                                 name=var['name'],
                                                 shape=var['shape'],
                                                 units=var['units'])
         # transmit the discrete input metadata
         for var in self._discrete_vars:
-            yield metadata_pb2.VariableMetaData(discrete=True,
-                                                input=True,
+            yield metadata_pb2.VariableMetaData(type=metadata_pb2.VariableType.kDiscreteInput,
                                                 name=var['name'],
                                                 shape=var['shape'],
                                                 units=var['units'])
         # transmit the continuous output metadata
         for func in self._funcs:
-            yield metadata_pb2.VariableMetaData(discrete=False,
-                                                input=False,
+            yield metadata_pb2.VariableMetaData(type=metadata_pb2.VariableType.kOutput,
                                                 name=func['name'],
                                                 shape=func['shape'],
                                                 units=func['units'])
         # transmit the discrete output metadata
         for func in self._discrete_funcs:
-            yield metadata_pb2.VariableMetaData(discrete=True,
-                                                input=False,
+            yield metadata_pb2.VariableMetaData(type=metadata_pb2.VariableType.kDiscreteOutput,
                                                 name=func['name'],
                                                 shape=func['shape'],
                                                 units=func['units'])
@@ -150,12 +150,13 @@ class ServerBase:
             yield metadata_pb2.PartialsMetaData(name=jac[0], subname=jac[1])
 
     def preallocate_inputs(self, inputs, flat_inputs,
-                           discrete_inputs={}, flat_disc={},
-                           outputs={}, flat_outputs={}):
+                           discrete_inputs={}, flat_disc_in={},
+                           outputs={}, flat_outputs={},
+                           discrete_outputs={}, flat_disc_out={}):
         """
         Preallocates the inputs before receiving data from the client.
 
-        Note: for implicit disciplines, the function values are considered
+        Note, for implicit disciplines, the function values are considered
         inputs to evaluate the residuals and the partials of the residuals.
         """
         # preallocate the input and discrete input arrays
@@ -164,16 +165,16 @@ class ServerBase:
             flat_inputs[var['name']] = get_flattened_view(inputs[var['name']])
         for dvar in self._discrete_vars:
             discrete_inputs[dvar['name']] = np.zeros(dvar['shape'])
-            flat_disc[dvar['name']] = get_flattened_view(
+            flat_disc_in[dvar['name']] = get_flattened_view(
                 discrete_inputs[dvar['name']])
 
         # preallocate the output and discrete output arrays
         for out in self._funcs:
             inputs[out['name']] = np.zeros(var['shape'])
-            flat_inputs[out['name']] = get_flattened_view(inputs[out['name']])
+            flat_outputs[out['name']] = get_flattened_view(inputs[out['name']])
         for dout in self._discrete_funcs:
             discrete_inputs[dout['name']] = np.zeros(dout['shape'])
-            flat_disc[dout['name']] = get_flattened_view(
+            flat_disc_out[dout['name']] = get_flattened_view(
                 discrete_inputs[dout['name']])
 
     def preallocate_partials(self):
@@ -192,11 +193,11 @@ class ServerBase:
         return jac
 
     def process_inputs(self, request_iterator, flat_inputs, flat_disc_in,
-                       flat_outputs={}, flat_disc_out={}):
+                       flat_outputs=None, flat_disc_out=None):
         """
         Processes the message inputs from a gRPC stream.
 
-        Note: for implicit disciplines, the function values are considered
+        Note, for implicit disciplines, the function values are considered
         inputs to evaluate the residuals and the partials of the residuals.
         """
         # process inputs
@@ -207,15 +208,14 @@ class ServerBase:
 
             # assign either continuous or discrete data
             if len(message.continuous) > 0:
-                # check if the variable name is in the inputs or outputs
-                if [dictionary for dictionary in self._vars if dictionary.get("name") == message.name]:
+                if message.type == metadata_pb2.VariableType.kInput:
                     flat_inputs[message.name][b:e] = message.continuous
-                elif [dictionary for dictionary in self._funcs if dictionary.get("name") == message.name]:
+                elif message.type == metadata_pb2.VariableType.kOutput:
                     flat_outputs[message.name][b:e] = message.continuous
             elif len(message.discrete) > 0:
-                if [dictionary for dictionary in self._discrete_vars if dictionary.get("name") == message.name]:
+                if message.type == metadata_pb2.VariableType.kDiscreteInput:
                     flat_disc_in[message.name][b:e] = message.discrete
-                elif [dictionary for dictionary in self._discrete_funcs if dictionary.get("name") == message.name]:
+                elif message.type == metadata_pb2.VariableType.kDiscreteOutput:
                     flat_disc_out[message.name][b:e] = message.discrete
             else:
                 raise ValueError('Expected continuous or discrete variables, '
