@@ -31,8 +31,8 @@ class ImplicitClient(ClientBase):
         if self.verbose:
             print("Set up connection.")
 
-    def remote_apply_nonlinear(self, inputs, outputs, discrete_inputs=None,
-                               discrete_outputs=None):
+    def remote_compute_residuals(self, inputs, outputs, discrete_inputs=None,
+                                 discrete_outputs=None):
         """
         Requests and receives the residual evaluation from the analysis server
         for a set of inputs and outputs (sent to the server).

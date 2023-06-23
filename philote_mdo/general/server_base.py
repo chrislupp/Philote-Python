@@ -25,6 +25,9 @@ class ServerBase:
     def __init__(self):
         """
         """
+        # flag that indicates the discipline is implicit
+        self._implicit = False
+
         self.verbose = False
         self.num_double = 100
         self.num_int = 100
@@ -69,7 +72,8 @@ class ServerBase:
         """
         if {'name': name, 'shape': shape, 'units': units} not in self._funcs:
             self._funcs += [{'name': name, 'shape': shape, 'units': units}]
-            self._res += [{'name': name, 'shape': shape, 'units': units}]
+            if self._implicit:
+                self._res += [{'name': name, 'shape': shape, 'units': units}]
 
     def define_discrete_output(self, name, shape=(1,), units=''):
         """
@@ -77,7 +81,7 @@ class ServerBase:
         """
         if {'name': name, 'shape': shape, 'units': units} not in self._discrete_funcs:
             self._discrete_funcs += [{'name': name,
-                                     'shape': shape,
+                                      'shape': shape,
                                       'units': units}]
 
     def define_partials(self, func, var):
@@ -170,12 +174,13 @@ class ServerBase:
 
         # preallocate the output and discrete output arrays
         for out in self._funcs:
-            inputs[out['name']] = np.zeros(var['shape'])
-            flat_outputs[out['name']] = get_flattened_view(inputs[out['name']])
+            outputs[out['name']] = np.zeros(var['shape'])
+            flat_outputs[out['name']] = get_flattened_view(
+                outputs[out['name']])
         for dout in self._discrete_funcs:
-            discrete_inputs[dout['name']] = np.zeros(dout['shape'])
+            discrete_outputs[dout['name']] = np.zeros(dout['shape'])
             flat_disc_out[dout['name']] = get_flattened_view(
-                discrete_inputs[dout['name']])
+                discrete_outputs[dout['name']])
 
     def preallocate_partials(self):
         """

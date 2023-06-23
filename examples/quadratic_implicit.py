@@ -27,12 +27,13 @@ class RemoteQuadratic(pmdo.general.ImplicitServer):
     def setup_partials(self):
         self.define_partials('x', '*')
 
-    def apply_nonlinear(self, inputs, outputs, residuals,
-                        discrete_inputs=None, discrete_outputs=None):
+    def compute_residuals(self, inputs, outputs, residuals,
+                          discrete_inputs=None, discrete_outputs=None):
         a = inputs['a']
         b = inputs['b']
         c = inputs['c']
         x = outputs['x']
+
         residuals['x'] = a * x ** 2.0 + b * x + c
 
     # def compute_partials(self, inputs, partials, discrete_inputs=None):

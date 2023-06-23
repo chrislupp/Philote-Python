@@ -39,7 +39,7 @@ outputs = {
 }
 
 # run a function evaluation
-residuals = client.remote_apply_nonlinear(inputs, outputs)
+residuals = client.remote_compute_residuals(inputs, outputs)
 
 print(residuals)
 

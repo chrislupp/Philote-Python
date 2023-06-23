@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import philote_mdo.generated.implicit_pb2_grpc as implicit_pb2_grpc
+from philote_mdo.generated.metadata_pb2 import VariableType
 import philote_mdo.generated.array_pb2 as array_pb2
 from philote_mdo.general.server_base import ServerBase
 from philote_mdo.utils import get_chunk_indicies
@@ -24,6 +25,7 @@ class ImplicitServer(ServerBase, implicit_pb2_grpc.ImplicitDisciplineServicer):
 
     def __init__(self):
         super().__init__()
+        self._implicit = True
 
     def Residuals(self, request_iterator, context):
         """
@@ -51,9 +53,8 @@ class ImplicitServer(ServerBase, implicit_pb2_grpc.ImplicitDisciplineServicer):
                             flat_outputs, flat_disc_out)
 
         # call the user-defined compute function
-        self.apply_nonlinear(inputs, outputs,
-                             residuals,
-                             discrete_inputs, discrete_outputs)
+        self.compute_residuals(inputs, outputs, residuals,
+                               discrete_inputs, discrete_outputs)
 
         # iterate through all continuous outputs in the dictionary
         for res_name, value in residuals.items():
@@ -63,7 +64,7 @@ class ImplicitServer(ServerBase, implicit_pb2_grpc.ImplicitDisciplineServicer):
                 yield array_pb2.Array(name=res_name,
                                       start=b,
                                       end=e,
-                                      input=False,
+                                      type=VariableType.kResidual,
                                       continuous=value.ravel()[b:e])
 
     def Solve(self, request_iterator, context):
@@ -96,7 +97,6 @@ class ImplicitServer(ServerBase, implicit_pb2_grpc.ImplicitDisciplineServicer):
 
         # iterate through all continuous outputs in the dictionary
         for output_name, value in outputs.items():
-
             # iterate through all chunks needed for the current input
             for b, e in get_chunk_indicies(value.size, self.num_double):
                 # create the chunked data
@@ -107,7 +107,6 @@ class ImplicitServer(ServerBase, implicit_pb2_grpc.ImplicitDisciplineServicer):
 
         # iterate through all discrete outputs in the dictionary
         for doutput_name, value in discrete_outputs.items():
-
             # iterate through all chunks needed for the current input
             for b, e in get_chunk_indicies(value.size, self.num_double):
                 # create the chunked data
@@ -176,8 +175,8 @@ class ImplicitServer(ServerBase, implicit_pb2_grpc.ImplicitDisciplineServicer):
         """
         pass
 
-    def apply_nonlinear(self, inputs, outputs, residuals,
-                        discrete_inputs=None, discrete_outputs=None):
+    def compute_residuals(self, inputs, outputs, residuals,
+                          discrete_inputs, discrete_outputs):
         """
         """
         pass
