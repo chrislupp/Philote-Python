@@ -27,8 +27,7 @@ class RemoteQuadratic(pmdo.general.ImplicitServer):
     def setup_partials(self):
         self.define_partials('x', '*')
 
-    def compute_residuals(self, inputs, outputs, residuals,
-                          discrete_inputs=None, discrete_outputs=None):
+    def compute_residuals(self, inputs, outputs, residuals):
         a = inputs['a']
         b = inputs['b']
         c = inputs['c']
@@ -36,12 +35,51 @@ class RemoteQuadratic(pmdo.general.ImplicitServer):
 
         residuals['x'] = a * x ** 2.0 + b * x + c
 
-    # def compute_partials(self, inputs, partials, discrete_inputs=None):
-    #     x = inputs['x']
-    #     y = inputs['y']
+    def solve_nonlinear(self, inputs, outputs):
+        a = inputs['a']
+        b = inputs['b']
+        c = inputs['c']
+        outputs['x'] = (-b + (b ** 2 - 4 * a * c) ** 0.5) / (2 * a)
 
-    #     partials['f_xy', 'x'] = 2.0 * x - 6.0 + y
-    #     partials['f_xy', 'y'] = 2.0 * y + 8.0 + x
+    def linearize(self, inputs, outputs, partials):
+        a = inputs['a']
+        b = inputs['b']
+        c = inputs['c']
+        x = outputs['x']
+
+        partials['x', 'a'] = x ** 2
+        partials['x', 'b'] = x
+        partials['x', 'c'] = 1.0
+        partials['x', 'x'] = 2 * a * x + b
+
+        self.inv_jac = 1.0 / (2 * a * x + b)
+
+    def apply_linear(self, inputs, outputs,
+                     d_inputs, d_outputs, d_residuals, mode):
+        a = inputs['a']
+        b = inputs['b']
+        c = inputs['c']
+        x = outputs['x']
+        if mode == 'fwd':
+            if 'x' in d_residuals:
+                if 'x' in d_outputs:
+                    d_residuals['x'] += (2 * a * x + b) * d_outputs['x']
+                if 'a' in d_inputs:
+                    d_residuals['x'] += x ** 2 * d_inputs['a']
+                if 'b' in d_inputs:
+                    d_residuals['x'] += x * d_inputs['b']
+                if 'c' in d_inputs:
+                    d_residuals['x'] += d_inputs['c']
+        elif mode == 'rev':
+            if 'x' in d_residuals:
+                if 'x' in d_outputs:
+                    d_outputs['x'] += (2 * a * x + b) * d_residuals['x']
+                if 'a' in d_inputs:
+                    d_inputs['a'] += x ** 2 * d_residuals['x']
+                if 'b' in d_inputs:
+                    d_inputs['b'] += x * d_residuals['x']
+                if 'c' in d_inputs:
+                    d_inputs['c'] += d_residuals['x']
 
 
 pmdo.run_server(RemoteQuadratic())
