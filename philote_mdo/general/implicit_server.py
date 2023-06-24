@@ -53,8 +53,11 @@ class ImplicitServer(ServerBase, implicit_pb2_grpc.ImplicitDisciplineServicer):
                             flat_outputs, flat_disc_out)
 
         # call the user-defined compute function
-        self.compute_residuals(inputs, outputs, residuals,
-                               discrete_inputs, discrete_outputs)
+        if discrete_inputs or discrete_outputs:
+            self.compute_residuals(inputs, outputs, residuals,
+                                   discrete_inputs, discrete_outputs)
+        else:
+            self.compute_residuals(inputs, outputs, residuals)
 
         # iterate through all continuous outputs in the dictionary
         for res_name, value in residuals.items():
@@ -122,21 +125,23 @@ class ImplicitServer(ServerBase, implicit_pb2_grpc.ImplicitDisciplineServicer):
         # inputs and outputs
         inputs = {}
         flat_inputs = {}
+        outputs = {}
+        flat_outputs = {}
         discrete_inputs = {}
-        flat_disc = {}
+        flat_disc_in = {}
+        flat_disc_out = {}
 
         # preallocate the input and discrete input arrays
         self.preallocate_inputs(inputs, flat_inputs,
-                                discrete_inputs, flat_disc)
+                                discrete_inputs, flat_disc_in,
+                                outputs, flat_outputs)
 
         # preallocate the partials
         jac = self.preallocate_partials()
 
-        # process inputs
-        self.process_inputs(request_iterator, flat_inputs, flat_disc)
-
-        # process outputs (which are inputs for an implicit discipline)
-        self.process_outputs(request_iterator, flat_inputs, flat_disc)
+        # process inputs for the implicit discipline
+        self.process_inputs(request_iterator, flat_inputs, flat_disc_in,
+                            flat_outputs, flat_disc_out)
 
         # call the user-defined compute_partials function
         self.linearize(inputs, jac, discrete_inputs)
@@ -176,7 +181,7 @@ class ImplicitServer(ServerBase, implicit_pb2_grpc.ImplicitDisciplineServicer):
         pass
 
     def compute_residuals(self, inputs, outputs, residuals,
-                          discrete_inputs, discrete_outputs):
+                          discrete_inputs=None, discrete_outputs=None):
         """
         """
         pass

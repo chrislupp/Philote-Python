@@ -45,7 +45,10 @@ class ExplicitServer(ServerBase, explicit_pb2_grpc.ExplicitDisciplineServicer):
         self.process_inputs(request_iterator, flat_inputs, flat_disc)
 
         # call the user-defined compute function
-        self.compute(inputs, outputs, discrete_inputs, discrete_outputs)
+        if discrete_inputs or discrete_outputs:
+            self.compute(inputs, outputs, discrete_inputs, discrete_outputs)
+        else:
+            self.compute(inputs, outputs)
 
         # iterate through all continuous outputs in the dictionary
         for output_name, value in outputs.items():
@@ -90,7 +93,10 @@ class ExplicitServer(ServerBase, explicit_pb2_grpc.ExplicitDisciplineServicer):
         self.process_inputs(request_iterator, flat_inputs, flat_disc)
 
         # call the user-defined compute_partials function
-        self.compute_partials(inputs, jac, discrete_inputs)
+        if discrete_inputs:
+            self.compute_partials(inputs, jac, discrete_inputs)
+        else:
+            self.compute_partials(inputs, jac)
 
         # iterate through all continuous outputs in the dictionary
         for jac, value in jac.items():
