@@ -11,16 +11,13 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+import grpc
 import numpy as np
 from philote_mdo.general import ImplicitClient
 from philote_mdo.utils import PairDict
 
-client = ImplicitClient()
-client._host = 'localhost:50051'
 
-# connect to the server
-client.connect_host()
+client = ImplicitClient(channel=grpc.insecure_channel('localhost:50051'))
 
 # transfer the stream options to the server
 client.stream_options()

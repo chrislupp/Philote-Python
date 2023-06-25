@@ -21,15 +21,9 @@ class ImplicitClient(ClientBase):
     Python client for implicit Philote discipline servers. 
     """
 
-    def __init__(self):
+    def __init__(self, channel):
         super().__init__()
-
-    def connect_host(self):
-        self.channel = grpc.insecure_channel(self._host)
-        self.stub = implicit_pb2_grpc.ImplicitDisciplineStub(self.channel)
-
-        if self.verbose:
-            print("Set up connection.")
+        self.stub = implicit_pb2_grpc.ImplicitDisciplineStub(channel)
 
     def remote_compute_residuals(self, inputs, outputs, discrete_inputs=None,
                                  discrete_outputs=None):

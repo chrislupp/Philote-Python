@@ -21,15 +21,10 @@ class ExplicitClient(ClientBase):
     Client for calling explicit analysis discipline servers.
     """
 
-    def __init__(self):
+    def __init__(self, channel):
         super().__init__()
 
-    def connect_host(self):
-        self.channel = grpc.insecure_channel(self._host)
-        self.stub = explicit_pb2_grpc.ExplicitDisciplineStub(self.channel)
-
-        if self.verbose:
-            print("Set up connection.")
+        self.stub = explicit_pb2_grpc.ExplicitDisciplineStub(channel)
 
     def remote_compute(self, inputs, discrete_inputs=None):
         """
