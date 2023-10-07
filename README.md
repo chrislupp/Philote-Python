@@ -3,10 +3,34 @@
 Python library for using and creating Philote analysis servers.
 
 
+## Requirements
+
+The installation process requires the following tools to be installed:
+
+- grpc-tools
+- protoletariat
+- importlib.resources
+
+Additionally, the following dependencies are required by Philote MDO and will be
+installed automatically during the installation process (if not process):
+
+- numpy
+- grpc
+
+
 ## Installation
 
-The Philote MDO Python bindings can be installed using pip (from the repository
-directory):
+The Philote MDO Python bindings require a two step installation process. First,
+make sure that `grpc-tools` and `protoletariat` are installed. If not, they can
+be installed using pip. Note, that the first step of the installation process
+will not complete without these tools. Unlike the other dependencies, pip will
+not automatically install them during the package build.
+The first step is to compile the protobuf/gRPC files into python files. This is
+done by running (from the repository directory):
+
+    python setup.py compile_proto
+
+Once this step completes successfully, the package can be installed using pip:
 
     pip install .
 
@@ -14,8 +38,7 @@ or
 
     pip install -e .
 
-for a development install. Note, that this package uses Poetry and will require
-that it is installed prior to building the package.
+for a development install.
 
 
 ## License

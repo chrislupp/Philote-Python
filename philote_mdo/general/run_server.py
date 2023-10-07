@@ -11,10 +11,10 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 import grpc
 from concurrent import futures
 import philote_mdo.generated.explicit_pb2_grpc as explicit_pb2_grpc
+import philote_mdo.generated.implicit_pb2_grpc as implicit_pb2_grpc
 
 
 def run_server(service, port='50051', max_workers=10):
@@ -27,21 +27,14 @@ def run_server(service, port='50051', max_workers=10):
     if isinstance(service, explicit_pb2_grpc.ExplicitDisciplineServicer):
         explicit_pb2_grpc.add_ExplicitDisciplineServicer_to_server(
             service, server)
+    elif isinstance(service, implicit_pb2_grpc.ImplicitDisciplineServicer):
+        implicit_pb2_grpc.add_ImplicitDisciplineServicer_to_server(
+            service, server)
     else:
         raise ValueError('Unexpected object type provided for variable '
                          '"service".')
 
     server.add_insecure_port('[::]:' + port)
     server.start()
-    print("Started server. Press 'q' and hit enter to stop the server.")
 
-    try:
-        while True:
-            user_input = input()
-            if user_input == 'q':
-                break
-    except KeyboardInterrupt:
-        pass
-
-    print("Stopping the server...")
-    server.stop(0)
+    server.wait_for_termination()

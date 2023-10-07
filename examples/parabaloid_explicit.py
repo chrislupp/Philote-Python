@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 import philote_mdo as pmdo
 
 
@@ -26,13 +25,13 @@ class RemoteParabaloid(pmdo.general.ExplicitServer):
     def setup_partials(self):
         self.define_partials('f_xy', '*')
 
-    def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
+    def compute(self, inputs, outputs):
         x = inputs['x']
         y = inputs['y']
 
         outputs['f_xy'] = (x - 3.0)**2 + x * y + (y + 4.0)**2 - 3.0
 
-    def compute_partials(self, inputs, partials, discrete_inputs=None):
+    def compute_partials(self, inputs, partials):
         x = inputs['x']
         y = inputs['y']
 

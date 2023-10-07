@@ -11,22 +11,18 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+import grpc
 import numpy as np
 from philote_mdo.general import ExplicitClient
-from philote_mdo.utils import PairDict
 
-client = ExplicitClient()
-client._host = 'localhost:50051'
 
-# connect to the server
-client._connect_host()
+client = ExplicitClient(channel=grpc.insecure_channel('localhost:50051'))
 
 # transfer the stream options to the server
-client._stream_options()
+client.stream_options()
 
 # run setup
-client._remote_setup()
+client.remote_setup()
 
 # define some inputs
 inputs = {
@@ -36,13 +32,12 @@ inputs = {
 outputs = {}
 
 # run a function evaluation
-outputs, discrete_outputs = client._remote_compute(inputs)
+outputs, discrete_outputs = client.remote_compute(inputs)
 
 print(outputs)
 
 # run a gradient evaluation
-# partials = PairDict()
-client._setup_remote_partials()
-partials = client._remote_compute_partials(inputs)
+client.remote_setup_partials()
+partials = client.remote_compute_partials(inputs)
 
 print(partials)
