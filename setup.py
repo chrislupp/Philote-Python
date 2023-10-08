@@ -23,11 +23,9 @@ class CompileProto(Command):
         proto_include = str(pathlib.Path(resource_path))
 
         # proto files
-        proto_files = ['array.proto',
-                       'explicit.proto',
-                       'implicit.proto',
-                       'metadata.proto',
-                       'options.proto']
+        proto_files = ['data.proto',
+                       'disciplines.proto'
+                       ]
 
         # compile the proto files for use in python
         grpc_tools.protoc.main([
