@@ -99,25 +99,25 @@ class DisciplineServer:
 
         # transmit the continuous input metadata
         for var in self._vars:
-            yield metadata_pb2.VariableMetaData(type=metadata_pb2.VariableType.kInput,
+            yield data.VariableMetaData(type=data.VariableType.kInput,
                                                 name=var['name'],
                                                 shape=var['shape'],
                                                 units=var['units'])
         # transmit the discrete input metadata
         for var in self._discrete_vars:
-            yield metadata_pb2.VariableMetaData(type=metadata_pb2.VariableType.kDiscreteInput,
+            yield data.VariableMetaData(type=data.VariableType.kDiscreteInput,
                                                 name=var['name'],
                                                 shape=var['shape'],
                                                 units=var['units'])
         # transmit the continuous output metadata
         for func in self._funcs:
-            yield metadata_pb2.VariableMetaData(type=metadata_pb2.VariableType.kOutput,
+            yield data.VariableMetaData(type=data.VariableType.kOutput,
                                                 name=func['name'],
                                                 shape=func['shape'],
                                                 units=func['units'])
         # transmit the discrete output metadata
         for func in self._discrete_funcs:
-            yield metadata_pb2.VariableMetaData(type=metadata_pb2.VariableType.kDiscreteOutput,
+            yield data.VariableMetaData(type=data.VariableType.kDiscreteOutput,
                                                 name=func['name'],
                                                 shape=func['shape'],
                                                 units=func['units'])
@@ -129,7 +129,7 @@ class DisciplineServer:
 
         # transmit the continuous input metadata
         for jac in self._partials:
-            yield metadata_pb2.PartialsMetaData(name=jac[0], subname=jac[1])
+            yield data.PartialsMetaData(name=jac[0], subname=jac[1])
 
     def preallocate_inputs(self, inputs, flat_inputs,
                            discrete_inputs={}, flat_disc_in={},
@@ -191,14 +191,14 @@ class DisciplineServer:
 
             # assign either continuous or discrete data
             if len(message.continuous) > 0:
-                if message.type == metadata_pb2.VariableType.kInput:
+                if message.type == data.VariableType.kInput:
                     flat_inputs[message.name][b:e] = message.continuous
-                elif message.type == metadata_pb2.VariableType.kOutput:
+                elif message.type == data.VariableType.kOutput:
                     flat_outputs[message.name][b:e] = message.continuous
             elif len(message.discrete) > 0:
-                if message.type == metadata_pb2.VariableType.kDiscreteInput:
+                if message.type == data.VariableType.kDiscreteInput:
                     flat_disc_in[message.name][b:e] = message.discrete
-                elif message.type == metadata_pb2.VariableType.kDiscreteOutput:
+                elif message.type == data.VariableType.kDiscreteOutput:
                     flat_disc_out[message.name][b:e] = message.discrete
             else:
                 raise ValueError('Expected continuous or discrete variables, '
