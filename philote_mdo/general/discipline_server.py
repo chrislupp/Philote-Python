@@ -86,10 +86,7 @@ class DisciplineServer:
         """
         # set the maximum size of arrays that will be sent over the wire in one
         # chunk
-        self.num_double = request.num_double
-        self.num_int = request.num_int
-
-        return Empty()
+        self.stream_opts = request
 
     def DefineVariables(self, request, context):
         """
