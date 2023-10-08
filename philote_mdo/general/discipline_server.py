@@ -17,7 +17,7 @@ import philote_mdo.generated.metadata_pb2 as metadata_pb2
 from philote_mdo.utils import PairDict, get_flattened_view
 
 
-class ServerBase:
+class DisciplineServer:
     """
     Base class for all server classes.
     """
