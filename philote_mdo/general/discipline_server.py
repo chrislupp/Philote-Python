@@ -14,6 +14,8 @@
 import numpy as np
 from google.protobuf.empty_pb2 import Empty
 import philote_mdo.generated.data_pb2 as data
+import philote_mdo.generated.disciplines_pb2_grpc as disc
+
 from philote_mdo.utils import PairDict, get_flattened_view
 
 
@@ -22,10 +24,13 @@ class DisciplineServer:
     Base class for all server classes.
     """
 
-    def __init__(self):
+    def __init__(self, discipline=None):
         """
         """
         self.verbose = False
+
+        # user/developer supplied discipline
+        self.discipline = discipline
 
         # discipline stream options
         self.stream_opts = data.StreamOptions()
@@ -36,11 +41,11 @@ class DisciplineServer:
         # partials metadata
         self.partials_meta = []
 
-        # discrete inputs (names, shapes, units)
-        self._discrete_vars = []
-
-        # discrete outputs (names, shapes, units)
-        self._discrete_funcs = []
+    def attach_discipline(self, impl):
+        """
+        Adds a discipline implementation to the server.
+        """
+        self.discipline = impl
 
     def add_input(self, name, shape=(1,), units=''):
         """
@@ -78,6 +83,14 @@ class DisciplineServer:
             if (func, var) not in self._partials:
                 self._partials += [(func, var)]
 
+    def GetInfo(self, request, context):
+        """
+        RPC that sends the discipline information/properties to the client.
+        """
+        yield data.DisciplineProperties(continuous=self.discipline.continuous,
+                                        differentiable=self.discipline.differentiable,
+                                        provides_gradients=self.discipline.provides_gradients)
+
     def SetStreamOptions(self, request, context):
         """
         Receives options from the client on how data will be transmitted to and
@@ -88,11 +101,22 @@ class DisciplineServer:
         # chunk
         self.stream_opts = request
 
-    def DefineVariables(self, request, context):
+    def SetOptions(self, request, context):
+        """
+        RPC that sets the discipline options.
+        """
+        pass
+
+    def Setup(self, request, context):
+        """
+        RPC that runs the setup function
+        """
+        self.discipline.setup()
+
+    def GetVariableDefinitions(self, request, context):
         """
         Transmits setup information about the analysis discipline to the client.
         """
-        self.setup()
 
         # transmit the continuous input metadata
         for var in self._vars:
@@ -101,28 +125,13 @@ class DisciplineServer:
                                                 shape=var['shape'],
                                                 units=var['units'])
         # transmit the discrete input metadata
-        for var in self._discrete_vars:
-            yield data.VariableMetaData(type=data.VariableType.kDiscreteInput,
-                                                name=var['name'],
-                                                shape=var['shape'],
-                                                units=var['units'])
-        # transmit the continuous output metadata
-        for func in self._funcs:
-            yield data.VariableMetaData(type=data.VariableType.kOutput,
-                                                name=func['name'],
-                                                shape=func['shape'],
-                                                units=func['units'])
-        # transmit the discrete output metadata
-        for func in self._discrete_funcs:
-            yield data.VariableMetaData(type=data.VariableType.kDiscreteOutput,
-                                                name=func['name'],
-                                                shape=func['shape'],
-                                                units=func['units'])
+        for var in self.var_meta:
+            yield var
 
-    def DefinePartials(self, request, context):
+    def GetPartialDefinitions(self, request, context):
         self._partials = []
 
-        self.setup_partials()
+        self.discipline.setup_partials()
 
         # transmit the continuous input metadata
         for jac in self._partials:
