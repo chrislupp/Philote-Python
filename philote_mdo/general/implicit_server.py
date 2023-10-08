@@ -11,14 +11,13 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import philote_mdo.generated.implicit_pb2_grpc as implicit_pb2_grpc
-from philote_mdo.generated.metadata_pb2 import VariableType
-import philote_mdo.generated.array_pb2 as array_pb2
-from philote_mdo.general.server_base import ServerBase
+import philote_mdo.generated.disciplines_pb2_grpc as disc
+import philote_mdo.generated.data_pb2 as data
+from philote_mdo.general.discipline_server import DisciplineServer
 from philote_mdo.utils import get_chunk_indicies
 
 
-class ImplicitServer(ServerBase, implicit_pb2_grpc.ImplicitDisciplineServicer):
+class ImplicitServer(DisciplineServer, disc.ImplicitDisciplineServicer):
     """
     Base class for creating an implicit discipline server.
     """

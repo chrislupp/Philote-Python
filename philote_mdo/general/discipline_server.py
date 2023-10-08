@@ -13,7 +13,7 @@
 # limitations under the License.
 import numpy as np
 from google.protobuf.empty_pb2 import Empty
-import philote_mdo.generated.metadata_pb2 as metadata_pb2
+import philote_mdo.generated.data_pb2 as data
 from philote_mdo.utils import PairDict, get_flattened_view
 
 
@@ -25,66 +25,44 @@ class DisciplineServer:
     def __init__(self):
         """
         """
-        # flag that indicates the discipline is implicit
-        self._implicit = False
-
         self.verbose = False
-        self.num_double = 100
-        self.num_int = 100
 
-        # continuous inputs (names, shapes, units)
-        self._vars = []
+        # discipline stream options
+        self.stream_opts = data.StreamOptions()
+
+        # variable metadata
+        self.var_meta = []
+
+        # partials metadata
+        self.partials_meta = []
 
         # discrete inputs (names, shapes, units)
         self._discrete_vars = []
 
-        # continous outputs (names, shapes, units)
-        self._funcs = []
-
-        # residuals (names, shapes, units)
-        self._res = []
-
         # discrete outputs (names, shapes, units)
         self._discrete_funcs = []
 
-        # list of all defined partials
-        self._partials = []
-
-    def define_input(self, name, shape=(1,), units=''):
+    def add_input(self, name, shape=(1,), units=''):
         """
         Define a continuous input.
         """
-        if {'name': name, 'shape': shape, 'units': units} not in self._vars:
-            self._vars += [{'name': name, 'shape': shape, 'units': units}]
+        meta = data.VariableMetaData()
+        meta.type = data.VariableType.kInput
+        meta.shape.extend(shape)
+        meta.units = units
+        self.var_meta += [meta]
 
-    def define_discrete_input(self, name, shape=(1,), units=''):
-        """
-        Define a discrete input.
-        """
-        if {'name': name, 'shape': shape, 'units': units} not in self._discrete_vars:
-            self._discrete_vars += [{'name': name,
-                                     'shape': shape,
-                                     'units': units}]
-
-    def define_output(self, name, shape=(1,), units=''):
+    def add_output(self, name, shape=(1,), units=''):
         """
         Defines a continuous output.
         """
-        if {'name': name, 'shape': shape, 'units': units} not in self._funcs:
-            self._funcs += [{'name': name, 'shape': shape, 'units': units}]
-            if self._implicit:
-                self._res += [{'name': name, 'shape': shape, 'units': units}]
+        meta = data.VariableMetaData()
+        meta.type = data.VariableType.kOutput
+        meta.shape.extend(shape)
+        meta.units = units
+        self.var_meta += [meta]
 
-    def define_discrete_output(self, name, shape=(1,), units=''):
-        """
-        Defines a discrete output.
-        """
-        if {'name': name, 'shape': shape, 'units': units} not in self._discrete_funcs:
-            self._discrete_funcs += [{'name': name,
-                                      'shape': shape,
-                                      'units': units}]
-
-    def define_partials(self, func, var):
+    def declare_partials(self, func, var):
         """
         Defines partials that will be determined using the analysis server.
         """
