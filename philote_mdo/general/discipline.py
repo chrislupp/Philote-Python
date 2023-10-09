@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import philote_mdo.generated.data_pb2 as data
 
 
 class Discipline:
@@ -23,6 +24,40 @@ class Discipline:
         self.is_differentiable = False
         self.provides_gradients = False
 
+        # variable metadata
+        self._var_meta = []
+
+        # partials metadata
+        self._partials_meta = []
+
+    def add_input(self, name, shape=(1,), units=''):
+        """
+        Define a continuous input.
+        """
+        meta = data.VariableMetaData()
+        meta.type = data.VariableType.kInput
+        meta.name = name
+        meta.shape.extend(shape)
+        meta.units = units
+        self._var_meta += [meta]
+
+    def add_output(self, name, shape=(1,), units=''):
+        """
+        Defines a continuous output.
+        """
+        meta = data.VariableMetaData()
+        meta.type = data.VariableType.kOutput
+        meta.name = name
+        meta.shape.extend(shape)
+        meta.units = units
+        self._var_meta += [meta]
+
+    def declare_partials(self, func, var):
+        """
+        Defines partials that will be determined using the analysis server.
+        """
+        self._partials_meta += [data.PartialsMetaData(name=func, subname=var)]
+
     def initialize(self):
         pass
 
@@ -34,3 +69,4 @@ class Discipline:
 
     def configure(self):
         pass
+    

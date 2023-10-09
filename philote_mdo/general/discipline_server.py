@@ -34,43 +34,11 @@ class DisciplineServer(disc.DisciplineService):
         # discipline stream options
         self._stream_opts = data.StreamOptions()
 
-        # variable metadata
-        self._var_meta = []
-
-        # partials metadata
-        self._partials_meta = []
-
     def attach_discipline(self, impl):
         """
         Adds a discipline implementation to the server.
         """
         self._discipline = impl
-
-    def add_input(self, name, shape=(1,), units=''):
-        """
-        Define a continuous input.
-        """
-        meta = data.VariableMetaData()
-        meta.type = data.VariableType.kInput
-        meta.shape.extend(shape)
-        meta.units = units
-        self.var_meta += [meta]
-
-    def add_output(self, name, shape=(1,), units=''):
-        """
-        Defines a continuous output.
-        """
-        meta = data.VariableMetaData()
-        meta.type = data.VariableType.kOutput
-        meta.shape.extend(shape)
-        meta.units = units
-        self._var_meta += [meta]
-
-    def declare_partials(self, func, var):
-        """
-        Defines partials that will be determined using the analysis server.
-        """
-        self._partials_meta += [data.PartialsMetaData(name=func, subname=var)]
 
     def GetInfo(self, request, context):
         """
@@ -105,19 +73,11 @@ class DisciplineServer(disc.DisciplineService):
         """
         Transmits setup information about the analysis discipline to the client.
         """
-
-        # transmit the continuous input metadata
-        for var in self._vars:
-            yield data.VariableMetaData(type=data.VariableType.kInput,
-                                                name=var['name'],
-                                                shape=var['shape'],
-                                                units=var['units'])
-        # transmit the discrete input metadata
-        for var in self.var_meta:
+        for var in self._discipline._var_meta:
             yield var
 
     def GetPartialDefinitions(self, request, context):
-        for jac in self._partials_meta:
+        for jac in self._discipline._partials_meta:
             yield jac
 
     def preallocate_inputs(self, inputs, flat_inputs,

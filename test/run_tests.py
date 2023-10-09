@@ -11,3 +11,11 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import unittest
+
+from test_discipline import TestDiscipline
+
+
+
+if __name__ == "__main__":
+    unittest.main(verbosity=2)
