@@ -17,10 +17,17 @@ from unittest.mock import Mock
 from google.protobuf.empty_pb2 import Empty
 
 from philote_mdo.general import Discipline, DisciplineServer
+import philote_mdo.generated.data_pb2 as data
 
 
 class TestDisciplineServer(unittest.TestCase):
+    """
+    Unit tests for the discipline server.
+    """
     def test_get_info(self):
+        """
+        Tests the GetInfo RPC.
+        """
         server = DisciplineServer()
         server._discipline = Discipline()
         server._discipline._is_continuous = True
@@ -41,14 +48,24 @@ class TestDisciplineServer(unittest.TestCase):
 
         # check the values of the response
         response = responses[0]
-        self.assertEqual(response.continuous, True)
-        self.assertEqual(response.differentiable, True)
-        self.assertEqual(response.provides_gradients, True)
-
-
+        self.assertTrue(response.continuous)
+        self.assertTrue(response.differentiable)
+        self.assertTrue(response.provides_gradients)
 
     def test_set_stream_options(self):
-        pass
+        """
+        Tests the SetStreamOptions RPC.
+        """
+        server = DisciplineServer()
+
+        # mock arguments
+        context = Mock()
+        request = data.StreamOptions(num_double=2)
+
+        server.SetStreamOptions(request, context)
+
+        # check that the streaming options were set properly
+        self.assertEqual(server._stream_opts.num_double, 2)
 
     def test_set_options(self):
         pass

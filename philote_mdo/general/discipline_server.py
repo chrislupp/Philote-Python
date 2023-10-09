@@ -32,7 +32,7 @@ class DisciplineServer(disc.DisciplineService):
         self._discipline = discipline
 
         # discipline stream options
-        self._stream_opts = data.StreamOptions()
+        self._stream_opts = data.StreamOptions(num_double=1000)
 
     def attach_discipline(self, impl):
         """
@@ -54,7 +54,7 @@ class DisciplineServer(disc.DisciplineService):
         received from the client. The options are stores locally for use in the
         compute routines.
         """
-        self.stream_opts = request
+        self._stream_opts = request
 
     def SetOptions(self, request, context):
         """
