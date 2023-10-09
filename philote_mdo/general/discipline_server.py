@@ -12,14 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import numpy as np
-from google.protobuf.empty_pb2 import Empty
+
 import philote_mdo.generated.data_pb2 as data
 import philote_mdo.generated.disciplines_pb2_grpc as disc
-
 from philote_mdo.utils import PairDict, get_flattened_view
 
 
-class DisciplineServer:
+class DisciplineServer(disc.DisciplineService):
     """
     Base class for all server classes.
     """
@@ -30,22 +29,22 @@ class DisciplineServer:
         self.verbose = False
 
         # user/developer supplied discipline
-        self.discipline = discipline
+        self._discipline = discipline
 
         # discipline stream options
-        self.stream_opts = data.StreamOptions()
+        self._stream_opts = data.StreamOptions()
 
         # variable metadata
-        self.var_meta = []
+        self._var_meta = []
 
         # partials metadata
-        self.partials_meta = []
+        self._partials_meta = []
 
     def attach_discipline(self, impl):
         """
         Adds a discipline implementation to the server.
         """
-        self.discipline = impl
+        self._discipline = impl
 
     def add_input(self, name, shape=(1,), units=''):
         """
@@ -65,23 +64,13 @@ class DisciplineServer:
         meta.type = data.VariableType.kOutput
         meta.shape.extend(shape)
         meta.units = units
-        self.var_meta += [meta]
+        self._var_meta += [meta]
 
     def declare_partials(self, func, var):
         """
         Defines partials that will be determined using the analysis server.
         """
-        if isinstance(var, list):
-            for val in var:
-                if (func, val) not in self._partials:
-                    self._partials += [(func, val['name'])]
-        elif var == '*':
-            for val in self._vars:
-                if (func, val) not in self._partials:
-                    self._partials += [(func, val['name'])]
-        else:
-            if (func, var) not in self._partials:
-                self._partials += [(func, var)]
+        self._partials_meta += [data.PartialsMetaData(name=func, subname=var)]
 
     def GetInfo(self, request, context):
         """
@@ -97,8 +86,6 @@ class DisciplineServer:
         received from the client. The options are stores locally for use in the
         compute routines.
         """
-        # set the maximum size of arrays that will be sent over the wire in one
-        # chunk
         self.stream_opts = request
 
     def SetOptions(self, request, context):
@@ -112,6 +99,7 @@ class DisciplineServer:
         RPC that runs the setup function
         """
         self.discipline.setup()
+        self.discipline.setup_partials()
 
     def GetVariableDefinitions(self, request, context):
         """
@@ -129,18 +117,11 @@ class DisciplineServer:
             yield var
 
     def GetPartialDefinitions(self, request, context):
-        self._partials = []
-
-        self.discipline.setup_partials()
-
-        # transmit the continuous input metadata
-        for jac in self._partials:
-            yield data.PartialsMetaData(name=jac[0], subname=jac[1])
+        for jac in self._partials_meta:
+            yield jac
 
     def preallocate_inputs(self, inputs, flat_inputs,
-                           discrete_inputs={}, flat_disc_in={},
-                           outputs={}, flat_outputs={},
-                           discrete_outputs={}, flat_disc_out={}):
+                           outputs={}, flat_outputs={}):
         """
         Preallocates the inputs before receiving data from the client.
 
@@ -151,20 +132,12 @@ class DisciplineServer:
         for var in self._vars:
             inputs[var['name']] = np.zeros(var['shape'])
             flat_inputs[var['name']] = get_flattened_view(inputs[var['name']])
-        for dvar in self._discrete_vars:
-            discrete_inputs[dvar['name']] = np.zeros(dvar['shape'])
-            flat_disc_in[dvar['name']] = get_flattened_view(
-                discrete_inputs[dvar['name']])
 
         # preallocate the output and discrete output arrays
         for out in self._funcs:
             outputs[out['name']] = np.zeros(var['shape'])
             flat_outputs[out['name']] = get_flattened_view(
                 outputs[out['name']])
-        for dout in self._discrete_funcs:
-            discrete_outputs[dout['name']] = np.zeros(dout['shape'])
-            flat_disc_out[dout['name']] = get_flattened_view(
-                discrete_outputs[dout['name']])
 
     def preallocate_partials(self):
         """
@@ -181,8 +154,8 @@ class DisciplineServer:
 
         return jac
 
-    def process_inputs(self, request_iterator, flat_inputs, flat_disc_in,
-                       flat_outputs=None, flat_disc_out=None):
+    def process_inputs(self, request_iterator, flat_inputs,
+                       flat_outputs=None):
         """
         Processes the message inputs from a gRPC stream.
 
@@ -196,16 +169,11 @@ class DisciplineServer:
             e = message.end
 
             # assign either continuous or discrete data
-            if len(message.continuous) > 0:
+            if len(message.data) > 0:
                 if message.type == data.VariableType.kInput:
-                    flat_inputs[message.name][b:e] = message.continuous
+                    flat_inputs[message.name][b:e] = message.data
                 elif message.type == data.VariableType.kOutput:
-                    flat_outputs[message.name][b:e] = message.continuous
-            elif len(message.discrete) > 0:
-                if message.type == data.VariableType.kDiscreteInput:
-                    flat_disc_in[message.name][b:e] = message.discrete
-                elif message.type == data.VariableType.kDiscreteOutput:
-                    flat_disc_out[message.name][b:e] = message.discrete
+                    flat_outputs[message.name][b:e] = message.data
             else:
                 raise ValueError('Expected continuous or discrete variables, '
                                  'but arrays were empty for variable %s.' %
