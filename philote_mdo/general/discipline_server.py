@@ -88,16 +88,14 @@ class DisciplineServer(disc.DisciplineService):
         Note, for implicit disciplines, the function values are considered
         inputs to evaluate the residuals and the partials of the residuals.
         """
-        # preallocate the input and discrete input arrays
-        for var in self._vars:
-            inputs[var['name']] = np.zeros(var['shape'])
-            flat_inputs[var['name']] = get_flattened_view(inputs[var['name']])
+        for var in self._discipline._var_meta:
+            if var.type == data.kInput:
+                inputs[var.name] = np.zeros(var.shape)
+                flat_inputs[var.name] = get_flattened_view(inputs[var.name])
 
-        # preallocate the output and discrete output arrays
-        for out in self._funcs:
-            outputs[out['name']] = np.zeros(var['shape'])
-            flat_outputs[out['name']] = get_flattened_view(
-                outputs[out['name']])
+            if var.type == data.kOutput:
+                outputs[var.name] = np.zeros(var.shape)
+                flat_outputs[var.name] = get_flattened_view(outputs[var.name])
 
     def preallocate_partials(self):
         """
@@ -131,9 +129,9 @@ class DisciplineServer(disc.DisciplineService):
             # assign either continuous or discrete data
             if len(message.data) > 0:
                 if message.type == data.VariableType.kInput:
-                    flat_inputs[message.name][b:e] = message.data
+                    flat_inputs[message.name][b:e+1] = message.data
                 elif message.type == data.VariableType.kOutput:
-                    flat_outputs[message.name][b:e] = message.data
+                    flat_outputs[message.name][b:e+1] = message.data
             else:
                 raise ValueError('Expected continuous variables but arrays were'
                                  ' empty for variable %s.' %

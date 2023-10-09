@@ -129,8 +129,97 @@ class TestDisciplineServer(unittest.TestCase):
         self.assertEqual(output.units, "m**2")
         self.assertEqual(output.type, data.kOutput)
 
-    # def test_preallocate_inputs(self):
-    #     pass
+    def test_preallocate_inputs_explicit(self):
+        """
+        Tests the preallocation of inputs for the explicit discipline case
+        (outputs are not an input).
+        """
+        server = DisciplineServer()
+        discipline = server._discipline = Discipline()
+        discipline.add_input("x", shape=(2, 2), units="m")
+        discipline.add_input("y", shape=(3, 3, 3), units="m**2")
+        discipline.add_output("f1", shape=(1,), units="m**3")
+        discipline.add_output("f2", shape=(2, 3), units="m**3")
+
+        # create simulated inputs for the function
+        inputs = {}
+        flat_inputs = {}
+        outputs = {}
+        flat_outputs = {}
+
+        server.preallocate_inputs(inputs, flat_inputs, outputs, flat_outputs)
+
+        # check the number of inputs and outputs
+        self.assertEqual(len(inputs), 2)
+        self.assertEqual(len(flat_inputs), 2)
+
+        for var, shape in zip(["x", "y"], [(2, 2), (3, 3, 3)]):
+            # check variable existence
+            self.assertTrue(var in inputs)
+            self.assertTrue(var in flat_inputs)
+
+            # check that variables are numpy arrays
+            self.assertIsInstance(inputs[var], np.ndarray)
+            self.assertIsInstance(flat_inputs[var], np.ndarray)
+
+            # check that the variables have the right shape
+            self.assertEqual(inputs[var].shape, shape)
+            self.assertEqual(flat_inputs[var].size, np.prod(shape))
+
+
+    def test_preallocate_inputs_implicit(self):
+        """
+        Tests the preallocation of inputs for the implicit discipline case
+        (outputs are an input).
+        """
+        server = DisciplineServer()
+        discipline = server._discipline = Discipline()
+        discipline.add_input("x", shape=(2, 2), units="m")
+        discipline.add_input("y", shape=(3, 3, 3), units="m**2")
+        discipline.add_output("f1", shape=(1,), units="m**3")
+        discipline.add_output("f2", shape=(2, 3), units="m**3")
+
+        # create simulated inputs for the function
+        inputs = {}
+        flat_inputs = {}
+        outputs = {}
+        flat_outputs = {}
+
+        server.preallocate_inputs(inputs, flat_inputs, outputs, flat_outputs)
+
+        # check the number of inputs and outputs
+        self.assertEqual(len(inputs), 2)
+        self.assertEqual(len(flat_inputs), 2)
+        self.assertEqual(len(outputs), 2)
+        self.assertEqual(len(flat_outputs), 2)
+
+        # check inputs
+        for var, shape in zip(["x", "y"], [(2, 2), (3, 3, 3)]):
+            # check variable existence
+            self.assertTrue(var in inputs)
+            self.assertTrue(var in flat_inputs)
+
+            # check that variables are numpy arrays
+            self.assertIsInstance(inputs[var], np.ndarray)
+            self.assertIsInstance(flat_inputs[var], np.ndarray)
+
+            # check that the variables have the right shape
+            self.assertEqual(inputs[var].shape, shape)
+            self.assertEqual(flat_inputs[var].size, np.prod(shape))
+
+        # check outputs
+        for out, shape in zip(["f1", "f2"], [(1,), (2, 3)]):
+            # check variable existence
+            self.assertTrue(out in outputs)
+            self.assertTrue(out in flat_outputs)
+
+            # check that variables are numpy arrays
+            self.assertIsInstance(outputs[out], np.ndarray)
+            self.assertIsInstance(flat_outputs[out], np.ndarray)
+
+            # check that the variables have the right shape
+            self.assertEqual(outputs[out].shape, shape)
+            self.assertEqual(flat_outputs[out].size, np.prod(shape))
 
     # def test_preallocate_partials(self):
     #     pass
@@ -138,19 +227,23 @@ class TestDisciplineServer(unittest.TestCase):
     def test_process_inputs(self):
         # create a mock request_iterator
         request_iterator = [
-            data.Array(start=0, end=3, data=[1.0, 2.0, 3.0], type=data.VariableType.kInput, name="x"),
-            data.Array(start=3, end=5, data=[4.0, 5.0], type=data.VariableType.kInput, name="x"),
-            data.Array(start=0, end=2, data=[0.1, 0.2], type=data.VariableType.kOutput, name="f"),
+            data.Array(start=0, end=2, data=[1.0, 2.0, 3.0],
+                       type=data.VariableType.kInput, name="x"),
+            data.Array(start=3, end=4, data=[4.0, 5.0],
+                       type=data.VariableType.kInput, name="x"),
+            data.Array(start=0, end=1, data=[0.1, 0.2],
+                       type=data.VariableType.kOutput, name="f"),
         ]
 
         your_service = DisciplineServer()
 
         # create mock flat_inputs and flat_outputs dictionaries
-        flat_inputs = {"x": np.array([0.0, 0.0, 0.0, 0.0, 0.0, 0.0])}
-        flat_outputs = {"f": np.array([0.0, 0.0, 0.0])}
+        flat_inputs = {"x": np.zeros(6)}
+        flat_outputs = {"f": np.zeros(3)}
 
         your_service.process_inputs(request_iterator, flat_inputs, flat_outputs)
 
         # check the results
-        self.assertEqual(flat_inputs["x"].tolist(), [1.0, 2.0, 3.0, 4.0, 5.0, 0.0])
+        self.assertEqual(flat_inputs["x"].tolist(),
+                         [1.0, 2.0, 3.0, 4.0, 5.0, 0.0])
         self.assertEqual(flat_outputs["f"].tolist(), [0.1, 0.2, 0.0])
