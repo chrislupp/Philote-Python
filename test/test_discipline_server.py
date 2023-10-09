@@ -71,7 +71,24 @@ class TestDisciplineServer(unittest.TestCase):
         pass
 
     def test_setup(self):
-        pass
+        # Create a mock context and request
+        context = Mock()
+        request = Empty()
+
+        # Create an instance of your service
+        server = DisciplineServer()
+
+        # Mock the 'setup' and 'setup_partials' methods of 'self.discipline'
+        server.discipline = Mock()
+        server.discipline.setup.return_value = None
+        server.discipline.setup_partials.return_value = None
+
+        # Call the Setup method
+        server.Setup(request, context)
+
+        # Assert that the 'setup' and 'setup_partials' methods were called
+        server.discipline.setup.assert_called_once()
+        server.discipline.setup_partials.assert_called_once()
 
     def test_get_variable_definitions(self):
         pass
