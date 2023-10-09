@@ -14,6 +14,8 @@
 import unittest
 from unittest.mock import Mock
 
+import numpy as np
+
 from google.protobuf.empty_pb2 import Empty
 
 from philote_mdo.general import Discipline, DisciplineServer
@@ -133,5 +135,22 @@ class TestDisciplineServer(unittest.TestCase):
     # def test_preallocate_partials(self):
     #     pass
 
-    # def test_process_inputs(self):
-    #     pass
+    def test_process_inputs(self):
+        # create a mock request_iterator
+        request_iterator = [
+            data.Array(start=0, end=3, data=[1.0, 2.0, 3.0], type=data.VariableType.kInput, name="x"),
+            data.Array(start=3, end=5, data=[4.0, 5.0], type=data.VariableType.kInput, name="x"),
+            data.Array(start=0, end=2, data=[0.1, 0.2], type=data.VariableType.kOutput, name="f"),
+        ]
+
+        your_service = DisciplineServer()
+
+        # create mock flat_inputs and flat_outputs dictionaries
+        flat_inputs = {"x": np.array([0.0, 0.0, 0.0, 0.0, 0.0, 0.0])}
+        flat_outputs = {"f": np.array([0.0, 0.0, 0.0])}
+
+        your_service.process_inputs(request_iterator, flat_inputs, flat_outputs)
+
+        # check the results
+        self.assertEqual(flat_inputs["x"].tolist(), [1.0, 2.0, 3.0, 4.0, 5.0, 0.0])
+        self.assertEqual(flat_outputs["f"].tolist(), [0.1, 0.2, 0.0])
