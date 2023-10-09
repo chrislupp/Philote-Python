@@ -15,6 +15,7 @@ import unittest
 
 from test_discipline import TestDiscipline
 
+from test_discipline_server import TestDisciplineServer
 
 
 if __name__ == "__main__":

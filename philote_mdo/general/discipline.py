@@ -20,9 +20,10 @@ class Discipline:
     """
 
     def __init__(self):
-        self.is_continuous = False
-        self.is_differentiable = False
-        self.provides_gradients = False
+        # discipline properties
+        self._is_continuous = False
+        self._is_differentiable = False
+        self._provides_gradients = False
 
         # variable metadata
         self._var_meta = []

@@ -44,9 +44,9 @@ class DisciplineServer(disc.DisciplineService):
         """
         RPC that sends the discipline information/properties to the client.
         """
-        yield data.DisciplineProperties(continuous=self.discipline.continuous,
-                                        differentiable=self.discipline.differentiable,
-                                        provides_gradients=self.discipline.provides_gradients)
+        yield data.DisciplineProperties(continuous=self._discipline._is_continuous,
+                                        differentiable=self._discipline._is_differentiable,
+                                        provides_gradients=self._discipline._provides_gradients)
 
     def SetStreamOptions(self, request, context):
         """
