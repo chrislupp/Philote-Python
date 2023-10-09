@@ -11,9 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from .discipline_server import DisciplineServer
 
-from .run_server import run_server
-from .explicit_server import ExplicitServer
-from .explicit_client import ExplicitClient
-from .implicit_server import ImplicitServer
-from .implicit_client import ImplicitClient
+from .discipline import Discipline
