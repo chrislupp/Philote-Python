@@ -19,8 +19,13 @@ import philote_mdo.generated.data_pb2 as data
 
 
 class TestDiscipline(unittest.TestCase):
-
+    """
+    Unit tests for the discipline base class.
+    """
     def test_add_input(self):
+        """
+        Tests the add input member function.
+        """
         disc = Discipline()
 
         disc.add_input("test", shape=(2, 2), units="m**2")
@@ -36,6 +41,9 @@ class TestDiscipline(unittest.TestCase):
 
 
     def test_add_output(self):
+        """
+        Tests the add output member function.
+        """
         disc = Discipline()
 
         disc.add_output("test", shape=(2, 2), units="m**2")
@@ -50,7 +58,19 @@ class TestDiscipline(unittest.TestCase):
         self.assertEqual(disc._var_meta[0].type, data.kOutput)
 
     def test_declare_partials(self):
-        pass
+        """
+        Tests the declare partials member function.
+        """
+        disc = Discipline()
+
+        disc.declare_partials("f", "x")
+
+        # check if the variable meta data contains one entry
+        self.assertEqual(len(disc._partials_meta), 1)
+
+        # check the meta data values
+        self.assertEqual(disc._partials_meta[0].name, "f")
+        self.assertEqual(disc._partials_meta[0].subname, "x")
 
 
 if __name__ == "__main__":
