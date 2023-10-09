@@ -135,6 +135,6 @@ class DisciplineServer(disc.DisciplineService):
                 elif message.type == data.VariableType.kOutput:
                     flat_outputs[message.name][b:e] = message.data
             else:
-                raise ValueError('Expected continuous or discrete variables, '
-                                 'but arrays were empty for variable %s.' %
+                raise ValueError('Expected continuous variables but arrays were'
+                                 ' empty for variable %s.' %
                                  (message.name))
