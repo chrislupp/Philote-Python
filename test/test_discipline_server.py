@@ -67,10 +67,13 @@ class TestDisciplineServer(unittest.TestCase):
         # check that the streaming options were set properly
         self.assertEqual(server._stream_opts.num_double, 2)
 
-    def test_set_options(self):
-        pass
+    # def test_set_options(self):
+    #     pass
 
     def test_setup(self):
+        """
+        Tests the Setup RPC.
+        """
         context = Mock()
         request = Empty()
 
@@ -88,13 +91,47 @@ class TestDisciplineServer(unittest.TestCase):
         server._discipline.setup_partials.assert_called_once()
 
     def test_get_variable_definitions(self):
-        pass
+        """
+        Tests the GetVariableDefinitions RPC.
+        """
+        server = DisciplineServer()
+        server._discipline = Discipline()
 
-    def test_preallocate_inputs(self):
-        pass
+        # add an input and an output
+        server._discipline.add_input('x', shape=(2, 2), units="m")
+        server._discipline.add_output('f', shape=(1,), units="m**2")
 
-    def test_preallocate_partials(self):
-        pass
+        # mock arguments
+        context = Mock()
+        request = Empty()
 
-    def test_process_inputs(self):
-        pass
+        response_generator = server.GetVariableDefinitions(request, context)
+
+        # Generate responses and collect them into a list
+        responses = list(response_generator)
+
+        # check that there are two responses (one input, one output)
+        self.assertEqual(len(responses), 2)
+
+        # check the response data
+        input = responses[0]
+        output = responses[1]
+
+        self.assertEqual(input.name, "x")
+        self.assertEqual(input.shape, [2, 2])
+        self.assertEqual(input.units, "m")
+        self.assertEqual(input.type, data.kInput)
+
+        self.assertEqual(output.name, "f")
+        self.assertEqual(output.shape, [1,])
+        self.assertEqual(output.units, "m**2")
+        self.assertEqual(output.type, data.kOutput)
+
+    # def test_preallocate_inputs(self):
+    #     pass
+
+    # def test_preallocate_partials(self):
+    #     pass
+
+    # def test_process_inputs(self):
+    #     pass
