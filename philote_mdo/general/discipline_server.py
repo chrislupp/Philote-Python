@@ -66,8 +66,8 @@ class DisciplineServer(disc.DisciplineService):
         """
         RPC that runs the setup function
         """
-        self.discipline.setup()
-        self.discipline.setup_partials()
+        self._discipline.setup()
+        self._discipline.setup_partials()
 
     def GetVariableDefinitions(self, request, context):
         """
