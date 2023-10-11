@@ -25,7 +25,7 @@ class ExplicitServer(DisciplineServer, disc.ExplicitDisciplineServicer):
     def __init__(self):
         super().__init__()
 
-    def Functions(self, request_iterator, context):
+    def ComputeFunction(self, request_iterator, context):
         """
         Computes the function evaluation and sends the result to the client.
         """
@@ -38,11 +38,10 @@ class ExplicitServer(DisciplineServer, disc.ExplicitDisciplineServicer):
         discrete_outputs = {}
 
         # preallocate the input and discrete input arrays
-        self.preallocate_inputs(inputs, flat_inputs,
-                                discrete_inputs, flat_disc)
+        self.preallocate_inputs(inputs, flat_inputs)
 
         # process inputs
-        self.process_inputs(request_iterator, flat_inputs, flat_disc)
+        self.process_inputs(request_iterator, flat_inputs)
 
         # call the user-defined compute function
         if discrete_inputs or discrete_outputs:
@@ -56,23 +55,12 @@ class ExplicitServer(DisciplineServer, disc.ExplicitDisciplineServicer):
             # iterate through all chunks needed for the current input
             for b, e in get_chunk_indicies(value.size, self.num_double):
                 # create the chunked data
-                yield array_pb2.Array(name=output_name,
-                                      start=b,
-                                      end=e,
-                                      continuous=value.ravel()[b:e])
+                yield data.Array(name=output_name,
+                                 start=b,
+                                 end=e,
+                                 continuous=value.ravel()[b:e])
 
-        # iterate through all discrete outputs in the dictionary
-        for doutput_name, value in discrete_outputs.items():
-
-            # iterate through all chunks needed for the current input
-            for b, e in get_chunk_indicies(value.size, self.num_double):
-                # create the chunked data
-                yield array_pb2.Array(name=doutput_name,
-                                      start=b,
-                                      end=e,
-                                      discrete=value.ravel()[b:e])
-
-    def Gradient(self, request_iterator, context):
+    def ComputeGradient(self, request_iterator, context):
         """
         Computes the gradient evaluation and sends the result to the client.
         """
@@ -83,8 +71,7 @@ class ExplicitServer(DisciplineServer, disc.ExplicitDisciplineServicer):
         flat_disc = {}
 
         # preallocate the input and discrete input arrays
-        self.preallocate_inputs(inputs, flat_inputs,
-                                discrete_inputs, flat_disc)
+        self.preallocate_inputs(inputs, flat_inputs)
 
         # preallocate the partials
         jac = self.preallocate_partials()
@@ -104,21 +91,8 @@ class ExplicitServer(DisciplineServer, disc.ExplicitDisciplineServicer):
             # iterate through all chunks needed for the current input
             for b, e in get_chunk_indicies(value.size, self.num_double):
                 # create and send the chunked data
-                yield array_pb2.Array(name=jac[0],
-                                      subname=jac[1],
-                                      start=b,
-                                      end=e,
-                                      continuous=value.ravel()[b:e])
-
-    def initialize(self):
-        pass
-
-    def setup(self):
-        pass
-
-    def compute(self, inputs, outputs, discrete_inputs=None,
-                discrete_outputs=None):
-        pass
-
-    def compute_partials(self, inputs, partials, discrete_inputs=None):
-        pass
+                yield data.Array(name=jac[0],
+                                 subname=jac[1],
+                                 start=b,
+                                 end=e,
+                                 continuous=value.ravel()[b:e])
