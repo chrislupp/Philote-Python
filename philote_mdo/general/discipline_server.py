@@ -99,16 +99,31 @@ class DisciplineServer(disc.DisciplineService):
 
     def preallocate_partials(self):
         """
-        Preallocates the partials
+        Preallocates the partials.
+
+        Note: there are edge cases for this function, where either f or x, or
+        both are scalar. In those cases the shapes of the partials must be
+        treated differently.
         """
         jac = PairDict()
 
-        for pair in self._partials:
-            shape = tuple([d['shape']
-                           for d in self._funcs if d['name'] == pair[0]])[0]
-            shape += tuple([d['shape']
-                            for d in self._vars if d['name'] == pair[1]])[0]
-            jac[pair] = np.zeros(shape)
+        for pair in self._discipline._partials_meta:
+            shapef = tuple([d.shape
+                           for d in self._discipline._var_meta if d.name == pair.name][0])
+            shapex = tuple([d.shape
+                           for d in self._discipline._var_meta if d.name == pair.subname][0])
+            
+            if shapef == (1,):
+                if shapex == (1,):
+                    shape = (1,)
+                else:
+                    shape = shapex
+            elif shapex == (1,):
+                shape = shapef
+            else:
+                shape = shapef + shapex
+                
+            jac[(pair.name, pair.subname)] = np.zeros(shape)
 
         return jac
 

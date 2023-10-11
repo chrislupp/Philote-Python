@@ -221,8 +221,35 @@ class TestDisciplineServer(unittest.TestCase):
             self.assertEqual(outputs[out].shape, shape)
             self.assertEqual(flat_outputs[out].size, np.prod(shape))
 
-    # def test_preallocate_partials(self):
-    #     pass
+    def test_preallocate_partials(self):
+        """
+        Tests the preallocation of the partial derivatives.
+
+        This test is designed to catch the edge cases where either f or x are
+        scalar.
+        """
+        server = DisciplineServer()
+        discipline = server._discipline = Discipline()
+        discipline.add_input("x", shape=(1,), units="m")
+        discipline.add_input("y", shape=(3, 3), units="m**2")
+        discipline.add_output("f1", shape=(1,), units="m**3")
+        discipline.add_output("f2", shape=(2, 3), units="m**3")
+
+        discipline.declare_partials('f1', 'x')
+        discipline.declare_partials('f1', 'y')
+        discipline.declare_partials('f2', 'x')
+        discipline.declare_partials('f2', 'y')
+
+
+        jac = server.preallocate_partials()
+
+        pairs = [("f1", "x"), ("f1", "y"), ("f2", "x"), ("f2", "y")]
+        expected_shapes = [(1,), (3, 3), (2, 3), (2, 3, 3, 3)]
+
+        for pair, shape in zip(pairs, expected_shapes):
+            self.assertTrue(pair in jac)
+            self.assertIsInstance(jac[pair], np.ndarray)
+            self.assertEqual(jac[pair].shape, shape)
 
     def test_process_inputs(self):
         # create a mock request_iterator
@@ -235,13 +262,13 @@ class TestDisciplineServer(unittest.TestCase):
                        type=data.VariableType.kOutput, name="f"),
         ]
 
-        your_service = DisciplineServer()
+        server = DisciplineServer()
 
         # create mock flat_inputs and flat_outputs dictionaries
         flat_inputs = {"x": np.zeros(6)}
         flat_outputs = {"f": np.zeros(3)}
 
-        your_service.process_inputs(request_iterator, flat_inputs, flat_outputs)
+        server.process_inputs(request_iterator, flat_inputs, flat_outputs)
 
         # check the results
         self.assertEqual(flat_inputs["x"].tolist(),

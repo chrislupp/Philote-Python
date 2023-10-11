@@ -1,4 +1,4 @@
-import pathlib
+import os
 from setuptools import setup, Command
 import importlib.resources as resources
 
@@ -18,14 +18,10 @@ class CompileProto(Command):
 
     def run(self):
         import grpc_tools.protoc
-        import grpc_tools._proto
-        resource_path = resources.path(grpc_tools._proto, '')
-        proto_include = str(pathlib.Path(resource_path))
+        proto_include = os.path.join(resources.files("grpc_tools"), "_proto")
 
         # proto files
-        proto_files = ['data.proto',
-                       'disciplines.proto'
-                       ]
+        proto_files = ['data.proto', 'disciplines.proto']
 
         # compile the proto files for use in python
         grpc_tools.protoc.main([
@@ -62,7 +58,9 @@ setup(
     ],
     install_requires=[
         "numpy",
-        "grpc",
+        "grpcio",
+        "grpcio-tools",
+        "protoletariat"
     ],
     packages=['philote_mdo'],
 
