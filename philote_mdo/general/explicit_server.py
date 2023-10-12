@@ -17,7 +17,7 @@ from philote_mdo.general.discipline_server import DisciplineServer
 from philote_mdo.utils import get_chunk_indices
 
 
-class ExplicitServer(DisciplineServer, disc.ExplicitDisciplineServicer):
+class ExplicitServer(DisciplineServer, disc.ExplicitServiceServicer):
     """
     Base class for remote explicit components.
     """
@@ -39,11 +39,11 @@ class ExplicitServer(DisciplineServer, disc.ExplicitDisciplineServicer):
 
         for output_name, value in outputs.items():
             # iterate through all chunks needed for the current output
-            for b, e in get_chunk_indices(value.size, self.num_double):
+            for b, e in get_chunk_indices(value.size, self._stream_opts.num_double):
                 yield data.Array(name=output_name,
                                  start=b,
-                                 end=e,
-                                 continuous=value.ravel()[b:e])
+                                 end=e-1,
+                                 data=value.ravel()[b:e])
 
     def ComputeGradient(self, request_iterator, context):
         """
@@ -62,5 +62,5 @@ class ExplicitServer(DisciplineServer, disc.ExplicitDisciplineServicer):
                 yield data.Array(name=jac[0],
                                  subname=jac[1],
                                  start=b,
-                                 end=e,
-                                 continuous=value.ravel()[b:e])
+                                 end=e-1,
+                                 data=value.ravel()[b:e])

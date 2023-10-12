@@ -28,7 +28,7 @@ class TestDisciplineServer(unittest.TestCase):
     """
     def test_get_info(self):
         """
-        Tests the GetInfo RPC.
+        Tests the GetInfo RPC of the Discipline Server.
         """
         server = DisciplineServer()
         server._discipline = Discipline()
@@ -56,7 +56,7 @@ class TestDisciplineServer(unittest.TestCase):
 
     def test_set_stream_options(self):
         """
-        Tests the SetStreamOptions RPC.
+        Tests the SetStreamOptions RPC of the Discipline Server.
         """
         server = DisciplineServer()
 
@@ -74,7 +74,7 @@ class TestDisciplineServer(unittest.TestCase):
 
     def test_setup(self):
         """
-        Tests the Setup RPC.
+        Tests the Setup RPC of the Discipline Server.
         """
         context = Mock()
         request = Empty()
@@ -94,7 +94,7 @@ class TestDisciplineServer(unittest.TestCase):
 
     def test_get_variable_definitions(self):
         """
-        Tests the GetVariableDefinitions RPC.
+        Tests the GetVariableDefinitions RPC of the Discipline Server.
         """
         server = DisciplineServer()
         server._discipline = Discipline()
@@ -131,7 +131,7 @@ class TestDisciplineServer(unittest.TestCase):
 
     def test_preallocate_inputs_explicit(self):
         """
-        Tests the preallocation of inputs for the explicit discipline case
+        Tests the preallocation of inputs for the explicit discipline cas of the Discipline Servere
         (outputs are not an input).
         """
         server = DisciplineServer()
@@ -169,7 +169,7 @@ class TestDisciplineServer(unittest.TestCase):
 
     def test_preallocate_inputs_implicit(self):
         """
-        Tests the preallocation of inputs for the implicit discipline case
+        Tests the preallocation of inputs for the implicit discipline cas of the Discipline Servere
         (outputs are an input).
         """
         server = DisciplineServer()
@@ -223,7 +223,7 @@ class TestDisciplineServer(unittest.TestCase):
 
     def test_preallocate_partials(self):
         """
-        Tests the preallocation of the partial derivatives.
+        Tests the preallocation of the partial derivatives of the Discipline Server.
 
         This test is designed to catch the edge cases where either f or x are
         scalar.

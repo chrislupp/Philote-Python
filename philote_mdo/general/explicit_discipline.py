@@ -11,14 +11,14 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import philote_mdo.general as pmdo
 
-
-class ExplicitDiscipline:
+class ExplicitDiscipline(pmdo.Discipline):
     """
     """
 
     def __init__(self):
-        pass
+        super().__init__()
 
     def compute(self):
         pass
