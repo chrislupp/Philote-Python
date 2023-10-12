@@ -14,7 +14,7 @@
 import philote_mdo.generated.disciplines_pb2_grpc as disc
 import philote_mdo.generated.data_pb2 as data
 from philote_mdo.general.discipline_server import DisciplineServer
-from philote_mdo.utils import get_chunk_indicies
+from philote_mdo.utils import get_chunk_indices
 
 
 class ExplicitServer(DisciplineServer, disc.ExplicitDisciplineServicer):
@@ -29,32 +29,17 @@ class ExplicitServer(DisciplineServer, disc.ExplicitDisciplineServicer):
         """
         Computes the function evaluation and sends the result to the client.
         """
-        # inputs and outputs
         inputs = {}
         flat_inputs = {}
-        discrete_inputs = {}
-        flat_disc = {}
         outputs = {}
-        discrete_outputs = {}
 
-        # preallocate the input and discrete input arrays
         self.preallocate_inputs(inputs, flat_inputs)
-
-        # process inputs
         self.process_inputs(request_iterator, flat_inputs)
+        self._discipline.compute(inputs, outputs)
 
-        # call the user-defined compute function
-        if discrete_inputs or discrete_outputs:
-            self.compute(inputs, outputs, discrete_inputs, discrete_outputs)
-        else:
-            self.compute(inputs, outputs)
-
-        # iterate through all continuous outputs in the dictionary
         for output_name, value in outputs.items():
-
-            # iterate through all chunks needed for the current input
-            for b, e in get_chunk_indicies(value.size, self.num_double):
-                # create the chunked data
+            # iterate through all chunks needed for the current output
+            for b, e in get_chunk_indices(value.size, self.num_double):
                 yield data.Array(name=output_name,
                                  start=b,
                                  end=e,
@@ -64,33 +49,16 @@ class ExplicitServer(DisciplineServer, disc.ExplicitDisciplineServicer):
         """
         Computes the gradient evaluation and sends the result to the client.
         """
-        # inputs and outputs
         inputs = {}
         flat_inputs = {}
-        discrete_inputs = {}
-        flat_disc = {}
-
-        # preallocate the input and discrete input arrays
         self.preallocate_inputs(inputs, flat_inputs)
-
-        # preallocate the partials
         jac = self.preallocate_partials()
+        self.process_inputs(request_iterator, flat_inputs)
+        self.compute_partials(inputs, jac)
 
-        # process inputs
-        self.process_inputs(request_iterator, flat_inputs, flat_disc)
-
-        # call the user-defined compute_partials function
-        if discrete_inputs:
-            self.compute_partials(inputs, jac, discrete_inputs)
-        else:
-            self.compute_partials(inputs, jac)
-
-        # iterate through all continuous outputs in the dictionary
         for jac, value in jac.items():
-
-            # iterate through all chunks needed for the current input
-            for b, e in get_chunk_indicies(value.size, self.num_double):
-                # create and send the chunked data
+            # iterate through all chunks needed for the current partials
+            for b, e in get_chunk_indices(value.size, self.num_double):
                 yield data.Array(name=jac[0],
                                  subname=jac[1],
                                  start=b,

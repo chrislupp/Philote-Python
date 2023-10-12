@@ -1,6 +1,6 @@
 import numpy as np
 
-def get_chunk_indicies(num_values, chunk_size):
+def get_chunk_indices(num_values, chunk_size):
     beg_i = np.arange(0, num_values, chunk_size)
 
     if beg_i.size == 1:

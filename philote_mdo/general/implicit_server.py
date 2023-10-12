@@ -14,7 +14,7 @@
 import philote_mdo.generated.disciplines_pb2_grpc as disc
 import philote_mdo.generated.data_pb2 as data
 from philote_mdo.general.discipline_server import DisciplineServer
-from philote_mdo.utils import get_chunk_indicies
+from philote_mdo.utils import get_chunk_indices
 
 
 class ImplicitServer(DisciplineServer, disc.ImplicitDisciplineServicer):
@@ -61,7 +61,7 @@ class ImplicitServer(DisciplineServer, disc.ImplicitDisciplineServicer):
         # iterate through all continuous outputs in the dictionary
         for res_name, value in residuals.items():
             # iterate through all chunks needed for the current input
-            for b, e in get_chunk_indicies(value.size, self.num_double):
+            for b, e in get_chunk_indices(value.size, self.num_double):
                 # create the chunked data
                 yield array_pb2.Array(name=res_name,
                                       start=b,
@@ -100,7 +100,7 @@ class ImplicitServer(DisciplineServer, disc.ImplicitDisciplineServicer):
         # iterate through all continuous outputs in the dictionary
         for output_name, value in outputs.items():
             # iterate through all chunks needed for the current input
-            for b, e in get_chunk_indicies(value.size, self.num_double):
+            for b, e in get_chunk_indices(value.size, self.num_double):
                 # create the chunked data
                 yield array_pb2.Array(name=output_name,
                                       start=b,
@@ -110,7 +110,7 @@ class ImplicitServer(DisciplineServer, disc.ImplicitDisciplineServicer):
         # iterate through all discrete outputs in the dictionary
         for doutput_name, value in discrete_outputs.items():
             # iterate through all chunks needed for the current input
-            for b, e in get_chunk_indicies(value.size, self.num_double):
+            for b, e in get_chunk_indices(value.size, self.num_double):
                 # create the chunked data
                 yield array_pb2.Array(name=doutput_name,
                                       start=b,
@@ -149,7 +149,7 @@ class ImplicitServer(DisciplineServer, disc.ImplicitDisciplineServicer):
         for jac, value in jac.items():
 
             # iterate through all chunks needed for the current input
-            for b, e in get_chunk_indicies(value.size, self.num_double):
+            for b, e in get_chunk_indices(value.size, self.num_double):
                 # create and send the chunked data
                 yield array_pb2.Array(name=jac[0],
                                       subname=jac[1],

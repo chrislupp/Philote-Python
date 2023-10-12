@@ -16,7 +16,7 @@ from google.protobuf.empty_pb2 import Empty
 import philote_mdo.generated.metadata_pb2 as metadata_pb2
 import philote_mdo.generated.options_pb2 as options_pb2
 import philote_mdo.generated.array_pb2 as array_pb2
-from philote_mdo.utils import PairDict, get_chunk_indicies, get_flattened_view
+from philote_mdo.utils import PairDict, get_chunk_indices, get_flattened_view
 
 
 class ClientBase:
@@ -149,7 +149,7 @@ class ClientBase:
         # iterate through all continuous inputs in the dictionary
         for input_name, value in inputs.items():
             # iterate through all chunks needed for the current input
-            for b, e in get_chunk_indicies(value.size, self.num_double):
+            for b, e in get_chunk_indices(value.size, self.num_double):
                 # create the chunked data
                 messages += [array_pb2.Array(name=input_name,
                                              start=b,
@@ -161,7 +161,7 @@ class ClientBase:
         if discrete_inputs:
             for input_name, value in discrete_inputs.items():
                 # iterate through all chunks needed for the current input
-                for b, e in get_chunk_indicies(value.size, self.num_double):
+                for b, e in get_chunk_indices(value.size, self.num_double):
                     # create the chunked data
                     messages += [array_pb2.Array(name=input_name,
                                                  start=b,
@@ -173,7 +173,7 @@ class ClientBase:
         if outputs:
             for output_name, value in outputs.items():
                 # iterate through all chunks needed for the current input
-                for b, e in get_chunk_indicies(value.size, self.num_double):
+                for b, e in get_chunk_indices(value.size, self.num_double):
                     # create the chunked data
                     messages += [array_pb2.Array(name=output_name,
                                                  start=b,
@@ -185,7 +185,7 @@ class ClientBase:
         if discrete_outputs:
             for output_name, value in discrete_outputs.items():
                 # iterate through all chunks needed for the current input
-                for b, e in get_chunk_indicies(value.size, self.num_double):
+                for b, e in get_chunk_indices(value.size, self.num_double):
                     # create the chunked data
                     messages += [array_pb2.Array(name=output_name,
                                                  start=b,
