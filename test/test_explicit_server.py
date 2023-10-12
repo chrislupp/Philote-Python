@@ -34,8 +34,8 @@ class TestExplicitServer(unittest.TestCase):
         server = ExplicitServer()
         discipline = server._discipline = ExplicitDiscipline()
         server._stream_opts.num_double = 3
-        discipline.add_input('x', shape=(5,), units="")
-        discipline.add_output('f', shape=(2,), units="")
+        discipline.add_input("x", shape=(5,), units="")
+        discipline.add_output("f", shape=(2,), units="")
 
         context = Mock()
         request_iterator = [
@@ -64,3 +64,47 @@ class TestExplicitServer(unittest.TestCase):
         self.assertEqual(response.end, 1)
         self.assertEqual(response.data[0], 28094.0)
         self.assertEqual(response.data[1], 1686.0)
+
+    def test_compute_gradient(self):
+        """
+        Tests the ComputeGradient RPC of the Explicit Server.
+        """
+        server = ExplicitServer()
+        discipline = server._discipline = ExplicitDiscipline()
+        server._stream_opts.num_double = 3
+        discipline.add_input("x", shape=(5,), units="")
+        discipline.add_output("f", shape=(1,), units="")
+        discipline.declare_partials("f", "x")
+
+
+        context = Mock()
+        request_iterator = [
+            data.Array(start=0, end=2, data=[0.5, 1.5, 3.5],
+                       type=data.VariableType.kInput, name="x"),
+            data.Array(start=3, end=4, data=[4.5, 5.5],
+                       type=data.VariableType.kInput, name="x")
+        ]
+
+        # mock function call
+        def compute_partials(inputs, jac):
+            jac["f", "x"] = rosen_der(inputs['x'])
+        server._discipline.compute_partials = compute_partials
+
+        # call the function
+        response_generator = server.ComputeGradient(request_iterator, context)
+        responses = list(response_generator)
+
+        # check that there is only one response
+        self.assertEqual(len(responses), 2)
+
+        # check the function value
+        response = responses[0]
+        self.assertEqual(response.name, "f")
+        self.assertEqual(response.subname, "x")
+        self.assertEqual(response.start, 0)
+        self.assertEqual(response.end, 2)
+        grad = np.array(response.data)
+
+        response = responses[1]
+        grad = np.append(grad, np.array(response.data))
+        self.assertTrue(np.array_equal(grad, np.array([ -251.,  -499., 11105., 25007., -2950.])))

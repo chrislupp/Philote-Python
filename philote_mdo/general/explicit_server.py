@@ -54,11 +54,11 @@ class ExplicitServer(DisciplineServer, disc.ExplicitServiceServicer):
         self.preallocate_inputs(inputs, flat_inputs)
         jac = self.preallocate_partials()
         self.process_inputs(request_iterator, flat_inputs)
-        self.compute_partials(inputs, jac)
+        self._discipline.compute_partials(inputs, jac)
 
         for jac, value in jac.items():
             # iterate through all chunks needed for the current partials
-            for b, e in get_chunk_indices(value.size, self.num_double):
+            for b, e in get_chunk_indices(value.size, self._stream_opts.num_double):
                 yield data.Array(name=jac[0],
                                  subname=jac[1],
                                  start=b,
