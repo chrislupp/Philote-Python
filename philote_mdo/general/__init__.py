@@ -16,3 +16,4 @@ from .explicit_server import ExplicitServer
 
 from .discipline import Discipline
 from .explicit_discipline import ExplicitDiscipline
+from .implicit_discipline import ImplicitDiscipline
