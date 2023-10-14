@@ -21,7 +21,7 @@ class ExplicitDiscipline(pmdo.Discipline):
         super().__init__()
 
     def compute(self):
-        pass
+        raise NotImplementedError('compute not implemented')
 
     def compute_partials(self):
-        pass
+        raise NotImplementedError('compute_partials not implemented')
