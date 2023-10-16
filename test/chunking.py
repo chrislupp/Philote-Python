@@ -11,3 +11,9 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+#
+#
+# This work has been cleared for public release, distribution unlimited, case
+# number: AFRL-2023-XXXX. The views expressed are those of the author and do not
+# necessarily reflect the official policy or position of the Department of the
+# Air Force, the Department of Defense, or the U.S. government.
