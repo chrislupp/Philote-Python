@@ -24,6 +24,8 @@ from test_discipline import TestDiscipline
 from test_discipline_server import TestDisciplineServer
 from test_explicit_server import TestExplicitServer
 
+from test_discipline_client import TestDisciplineClient
+
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)
