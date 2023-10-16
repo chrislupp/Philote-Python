@@ -13,31 +13,46 @@
 # limitations under the License.
 import numpy as np
 from google.protobuf.empty_pb2 import Empty
-import philote_mdo.generated as data
+import philote_mdo.generated.data_pb2 as data
+import philote_mdo.generated.disciplines_pb2_grpc as disc
 import philote_mdo.utils as utils
 
 
-class ClientBase:
+
+class DisciplineClient:
     """
     Base class for analysis discipline clients.
     """
 
-    def __init__(self):
+    def __init__(self, channel):
         # verbose outputs
         self.verbose = True
 
         # grpc options
         self.grpc_options = []
 
+        # discipline properties
+        self._is_continuous = False
+        self._is_differentiable = False
+        self._provides_gradients = False
 
-    def stream_options(self):
+        # discipline client stub
+        self._disc_stub = disc.DisciplineServiceStub(channel)
+
+
+    def get_discipline_info(self):
+        """
+        Gets the discipline properties from the analysis server.
+        """
+        responses = self._disc_stub.GetInfo(Empty())
+
+    def send_stream_options(self):
         """
         Transmits the stream options for the remote analysis to the server.
         """
         # send the options
-        options = data.Options(
-            num_double=self.num_double, num_int=self.num_int)
-        response = self.stub.SetStreamOptions(options)
+        options = data.StreamOptions(num_double=self.num_double, num_int=self.num_int)
+        response = self._disc_stub.SetStreamOptions(options)
 
         if self.verbose:
             print("Streaming options sent to server.")
@@ -46,14 +61,14 @@ class ClientBase:
         """
         Runs the setup function on the analysis server.
         """
-        pass
+        self._disc_stub.Setup(Empty())
 
     def get_variables_meta(self):
         """
         Requests the input and output metadata from the server.
         """
         # stream back the metadata
-        for message in self.stub.DefineVariables(Empty()):
+        for message in self._disc_stub.DefineVariables(Empty()):
             if message.type == data.VariableType.kInput:
                 self._vars += [{"name": message.name,
                                 "shape": tuple(message.shape),
@@ -72,7 +87,7 @@ class ClientBase:
         """
         Requests metadata information on the partials from the analysis server.
         """
-        for message in self.stub.DefinePartials(Empty()):
+        for message in self._disc_stub.DefinePartials(Empty()):
             if (message.name, message.subname) not in self._partials:
                 self._partials += [(message.name, message.subname)]
 
@@ -161,7 +176,7 @@ class ClientBase:
         for message in responses:
             # start and end indices for the array chunk
             b = message.start
-            e = message.end
+            e = message.end + 1
 
             # assign either continuous or discrete data
             if len(message.data) > 0:
