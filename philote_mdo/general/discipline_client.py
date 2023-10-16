@@ -45,6 +45,8 @@ class DisciplineClient:
         # discipline client stub
         self._disc_stub = disc.DisciplineServiceStub(channel)
 
+        # streaming options
+        self._stream_options = data.StreamOptions(num_double=1000)
 
     def get_discipline_info(self):
         """
@@ -55,17 +57,11 @@ class DisciplineClient:
         self._is_differentiable = response[0].differentiable
         self._provides_gradients = response[0].provides_gradients
 
-
     def send_stream_options(self):
         """
         Transmits the stream options for the remote analysis to the server.
         """
-        # send the options
-        options = data.StreamOptions(num_double=self.num_double, num_int=self.num_int)
-        response = self._disc_stub.SetStreamOptions(options)
-
-        if self.verbose:
-            print("Streaming options sent to server.")
+        response = self._disc_stub.SetStreamOptions(self._stream_options)
 
     def run_setup(self):
         """

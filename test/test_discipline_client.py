@@ -44,11 +44,6 @@ class TestDisciplineClient(unittest.TestCase):
         )]
 
         client = DisciplineClient(mock_channel)
-
-        # mock arguments
-        context = Mock()
-        request = Empty()
-
         client.get_discipline_info()
 
         # check the values of the response
@@ -56,20 +51,28 @@ class TestDisciplineClient(unittest.TestCase):
         self.assertTrue(client._is_differentiable)
         self.assertTrue(client._provides_gradients)
 
-    # def test_set_stream_options(self):
-    #     """
-    #     Tests the SetStreamOptions RPC of the Discipline Server.
-    #     """
-    #     server = DisciplineClient()
+    @patch('philote_mdo.generated.disciplines_pb2_grpc.DisciplineServiceStub')
+    def test_set_stream_options(self, mock_discipline_stub):
+        """
+        Tests the set_stream_options function of the Discipline Client.
+        """
+        mock_channel = Mock()
+        mock_stub = mock_discipline_stub.return_value
 
-    #     # mock arguments
-    #     context = Mock()
-    #     request = data.StreamOptions(num_double=2)
 
-    #     server.SetStreamOptions(request, context)
+        client = DisciplineClient(mock_channel)
+        expected_num_double = 10
+        client._stream_options = expected_options = data.StreamOptions(
+            num_double=expected_num_double,
+        )
+        client.send_stream_options()
 
-    #     # check that the streaming options were set properly
-    #     self.assertEqual(server._stream_opts.num_double, 2)
+        # check that the streaming options were set properly
+        expected_options = data.StreamOptions(
+            num_double=expected_num_double,
+        )
+        self.assertTrue(mock_stub.SetStreamOptions.called)
+        mock_stub.SetStreamOptions.assert_called_with(expected_options)
 
     # # def test_set_options(self):
     # #     pass
