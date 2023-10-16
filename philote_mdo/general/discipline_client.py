@@ -61,7 +61,13 @@ class DisciplineClient:
         """
         Transmits the stream options for the remote analysis to the server.
         """
-        response = self._disc_stub.SetStreamOptions(self._stream_options)
+        self._disc_stub.SetStreamOptions(self._stream_options)
+
+    def send_options(self):
+        """
+        Sends the discipline options to the analysis server.
+        """
+        pass
 
     def run_setup(self):
         """

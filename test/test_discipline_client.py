@@ -52,7 +52,7 @@ class TestDisciplineClient(unittest.TestCase):
         self.assertTrue(client._provides_gradients)
 
     @patch('philote_mdo.generated.disciplines_pb2_grpc.DisciplineServiceStub')
-    def test_set_stream_options(self, mock_discipline_stub):
+    def test_send_stream_options(self, mock_discipline_stub):
         """
         Tests the set_stream_options function of the Discipline Client.
         """
@@ -77,25 +77,19 @@ class TestDisciplineClient(unittest.TestCase):
     # # def test_set_options(self):
     # #     pass
 
-    # def test_setup(self):
-    #     """
-    #     Tests the Setup RPC of the Discipline Server.
-    #     """
-    #     context = Mock()
-    #     request = Empty()
+    @patch('philote_mdo.generated.disciplines_pb2_grpc.DisciplineServiceStub')
+    def test_run_setup(self, mock_discipline_stub):
+        """
+        Tests the run_setup function of the Discipline Client.
+        """
+        mock_channel = Mock()
+        mock_stub = mock_discipline_stub.return_value
+        client = DisciplineClient(mock_channel)
+        client.run_setup()
 
-    #     server = DisciplineClient()
-
-    #     # mock the 'setup' and 'setup_partials' methods of 'self.discipline'
-    #     server._discipline = Mock()
-    #     server._discipline.setup.return_value = None
-    #     server._discipline.setup_partials.return_value = None
-
-    #     server.Setup(request, context)
-
-    #     # assert that the 'setup' and 'setup_partials' methods were called
-    #     server._discipline.setup.assert_called_once()
-    #     server._discipline.setup_partials.assert_called_once()
+        # assert that the 'setup' and 'setup_partials' methods were called
+        self.assertTrue(mock_stub.Setup.called)
+        mock_stub.Setup.assert_called_with(Empty())
 
     # def test_get_variable_definitions(self):
     #     """
