@@ -127,18 +127,11 @@ class DisciplineClient:
         outputs = {}
         flat_outputs = {}
 
-        discrete_outputs = None
-        flat_disc = None
-
-        for out in self._funcs:
-            outputs[out['name']] = np.zeros(out['shape'])
-            flat_outputs[out['name']] = utils.get_flattened_view(
-                outputs[out['name']])
-
-        for dout in self._discrete_funcs:
-            discrete_outputs[dout['name']] = np.zeros(dout['shape'])
-            flat_disc[dout['name']] = utils.get_flattened_view(
-                discrete_outputs[dout['name']])
+        for out in self._var_meta:
+            if out.type == data.kOutput:
+                name = out.name
+                outputs[name] = np.zeros(out.shape)
+                flat_outputs[name] = utils.get_flattened_view(outputs[name])
 
         for message in responses:
             b = message.start
@@ -150,7 +143,7 @@ class DisciplineClient:
                 raise ValueError('Expected continuous variables, '
                                  'but array is empty.')
 
-        return outputs, discrete_outputs
+        return outputs
 
     def _recover_residuals(self, responses):
         """

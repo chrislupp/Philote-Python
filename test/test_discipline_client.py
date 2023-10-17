@@ -166,6 +166,9 @@ class TestDisciplineClient(unittest.TestCase):
 
 
     def test_assemble_input_messages(self):
+        """
+        Tests the _assemble_input_messages function of the Discipline Client.
+        """
         mock_channel = Mock()
         client = DisciplineClient(mock_channel)
         client._stream_options.num_double = 2
@@ -177,7 +180,6 @@ class TestDisciplineClient(unittest.TestCase):
             "f": np.array([5.0, 6.0, 7.0]).reshape(1, 3),
         }
 
-        # expected messages based on input and output data
         expected_messages = [
             data.Array(
                 name="x",
@@ -215,3 +217,40 @@ class TestDisciplineClient(unittest.TestCase):
         self.assertEqual(len(messages), len(expected_messages))
         for msg, expected_msg in zip(messages, expected_messages):
             self.assertEqual(msg, expected_msg)
+
+
+    def test_recover_outputs(self):
+        """
+        Tests the _recover_outputs function of the Discipline Client.
+        """
+        mock_channel = Mock()
+        client = DisciplineClient(mock_channel)
+
+        client._var_meta = [
+            data.VariableMetaData(name="f", type=data.kOutput, shape=(2,2)),
+            data.VariableMetaData(name="g", type=data.kOutput, shape=(3,))
+            ]
+
+        response1 = data.Array(
+            name="f", start=0, end=1, data=[1.0, 2.0]
+        )
+        response2 = data.Array(
+            name="f", start=2, end=3, data=[3.0, 4.0]
+        )
+        response3 = data.Array(
+            name="g", start=0, end=2, data=[4.0, 5.0, 6.0]
+        )
+        mock_responses = [response1, response2, response3]
+
+        expected_outputs = {
+            "f": np.array([1.0, 2.0, 3.0, 4.0]).reshape((2, 2)),
+            "g": np.array([4.0, 5.0, 6.0]),
+        }
+
+        outputs = client._recover_outputs(mock_responses)
+
+        # check that the resulting outputs match the expected output data
+        self.assertEqual(len(outputs), len(expected_outputs))
+        for output_name, expected_data in expected_outputs.items():
+            self.assertTrue(output_name in outputs)
+            np.testing.assert_array_equal(outputs[output_name], expected_data)
