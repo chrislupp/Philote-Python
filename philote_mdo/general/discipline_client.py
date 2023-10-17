@@ -134,14 +134,14 @@ class DisciplineClient:
                 flat_outputs[name] = utils.get_flattened_view(outputs[name])
 
         for message in responses:
-            b = message.start
-            e = message.end + 1
-
-            if len(message.data) > 0:
-                flat_outputs[message.name][b:e] = message.data
-            else:
-                raise ValueError('Expected continuous variables, '
-                                 'but array is empty.')
+            if message.type == data.kOutput:
+                b = message.start
+                e = message.end + 1
+                if len(message.data) > 0:
+                    flat_outputs[message.name][b:e] = message.data
+                else:
+                    raise ValueError('Expected continuous variables, '
+                                    'but array is empty.')
 
         return outputs
 
@@ -152,20 +152,21 @@ class DisciplineClient:
         residuals = {}
         flat_residuals = {}
 
-        for res in self._res:
-            residuals[res['name']] = np.zeros(res['shape'])
-            flat_residuals[res['name']] = utils.get_flattened_view(
-                residuals[res['name']])
+        for res in self._var_meta:
+            if res.type == data.kOutput:
+                name = res.name
+                residuals[name] = np.zeros(res.shape)
+                flat_residuals[name] = utils.get_flattened_view(residuals[name])
 
         for message in responses:
-            b = message.start
-            e = message.end + 1
-
-            if len(message.data) > 0:
-                flat_residuals[message.name][b:e] = message.data
-            else:
-                raise ValueError('Expected continuous variables for residuals, '
-                                 'but array is empty.')
+            if message.type == data.kResidual:
+                b = message.start
+                e = message.end + 1
+                if len(message.data) > 0:
+                    flat_residuals[message.name][b:e] = message.data
+                else:
+                    raise ValueError('Expected continuous variables, '
+                                    'but array is empty.')
 
         return residuals
 
