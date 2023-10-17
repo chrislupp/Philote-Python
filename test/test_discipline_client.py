@@ -136,6 +136,9 @@ class TestDisciplineClient(unittest.TestCase):
 
     @patch('philote_mdo.generated.disciplines_pb2_grpc.DisciplineServiceStub')
     def test_get_partial_definitions(self, mock_discipline_stub):
+        """
+        Tests the get_partial_definitions function of the Discipline Client.
+        """
         mock_channel = Mock()
         mock_stub = mock_discipline_stub.return_value
         client = DisciplineClient(mock_channel)
@@ -160,3 +163,55 @@ class TestDisciplineClient(unittest.TestCase):
         self.assertEqual(client._partials_meta[0].subname, "output1")
         self.assertEqual(client._partials_meta[1].name, "input2")
         self.assertEqual(client._partials_meta[1].subname, "output2")
+
+
+    def test_assemble_input_messages(self):
+        mock_channel = Mock()
+        client = DisciplineClient(mock_channel)
+        client._stream_options.num_double = 2
+
+        input_data = {
+            "x": np.array([1.0, 2.0, 3.0, 4.0]).reshape(2, 2),
+        }
+        output_data = {
+            "f": np.array([5.0, 6.0, 7.0]).reshape(1, 3),
+        }
+
+        # expected messages based on input and output data
+        expected_messages = [
+            data.Array(
+                name="x",
+                start=0,
+                end=1,
+                type=data.VariableType.kInput,
+                data=[1.0, 2.0]
+            ),
+            data.Array(
+                name="x",
+                start=2,
+                end=3,
+                type=data.VariableType.kInput,
+                data=[3.0, 4.0]
+            ),
+            data.Array(
+                name="f",
+                start=0,
+                end=1,
+                type=data.VariableType.kOutput,
+                data=[5.0, 6.0]
+            ),
+            data.Array(
+                name="f",
+                start=2,
+                end=2,
+                type=data.VariableType.kOutput,
+                data=[7.0]
+            )
+        ]
+
+        messages = client._assemble_input_messages(input_data, output_data)
+
+        # check that the resulting messages match the expected messages
+        self.assertEqual(len(messages), len(expected_messages))
+        for msg, expected_msg in zip(messages, expected_messages):
+            self.assertEqual(msg, expected_msg)

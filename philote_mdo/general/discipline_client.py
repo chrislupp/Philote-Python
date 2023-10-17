@@ -107,7 +107,7 @@ class DisciplineClient:
                                         start=b,
                                         end=e-1,
                                         type=data.VariableType.kInput,
-                                        continuous=value.ravel()[b:e])]
+                                        data=value.ravel()[b:e])]
 
         if outputs:
             for output_name, value in outputs.items():
@@ -116,7 +116,7 @@ class DisciplineClient:
                                             start=b,
                                             end=e-1,
                                             type=data.VariableType.kOutput,
-                                            continuous=value.ravel()[b:e])]
+                                            data=value.ravel()[b:e])]
 
         return messages
 
