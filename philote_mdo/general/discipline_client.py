@@ -48,6 +48,10 @@ class DisciplineClient:
         # streaming options
         self._stream_options = data.StreamOptions(num_double=1000)
 
+        # variable and partials metadata
+        self._var_meta = []
+        self._partials_meta = []
+
     def get_discipline_info(self):
         """
         Gets the discipline properties from the analysis server.
@@ -75,59 +79,39 @@ class DisciplineClient:
         """
         self._disc_stub.Setup(Empty())
 
-    def get_variables_meta(self):
+    def get_variable_definitions(self):
         """
         Requests the input and output metadata from the server.
         """
-        # stream back the metadata
         for message in self._disc_stub.DefineVariables(Empty()):
-            if message.type == data.VariableType.kInput:
-                self._vars += [{"name": message.name,
-                                "shape": tuple(message.shape),
-                                "units": message.units}]
+            self._var_meta += [message]
 
-            if message.type == data.VariableType.kOutput:
-                self._funcs += [{"name": message.name,
-                                 "shape": tuple(message.shape),
-                                 "units": message.units}]
-
-                self._res += [{"name": message.name,
-                               "shape": tuple(message.shape),
-                               "units": message.units}]
-
-    def get_partials_meta(self):
+    def get_partials_definitions(self):
         """
         Requests metadata information on the partials from the analysis server.
         """
         for message in self._disc_stub.DefinePartials(Empty()):
-            if (message.name, message.subname) not in self._partials:
-                self._partials += [(message.name, message.subname)]
+            if message.name not in self._partials_meta:
+                self._partials_meta += [message]
 
     def _assemble_input_messages(self, inputs, outputs=None):
         """
         Assembles the messages for transmitting the input variables to the
         server.
         """
-        # array of messages used for the send command
         messages = []
 
-        # iterate through all continuous inputs in the dictionary
         for input_name, value in inputs.items():
-            # iterate through all chunks needed for the current input
-            for b, e in utils.get_chunk_indices(value.size, self.num_double):
-                # create the chunked data
+            for b, e in utils.get_chunk_indices(value.size, self._stream_options.num_double):
                 messages += [data.Array(name=input_name,
                                         start=b,
                                         end=e-1,
                                         type=data.VariableType.kInput,
                                         continuous=value.ravel()[b:e])]
 
-        # iterate through all continuous outputs in the dictionary
         if outputs:
             for output_name, value in outputs.items():
-                # iterate through all chunks needed for the current input
-                for b, e in utils.get_chunk_indices(value.size, self.num_double):
-                    # create the chunked data
+                for b, e in utils.get_chunk_indices(value.size, self._stream_options.num_double):
                     messages += [data.Array(name=output_name,
                                             start=b,
                                             end=e-1,
@@ -146,7 +130,6 @@ class DisciplineClient:
         discrete_outputs = None
         flat_disc = None
 
-        # preallocate outputs and discrete output arrays
         for out in self._funcs:
             outputs[out['name']] = np.zeros(out['shape'])
             flat_outputs[out['name']] = utils.get_flattened_view(
@@ -157,9 +140,7 @@ class DisciplineClient:
             flat_disc[dout['name']] = utils.get_flattened_view(
                 discrete_outputs[dout['name']])
 
-        # iterate through the results
         for message in responses:
-            # start and end indices for the array chunk
             b = message.start
             e = message.end + 1
 
@@ -178,19 +159,15 @@ class DisciplineClient:
         residuals = {}
         flat_residuals = {}
 
-        # preallocate outputs and discrete output arrays
         for res in self._res:
             residuals[res['name']] = np.zeros(res['shape'])
             flat_residuals[res['name']] = utils.get_flattened_view(
                 residuals[res['name']])
 
-        # iterate through the results
         for message in responses:
-            # start and end indices for the array chunk
             b = message.start
             e = message.end + 1
 
-            # assign either continuous or discrete data
             if len(message.data) > 0:
                 flat_residuals[message.name][b:e] = message.data
             else:
@@ -200,7 +177,9 @@ class DisciplineClient:
         return residuals
 
     def _recover_partials(self, responses):
-        # preallocate the partials
+        """
+        Recovers the partials from the stream of responses.
+        """
         partials = utils.PairDict()
         flat_p = utils.PairDict()
 
@@ -212,13 +191,10 @@ class DisciplineClient:
             partials[pair] = np.zeros(shape)
             flat_p[pair] = utils.get_flattened_view(partials[pair])
 
-        # iterate through the results
         for message in responses:
-            # start and end indices for the array chunk
             b = message.start
             e = message.end + 1
 
-            # assign either continuous or discrete data
             if len(message.continuous) > 0:
                 flat_p[message.name, message.subname][b:e] = message.data
             else:

@@ -74,8 +74,8 @@ class TestDisciplineClient(unittest.TestCase):
         self.assertTrue(mock_stub.SetStreamOptions.called)
         mock_stub.SetStreamOptions.assert_called_with(expected_options)
 
-    # # def test_set_options(self):
-    # #     pass
+    # def test_set_options(self):
+    #     pass
 
     @patch('philote_mdo.generated.disciplines_pb2_grpc.DisciplineServiceStub')
     def test_run_setup(self, mock_discipline_stub):
@@ -91,185 +91,72 @@ class TestDisciplineClient(unittest.TestCase):
         self.assertTrue(mock_stub.Setup.called)
         mock_stub.Setup.assert_called_with(Empty())
 
-    # def test_get_variable_definitions(self):
-    #     """
-    #     Tests the GetVariableDefinitions RPC of the Discipline Server.
-    #     """
-    #     server = DisciplineClient()
-    #     server._discipline = Discipline()
+    @patch('philote_mdo.generated.disciplines_pb2_grpc.DisciplineServiceStub')
+    def test_get_variable_definitions(self, mock_discipline_stub):
+        """
+        Tests the get_variable_definitions function of the Discipline Client.
+        """
+        mock_channel = Mock()
+        mock_stub = mock_discipline_stub.return_value
+        client = DisciplineClient(mock_channel)
 
-    #     # add an input and an output
-    #     server._discipline.add_input('x', shape=(2, 2), units="m")
-    #     server._discipline.add_output('f', shape=(1,), units="m**2")
+        input_definition = data.VariableMetaData(
+            name="x", shape=[2, 2], units="m", type=data.VariableType.kInput
+        )
+        output_definition = data.VariableMetaData(
+            name="f", shape=[1], units="m**2", type=data.VariableType.kOutput
+        )
 
-    #     # mock arguments
-    #     context = Mock()
-    #     request = Empty()
+        # configure the stub to return the mock input and output definitions
+        mock_stub.DefineVariables.return_value = [input_definition, output_definition]
 
-    #     response_generator = server.GetVariableDefinitions(request, context)
+        # call the get_variables_definitions method
+        client.get_variable_definitions()
 
-    #     # Generate responses and collect them into a list
-    #     responses = list(response_generator)
+        # assert that the gRPC call was made
+        self.assertTrue(mock_stub.DefineVariables.called)
 
-    #     # check that there are two responses (one input, one output)
-    #     self.assertEqual(len(responses), 2)
+        # assert that the _var_meta attribute is updated with the expected input
+        # and output definitions
+        self.assertEqual(len(client._var_meta), 2)
 
-    #     # check the response data
-    #     input = responses[0]
-    #     output = responses[1]
+        # check the response data for input definition
+        input = client._var_meta[0]
+        self.assertEqual(input.name, "x")
+        self.assertEqual(input.shape, [2, 2])
+        self.assertEqual(input.units, "m")
+        self.assertEqual(input.type, data.kInput)
 
-    #     self.assertEqual(input.name, "x")
-    #     self.assertEqual(input.shape, [2, 2])
-    #     self.assertEqual(input.units, "m")
-    #     self.assertEqual(input.type, data.kInput)
+        # check the response data for output definition
+        output = client._var_meta[1]
+        self.assertEqual(output.name, "f")
+        self.assertEqual(output.shape, [1])
+        self.assertEqual(output.units, "m**2")
+        self.assertEqual(output.type, data.kOutput)
 
-    #     self.assertEqual(output.name, "f")
-    #     self.assertEqual(output.shape, [1,])
-    #     self.assertEqual(output.units, "m**2")
-    #     self.assertEqual(output.type, data.kOutput)
+    @patch('philote_mdo.generated.disciplines_pb2_grpc.DisciplineServiceStub')
+    def test_get_partial_definitions(self, mock_discipline_stub):
+        mock_channel = Mock()
+        mock_stub = mock_discipline_stub.return_value
+        client = DisciplineClient(mock_channel)
 
-    # def test_preallocate_inputs_explicit(self):
-    #     """
-    #     Tests the preallocation of inputs for the explicit discipline cas of the Discipline Servere
-    #     (outputs are not an input).
-    #     """
-    #     server = DisciplineClient()
-    #     discipline = server._discipline = Discipline()
-    #     discipline.add_input("x", shape=(2, 2), units="m")
-    #     discipline.add_input("y", shape=(3, 3, 3), units="m**2")
-    #     discipline.add_output("f1", shape=(1,), units="m**3")
-    #     discipline.add_output("f2", shape=(2, 3), units="m**3")
+        partials_metadata = [
+            data.PartialsMetaData(name="input1", subname="output1"),
+            data.PartialsMetaData(name="input2", subname="output2"),
+        ]
 
-    #     # create simulated inputs for the function
-    #     inputs = {}
-    #     flat_inputs = {}
-    #     outputs = {}
-    #     flat_outputs = {}
+        mock_stub.DefinePartials.return_value = partials_metadata
 
-    #     server.preallocate_inputs(inputs, flat_inputs, outputs, flat_outputs)
+        client.get_partials_definitions()
 
-    #     # check the number of inputs and outputs
-    #     self.assertEqual(len(inputs), 2)
-    #     self.assertEqual(len(flat_inputs), 2)
+        # check that the client function was called
+        self.assertTrue(mock_stub.DefinePartials.called)
 
-    #     for var, shape in zip(["x", "y"], [(2, 2), (3, 3, 3)]):
-    #         # check variable existence
-    #         self.assertTrue(var in inputs)
-    #         self.assertTrue(var in flat_inputs)
+        # check that the number of entries is correct
+        self.assertEqual(len(client._partials_meta), 2)
 
-    #         # check that variables are numpy arrays
-    #         self.assertIsInstance(inputs[var], np.ndarray)
-    #         self.assertIsInstance(flat_inputs[var], np.ndarray)
-
-    #         # check that the variables have the right shape
-    #         self.assertEqual(inputs[var].shape, shape)
-    #         self.assertEqual(flat_inputs[var].size, np.prod(shape))
-
-
-    # def test_preallocate_inputs_implicit(self):
-    #     """
-    #     Tests the preallocation of inputs for the implicit discipline cas of the Discipline Servere
-    #     (outputs are an input).
-    #     """
-    #     server = DisciplineClient()
-    #     discipline = server._discipline = Discipline()
-    #     discipline.add_input("x", shape=(2, 2), units="m")
-    #     discipline.add_input("y", shape=(3, 3, 3), units="m**2")
-    #     discipline.add_output("f1", shape=(1,), units="m**3")
-    #     discipline.add_output("f2", shape=(2, 3), units="m**3")
-
-    #     # create simulated inputs for the function
-    #     inputs = {}
-    #     flat_inputs = {}
-    #     outputs = {}
-    #     flat_outputs = {}
-
-    #     server.preallocate_inputs(inputs, flat_inputs, outputs, flat_outputs)
-
-    #     # check the number of inputs and outputs
-    #     self.assertEqual(len(inputs), 2)
-    #     self.assertEqual(len(flat_inputs), 2)
-    #     self.assertEqual(len(outputs), 2)
-    #     self.assertEqual(len(flat_outputs), 2)
-
-    #     # check inputs
-    #     for var, shape in zip(["x", "y"], [(2, 2), (3, 3, 3)]):
-    #         # check variable existence
-    #         self.assertTrue(var in inputs)
-    #         self.assertTrue(var in flat_inputs)
-
-    #         # check that variables are numpy arrays
-    #         self.assertIsInstance(inputs[var], np.ndarray)
-    #         self.assertIsInstance(flat_inputs[var], np.ndarray)
-
-    #         # check that the variables have the right shape
-    #         self.assertEqual(inputs[var].shape, shape)
-    #         self.assertEqual(flat_inputs[var].size, np.prod(shape))
-
-    #     # check outputs
-    #     for out, shape in zip(["f1", "f2"], [(1,), (2, 3)]):
-    #         # check variable existence
-    #         self.assertTrue(out in outputs)
-    #         self.assertTrue(out in flat_outputs)
-
-    #         # check that variables are numpy arrays
-    #         self.assertIsInstance(outputs[out], np.ndarray)
-    #         self.assertIsInstance(flat_outputs[out], np.ndarray)
-
-    #         # check that the variables have the right shape
-    #         self.assertEqual(outputs[out].shape, shape)
-    #         self.assertEqual(flat_outputs[out].size, np.prod(shape))
-
-    # def test_preallocate_partials(self):
-    #     """
-    #     Tests the preallocation of the partial derivatives of the Discipline Server.
-
-    #     This test is designed to catch the edge cases where either f or x are
-    #     scalar.
-    #     """
-    #     server = DisciplineClient()
-    #     discipline = server._discipline = Discipline()
-    #     discipline.add_input("x", shape=(1,), units="m")
-    #     discipline.add_input("y", shape=(3, 3), units="m**2")
-    #     discipline.add_output("f1", shape=(1,), units="m**3")
-    #     discipline.add_output("f2", shape=(2, 3), units="m**3")
-
-    #     discipline.declare_partials('f1', 'x')
-    #     discipline.declare_partials('f1', 'y')
-    #     discipline.declare_partials('f2', 'x')
-    #     discipline.declare_partials('f2', 'y')
-
-
-    #     jac = server.preallocate_partials()
-
-    #     pairs = [("f1", "x"), ("f1", "y"), ("f2", "x"), ("f2", "y")]
-    #     expected_shapes = [(1,), (3, 3), (2, 3), (2, 3, 3, 3)]
-
-    #     for pair, shape in zip(pairs, expected_shapes):
-    #         self.assertTrue(pair in jac)
-    #         self.assertIsInstance(jac[pair], np.ndarray)
-    #         self.assertEqual(jac[pair].shape, shape)
-
-    # def test_process_inputs(self):
-    #     # create a mock request_iterator
-    #     request_iterator = [
-    #         data.Array(start=0, end=2, data=[1.0, 2.0, 3.0],
-    #                    type=data.VariableType.kInput, name="x"),
-    #         data.Array(start=3, end=4, data=[4.0, 5.0],
-    #                    type=data.VariableType.kInput, name="x"),
-    #         data.Array(start=0, end=1, data=[0.1, 0.2],
-    #                    type=data.VariableType.kOutput, name="f"),
-    #     ]
-
-    #     server = DisciplineClient()
-
-    #     # create mock flat_inputs and flat_outputs dictionaries
-    #     flat_inputs = {"x": np.zeros(6)}
-    #     flat_outputs = {"f": np.zeros(3)}
-
-    #     server.process_inputs(request_iterator, flat_inputs, flat_outputs)
-
-    #     # check the results
-    #     self.assertEqual(flat_inputs["x"].tolist(),
-    #                      [1.0, 2.0, 3.0, 4.0, 5.0, 0.0])
-    #     self.assertEqual(flat_outputs["f"].tolist(), [0.1, 0.2, 0.0])
+        # check the values
+        self.assertEqual(client._partials_meta[0].name, "input1")
+        self.assertEqual(client._partials_meta[0].subname, "output1")
+        self.assertEqual(client._partials_meta[1].name, "input2")
+        self.assertEqual(client._partials_meta[1].subname, "output2")

@@ -135,10 +135,16 @@ class TestDisciplineServer(unittest.TestCase):
         self.assertEqual(output.units, "m**2")
         self.assertEqual(output.type, data.kOutput)
 
+    # def test_get_partials_definition(self):
+    #     """
+    #     Tests the GetPartialDefinitions RPC of Discipline Server.
+    #     """
+    #     pass
+
     def test_preallocate_inputs_explicit(self):
         """
-        Tests the preallocation of inputs for the explicit discipline cas of the Discipline Servere
-        (outputs are not an input).
+        Tests the preallocation of inputs for the explicit discipline cas of the
+        Discipline Server (outputs are not an input).
         """
         server = DisciplineServer()
         discipline = server._discipline = Discipline()
@@ -175,8 +181,8 @@ class TestDisciplineServer(unittest.TestCase):
 
     def test_preallocate_inputs_implicit(self):
         """
-        Tests the preallocation of inputs for the implicit discipline cas of the Discipline Servere
-        (outputs are an input).
+        Tests the preallocation of inputs for the implicit discipline cas of the
+        Discipline Server (outputs are an input).
         """
         server = DisciplineServer()
         discipline = server._discipline = Discipline()

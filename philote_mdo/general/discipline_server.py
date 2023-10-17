@@ -77,12 +77,15 @@ class DisciplineServer(disc.DisciplineService):
 
     def GetVariableDefinitions(self, request, context):
         """
-        Transmits setup information about the analysis discipline to the client.
+        Transmits variable metadata about the analysis discipline to the client.
         """
         for var in self._discipline._var_meta:
             yield var
 
     def GetPartialDefinitions(self, request, context):
+        """
+        Transmits partials metadata about the analysis discipline to the client.
+        """
         for jac in self._discipline._partials_meta:
             yield jac
 
