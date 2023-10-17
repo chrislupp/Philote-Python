@@ -127,6 +127,7 @@ class DisciplineClient:
         outputs = {}
         flat_outputs = {}
 
+        # preallocate
         for out in self._var_meta:
             if out.type == data.kOutput:
                 name = out.name
@@ -152,6 +153,7 @@ class DisciplineClient:
         residuals = {}
         flat_residuals = {}
 
+        # preallocate
         for res in self._var_meta:
             if res.type == data.kOutput:
                 name = res.name
@@ -177,22 +179,36 @@ class DisciplineClient:
         partials = utils.PairDict()
         flat_p = utils.PairDict()
 
-        for pair in self._partials:
-            shape = tuple([d['shape']
-                           for d in self._funcs if d['name'] == pair[0]])[0]
-            shape += tuple([d['shape']
-                            for d in self._vars if d['name'] == pair[1]])[0]
-            partials[pair] = np.zeros(shape)
-            flat_p[pair] = utils.get_flattened_view(partials[pair])
+        # preallocate
+        for part in self._partials_meta:
+            shapef = tuple([d.shape
+                           for d in self._var_meta if d.name == part.name][0])
+            shapex = tuple([d.shape
+                           for d in self._var_meta if d.name == part.subname][0])
+            
+            if shapef == (1,):
+                if shapex == (1,):
+                    shape = (1,)
+                else:
+                    shape = shapex
+            elif shapex == (1,):
+                shape = shapef
+            else:
+                shape = shapef + shapex
+
+
+            partials[(part.name, part.subname)] = np.zeros(shape)
+            flat_p[(part.name, part.subname)] = utils.get_flattened_view(partials[(part.name, part.subname)])
 
         for message in responses:
             b = message.start
             e = message.end + 1
 
-            if len(message.continuous) > 0:
-                flat_p[message.name, message.subname][b:e] = message.data
-            else:
-                raise ValueError('Expected continuous outputs for the partials,'
-                                 ' but array was empty.')
+            if message.type == data.kPartial:
+                if len(message.data) > 0:
+                    flat_p[(message.name, message.subname)][b:e] = message.data
+                else:
+                    raise ValueError('Expected continuous outputs for the '
+                                     'partials, but array was empty.')
 
         return partials

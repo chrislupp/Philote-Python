@@ -26,6 +26,7 @@ from google.protobuf.empty_pb2 import Empty
 
 from philote_mdo.general import Discipline, DisciplineClient
 import philote_mdo.generated.data_pb2 as data
+import philote_mdo.utils as utils
 
 
 class TestDisciplineClient(unittest.TestCase):
@@ -291,3 +292,44 @@ class TestDisciplineClient(unittest.TestCase):
         for output_name, expected_data in expected_outputs.items():
             self.assertTrue(output_name in outputs)
             np.testing.assert_array_equal(outputs[output_name], expected_data)
+
+    def test_recover_partials(self):
+        """
+        Tests the _recover_partials function of the Discipline Client.
+        """
+        mock_channel = Mock()
+        client = DisciplineClient(mock_channel)
+
+        client._var_meta = [data.VariableMetaData(name="f", type=data.kOutput, shape=(1,)),
+                            data.VariableMetaData(name="x", type=data.kInput, shape=(2,2)),
+                            data.VariableMetaData(name="g", type=data.kOutput, shape=(3,)),
+                            data.VariableMetaData(name="y", type=data.kInput, shape=(1,))]
+
+        partial_metadata1 = data.PartialsMetaData(name="f", subname="x")
+        partial_metadata2 = data.PartialsMetaData(name="g", subname="y")
+        client._partials_meta = [partial_metadata1, partial_metadata2]
+
+        # Define mock responses
+        response1 = data.Array(name="f", subname="x", type=data.kPartial, start=0, end=1, data=[1.0, 2.0])
+        response2 = data.Array(name="f", subname="x", type=data.kPartial, start=2, end=3, data=[3.0, 4.0])
+        response3 = data.Array(name="g", subname="y", type=data.kPartial, start=0, end=2, data=[4.0, 5.0, 6.0])
+        mock_responses = [response1, response2, response3]
+
+        # Define expected partial data
+        expected_partials = utils.PairDict()
+        expected_flat_p = utils.PairDict()
+
+        expected_partials[("f", "x")] = np.array([1.0, 2.0, 3.0, 4.0]).reshape((2,2))
+        expected_partials[("g", "y")] = np.array([4.0, 5.0, 6.0])
+
+        expected_flat_p[("f", "x")] = expected_partials[("f", "x")].ravel()
+        expected_flat_p[("g", "y")] = expected_partials[("g", "y")].ravel()
+
+        # Call the _recover_partials method with mock responses
+        partials = client._recover_partials(mock_responses)
+
+        # Assert that the resulting partials match the expected partial data
+        self.assertEqual(len(partials), len(expected_partials))
+        for (name, subname), expected_data in expected_partials.items():
+            self.assertTrue((name, subname) in partials)
+            np.testing.assert_array_equal(partials[(name, subname)], expected_data)
