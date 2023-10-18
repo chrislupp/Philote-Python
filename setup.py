@@ -18,7 +18,7 @@
 # necessarily reflect the official policy or position of the Department of the
 # Air Force, the Department of Defense, or the U.S. government.
 import os
-from setuptools import setup, Command
+from setuptools import setup, Command, find_packages
 import importlib.resources as resources
 
 __name__ = 'philote-mdo'
@@ -81,7 +81,7 @@ setup(
         "grpcio-tools",
         "protoletariat"
     ],
-    packages=['philote_mdo'],
+    packages=find_packages(where='', include='philote_mdo'),
 
     cmdclass={
         'compile_proto': CompileProto
