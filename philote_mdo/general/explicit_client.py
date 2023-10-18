@@ -48,7 +48,7 @@ class ExplicitClient(DisciplineClient):
         for a set of inputs (sent to the server).
         """
         messages = self._assemble_input_messages(inputs)
-        responses = self._expl_stub.ComputeGradients(iter(messages))
+        responses = self._expl_stub.ComputeGradient(iter(messages))
         partials = self._recover_partials(responses)
 
         return partials
