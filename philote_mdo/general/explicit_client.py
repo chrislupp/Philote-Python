@@ -18,60 +18,37 @@
 # necessarily reflect the official policy or position of the Department of the
 # Air Force, the Department of Defense, or the U.S. government.
 import grpc
-from philote_mdo.general.client_base import ClientBase
-import philote_mdo.generated.explicit_pb2_grpc as explicit_pb2_grpc
+from philote_mdo.general.discipline_client import DisciplineClient
+import philote_mdo.generated.disciplines_pb2_grpc as disc
 
 
-class ExplicitClient(ClientBase):
+class ExplicitClient(DisciplineClient):
     """
     Client for calling explicit analysis discipline servers.
     """
 
     def __init__(self, channel):
-        super().__init__()
+        super().__init__(channel)
+        self._expl_stub = disc.ExplicitServiceStub(channel)
 
-        self.stub = explicit_pb2_grpc.ExplicitDisciplineStub(channel)
-
-    def remote_compute(self, inputs, discrete_inputs=None):
+    def run_compute(self, inputs):
         """
         Requests and receives the function evaluation from the analysis server
         for a set of inputs (sent to the server).
         """
-        if self.verbose:
-            print("Started compute method.")
+        messages = self._assemble_input_messages(inputs)
+        responses = self._expl_stub.ComputeFunction(iter(messages))
+        outputs = self._recover_outputs(responses)
 
-        # assemble the inputs that need to be sent to the server
-        messages = self.assemble_input_messages(inputs, discrete_inputs)
+        return outputs
 
-        # stream the messages to the server and receive the stream of results
-        responses = self.stub.Functions(iter(messages))
-
-        # parse the outputs
-        outputs, discrete_outputs = self.recover_outputs(responses)
-
-        if self.verbose:
-            print("    [Complete]")
-
-        return outputs, discrete_outputs
-
-    def remote_compute_partials(self, inputs, discrete_inputs=None):
+    def run_compute_partials(self, inputs):
         """
         Requests and receives the gradient evaluation from the analysis server
         for a set of inputs (sent to the server).
         """
-        if self.verbose:
-            print("Started compute partials method.")
-
-        # assemble the inputs that need to be sent to the server
-        messages = self.assemble_input_messages(inputs, discrete_inputs)
-
-        # stream the messages to the server and receive the stream of results
-        responses = self.stub.Gradient(iter(messages))
-
-        # recover the partials from the stream responses
-        partials = self.recover_partials(responses)
-
-        if self.verbose:
-            print("    [Complete]")
+        messages = self._assemble_input_messages(inputs)
+        responses = self._expl_stub.ComputeGradients(iter(messages))
+        partials = self._recover_partials(responses)
 
         return partials

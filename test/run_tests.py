@@ -25,6 +25,7 @@ from test_discipline_server import TestDisciplineServer
 from test_explicit_server import TestExplicitServer
 
 from test_discipline_client import TestDisciplineClient
+from test_explicit_client import TestExplicitClient
 
 
 if __name__ == "__main__":

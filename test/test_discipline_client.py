@@ -24,7 +24,7 @@ import numpy as np
 
 from google.protobuf.empty_pb2 import Empty
 
-from philote_mdo.general import Discipline, DisciplineClient
+from philote_mdo.general import DisciplineClient
 import philote_mdo.generated.data_pb2 as data
 import philote_mdo.utils as utils
 

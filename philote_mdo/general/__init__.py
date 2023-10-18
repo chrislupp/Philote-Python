@@ -18,6 +18,7 @@
 # necessarily reflect the official policy or position of the Department of the
 # Air Force, the Department of Defense, or the U.S. government.
 from .discipline_client import DisciplineClient
+from .explicit_client import ExplicitClient
 
 from .discipline_server import DisciplineServer
 from .explicit_server import ExplicitServer
