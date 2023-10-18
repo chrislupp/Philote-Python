@@ -11,10 +11,10 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import philote_mdo as pmdo
+import philote_mdo.general as pmdo
 
 
-class RemoteQuadratic(pmdo.general.ImplicitDiscipline):
+class QuadradicImplicit(pmdo.ImplicitDiscipline):
 
     def setup(self):
         self.define_input('a', shape=(1,))
