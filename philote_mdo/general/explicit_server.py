@@ -47,6 +47,7 @@ class ExplicitServer(DisciplineServer, disc.ExplicitServiceServicer):
             # iterate through all chunks needed for the current output
             for b, e in get_chunk_indices(value.size, self._stream_opts.num_double):
                 yield data.Array(name=output_name,
+                                 type=data.kOutput,
                                  start=b,
                                  end=e-1,
                                  data=value.ravel()[b:e])
@@ -67,6 +68,7 @@ class ExplicitServer(DisciplineServer, disc.ExplicitServiceServicer):
             for b, e in get_chunk_indices(value.size, self._stream_opts.num_double):
                 yield data.Array(name=jac[0],
                                  subname=jac[1],
+                                 type=data.kPartial,
                                  start=b,
                                  end=e-1,
                                  data=value.ravel()[b:e])

@@ -81,7 +81,7 @@ setup(
         "grpcio-tools",
         "protoletariat"
     ],
-    packages=find_packages(where='', include='philote_mdo'),
+    packages=find_packages(exclude=['*test']),
 
     cmdclass={
         'compile_proto': CompileProto

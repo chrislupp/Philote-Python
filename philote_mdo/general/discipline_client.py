@@ -83,14 +83,14 @@ class DisciplineClient:
         """
         Requests the input and output metadata from the server.
         """
-        for message in self._disc_stub.DefineVariables(Empty()):
+        for message in self._disc_stub.GetVariableDefinitions(Empty()):
             self._var_meta += [message]
 
     def get_partials_definitions(self):
         """
         Requests metadata information on the partials from the analysis server.
         """
-        for message in self._disc_stub.DefinePartials(Empty()):
+        for message in self._disc_stub.GetPartialDefinitions(Empty()):
             if message.name not in self._partials_meta:
                 self._partials_meta += [message]
 

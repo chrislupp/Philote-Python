@@ -21,6 +21,7 @@ import numpy as np
 
 import philote_mdo.generated.data_pb2 as data
 import philote_mdo.generated.disciplines_pb2_grpc as disc
+from google.protobuf.empty_pb2 import Empty
 from philote_mdo.utils import PairDict, get_flattened_view
 
 
@@ -61,6 +62,7 @@ class DisciplineServer(disc.DisciplineService):
         compute routines.
         """
         self._stream_opts = request
+        return Empty()
 
     def SetOptions(self, request, context):
         """
@@ -74,6 +76,7 @@ class DisciplineServer(disc.DisciplineService):
         """
         self._discipline.setup()
         self._discipline.setup_partials()
+        return Empty()
 
     def GetVariableDefinitions(self, request, context):
         """
