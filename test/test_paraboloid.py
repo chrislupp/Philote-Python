@@ -18,8 +18,9 @@
 # necessarily reflect the official policy or position of the Department of the
 # Air Force, the Department of Defense, or the U.S. government.
 import unittest
-from philote_mdo.examples import Paraboloid
+import philote_mdo.general as pmdo
 import philote_mdo.utils as utils
+from philote_mdo.examples import Paraboloid
 
 class TestParaboloid(unittest.TestCase):
     """
@@ -86,14 +87,13 @@ class TestParaboloidIntegration(unittest.TestCase):
     """
     Integration tests for the paraboloid discipline.
     """
-    def test_setup_partials(self):
-        """
-        Tests the setup function of the Paraboloid server.
-        """
-        pass
-
     def test_compute(self):
         """
         Tests the compute function of the Paraboloid server.
         """
-        pass
+        # server code
+        server = pmdo.ExplicitServer()
+        server.attach_discipline(Paraboloid())
+
+        # client code
+        client = pmdo.ExplicitClient()

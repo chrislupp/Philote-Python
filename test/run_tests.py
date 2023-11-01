@@ -27,7 +27,6 @@ from test_explicit_server import TestExplicitServer
 from test_discipline_client import TestDisciplineClient
 from test_explicit_client import TestExplicitClient
 
-from test_paraboloid import TestParaboloid, TestParaboloidIntegration
 
 
 if __name__ == "__main__":
