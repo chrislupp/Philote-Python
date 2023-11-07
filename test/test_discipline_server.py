@@ -1,3 +1,5 @@
+# Philote-Python
+#
 # Copyright 2022-2023 Christopher A. Lupp
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,9 +16,17 @@
 #
 #
 # This work has been cleared for public release, distribution unlimited, case
-# number: AFRL-2023-XXXX. The views expressed are those of the author and do not
-# necessarily reflect the official policy or position of the Department of the
-# Air Force, the Department of Defense, or the U.S. government.
+# number: AFRL-2023-XXXX.
+#
+# The views expressed are those of the authors and do not reflect the
+# official guidance or position of the United States Government, the
+# Department of Defense or of the United States Air Force.
+#
+# Statement from DoD: The Appearance of external hyperlinks does not
+# constitute endorsement by the United States Department of Defense (DoD) of
+# the linked websites, of the information, products, or services contained
+# therein. The DoD does not exercise any editorial, security, or other
+# control over the information you may find at these locations.
 import unittest
 from unittest.mock import Mock
 
@@ -32,6 +42,7 @@ class TestDisciplineServer(unittest.TestCase):
     """
     Unit tests for the discipline server.
     """
+
     def test_get_info(self):
         """
         Tests the GetInfo RPC of the Discipline Server.
@@ -106,8 +117,8 @@ class TestDisciplineServer(unittest.TestCase):
         server._discipline = Discipline()
 
         # add an input and an output
-        server._discipline.add_input('x', shape=(2, 2), units="m")
-        server._discipline.add_output('f', shape=(1,), units="m**2")
+        server._discipline.add_input("x", shape=(2, 2), units="m")
+        server._discipline.add_output("f", shape=(1,), units="m**2")
 
         # mock arguments
         context = Mock()
@@ -131,7 +142,12 @@ class TestDisciplineServer(unittest.TestCase):
         self.assertEqual(input.type, data.kInput)
 
         self.assertEqual(output.name, "f")
-        self.assertEqual(output.shape, [1,])
+        self.assertEqual(
+            output.shape,
+            [
+                1,
+            ],
+        )
         self.assertEqual(output.units, "m**2")
         self.assertEqual(output.type, data.kOutput)
 
@@ -177,7 +193,6 @@ class TestDisciplineServer(unittest.TestCase):
             # check that the variables have the right shape
             self.assertEqual(inputs[var].shape, shape)
             self.assertEqual(flat_inputs[var].size, np.prod(shape))
-
 
     def test_preallocate_inputs_implicit(self):
         """
@@ -247,11 +262,10 @@ class TestDisciplineServer(unittest.TestCase):
         discipline.add_output("f1", shape=(1,), units="m**3")
         discipline.add_output("f2", shape=(2, 3), units="m**3")
 
-        discipline.declare_partials('f1', 'x')
-        discipline.declare_partials('f1', 'y')
-        discipline.declare_partials('f2', 'x')
-        discipline.declare_partials('f2', 'y')
-
+        discipline.declare_partials("f1", "x")
+        discipline.declare_partials("f1", "y")
+        discipline.declare_partials("f2", "x")
+        discipline.declare_partials("f2", "y")
 
         jac = server.preallocate_partials()
 
@@ -266,12 +280,23 @@ class TestDisciplineServer(unittest.TestCase):
     def test_process_inputs(self):
         # create a mock request_iterator
         request_iterator = [
-            data.Array(start=0, end=2, data=[1.0, 2.0, 3.0],
-                       type=data.VariableType.kInput, name="x"),
-            data.Array(start=3, end=4, data=[4.0, 5.0],
-                       type=data.VariableType.kInput, name="x"),
-            data.Array(start=0, end=1, data=[0.1, 0.2],
-                       type=data.VariableType.kOutput, name="f"),
+            data.Array(
+                start=0,
+                end=2,
+                data=[1.0, 2.0, 3.0],
+                type=data.VariableType.kInput,
+                name="x",
+            ),
+            data.Array(
+                start=3, end=4, data=[4.0, 5.0], type=data.VariableType.kInput, name="x"
+            ),
+            data.Array(
+                start=0,
+                end=1,
+                data=[0.1, 0.2],
+                type=data.VariableType.kOutput,
+                name="f",
+            ),
         ]
 
         server = DisciplineServer()
@@ -283,6 +308,5 @@ class TestDisciplineServer(unittest.TestCase):
         server.process_inputs(request_iterator, flat_inputs, flat_outputs)
 
         # check the results
-        self.assertEqual(flat_inputs["x"].tolist(),
-                         [1.0, 2.0, 3.0, 4.0, 5.0, 0.0])
+        self.assertEqual(flat_inputs["x"].tolist(), [1.0, 2.0, 3.0, 4.0, 5.0, 0.0])
         self.assertEqual(flat_outputs["f"].tolist(), [0.1, 0.2, 0.0])

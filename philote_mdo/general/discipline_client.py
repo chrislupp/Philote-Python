@@ -1,28 +1,37 @@
+# Philote-Python
+#
 # Copyright 2022-2023 Christopher A. Lupp
 #
-# Licensed under the Apache License, Version 2.0 (the "License"); you may not
-# use this file except in compliance with the License. You may obtain a copy of
-# the License at
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
 #
 #     http://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
-# WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
-# License for the specific language governing permissions and limitations under
-# the License.
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 #
 #
 # This work has been cleared for public release, distribution unlimited, case
-# number: AFRL-2023-XXXX. The views expressed are those of the author and do not
-# necessarily reflect the official policy or position of the Department of the
-# Air Force, the Department of Defense, or the U.S. government.
+# number: AFRL-2023-XXXX.
+#
+# The views expressed are those of the authors and do not reflect the
+# official guidance or position of the United States Government, the
+# Department of Defense or of the United States Air Force.
+#
+# Statement from DoD: The Appearance of external hyperlinks does not
+# constitute endorsement by the United States Department of Defense (DoD) of
+# the linked websites, of the information, products, or services contained
+# therein. The DoD does not exercise any editorial, security, or other
+# control over the information you may find at these locations.
 import numpy as np
 from google.protobuf.empty_pb2 import Empty
 import philote_mdo.generated.data_pb2 as data
 import philote_mdo.generated.disciplines_pb2_grpc as disc
 import philote_mdo.utils as utils
-
 
 
 class DisciplineClient:
@@ -102,21 +111,33 @@ class DisciplineClient:
         messages = []
 
         for input_name, value in inputs.items():
-            for b, e in utils.get_chunk_indices(value.size, self._stream_options.num_double):
-                messages += [data.Array(name=input_name,
-                                        start=b,
-                                        end=e-1,
-                                        type=data.VariableType.kInput,
-                                        data=value.ravel()[b:e])]
+            for b, e in utils.get_chunk_indices(
+                value.size, self._stream_options.num_double
+            ):
+                messages += [
+                    data.Array(
+                        name=input_name,
+                        start=b,
+                        end=e - 1,
+                        type=data.VariableType.kInput,
+                        data=value.ravel()[b:e],
+                    )
+                ]
 
         if outputs:
             for output_name, value in outputs.items():
-                for b, e in utils.get_chunk_indices(value.size, self._stream_options.num_double):
-                    messages += [data.Array(name=output_name,
-                                            start=b,
-                                            end=e-1,
-                                            type=data.VariableType.kOutput,
-                                            data=value.ravel()[b:e])]
+                for b, e in utils.get_chunk_indices(
+                    value.size, self._stream_options.num_double
+                ):
+                    messages += [
+                        data.Array(
+                            name=output_name,
+                            start=b,
+                            end=e - 1,
+                            type=data.VariableType.kOutput,
+                            data=value.ravel()[b:e],
+                        )
+                    ]
 
         return messages
 
@@ -141,8 +162,9 @@ class DisciplineClient:
                 if len(message.data) > 0:
                     flat_outputs[message.name][b:e] = message.data
                 else:
-                    raise ValueError('Expected continuous variables, '
-                                    'but array is empty.')
+                    raise ValueError(
+                        "Expected continuous variables, " "but array is empty."
+                    )
 
         return outputs
 
@@ -167,8 +189,9 @@ class DisciplineClient:
                 if len(message.data) > 0:
                     flat_residuals[message.name][b:e] = message.data
                 else:
-                    raise ValueError('Expected continuous variables, '
-                                    'but array is empty.')
+                    raise ValueError(
+                        "Expected continuous variables, " "but array is empty."
+                    )
 
         return residuals
 
@@ -181,11 +204,11 @@ class DisciplineClient:
 
         # preallocate
         for part in self._partials_meta:
-            shapef = tuple([d.shape
-                           for d in self._var_meta if d.name == part.name][0])
-            shapex = tuple([d.shape
-                           for d in self._var_meta if d.name == part.subname][0])
-            
+            shapef = tuple([d.shape for d in self._var_meta if d.name == part.name][0])
+            shapex = tuple(
+                [d.shape for d in self._var_meta if d.name == part.subname][0]
+            )
+
             if shapef == (1,):
                 if shapex == (1,):
                     shape = (1,)
@@ -196,9 +219,10 @@ class DisciplineClient:
             else:
                 shape = shapef + shapex
 
-
             partials[(part.name, part.subname)] = np.zeros(shape)
-            flat_p[(part.name, part.subname)] = utils.get_flattened_view(partials[(part.name, part.subname)])
+            flat_p[(part.name, part.subname)] = utils.get_flattened_view(
+                partials[(part.name, part.subname)]
+            )
 
         for message in responses:
             b = message.start
@@ -208,7 +232,9 @@ class DisciplineClient:
                 if len(message.data) > 0:
                     flat_p[(message.name, message.subname)][b:e] = message.data
                 else:
-                    raise ValueError('Expected continuous outputs for the '
-                                     'partials, but array was empty.')
+                    raise ValueError(
+                        "Expected continuous outputs for the "
+                        "partials, but array was empty."
+                    )
 
         return partials

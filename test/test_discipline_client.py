@@ -1,3 +1,5 @@
+# Philote-Python
+#
 # Copyright 2022-2023 Christopher A. Lupp
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,9 +16,17 @@
 #
 #
 # This work has been cleared for public release, distribution unlimited, case
-# number: AFRL-2023-XXXX. The views expressed are those of the author and do not
-# necessarily reflect the official policy or position of the Department of the
-# Air Force, the Department of Defense, or the U.S. government.
+# number: AFRL-2023-XXXX.
+#
+# The views expressed are those of the authors and do not reflect the
+# official guidance or position of the United States Government, the
+# Department of Defense or of the United States Air Force.
+#
+# Statement from DoD: The Appearance of external hyperlinks does not
+# constitute endorsement by the United States Department of Defense (DoD) of
+# the linked websites, of the information, products, or services contained
+# therein. The DoD does not exercise any editorial, security, or other
+# control over the information you may find at these locations.
 import unittest
 from unittest.mock import Mock, patch
 
@@ -33,16 +43,19 @@ class TestDisciplineClient(unittest.TestCase):
     """
     Unit tests for the discipline client.
     """
-    @patch('philote_mdo.generated.disciplines_pb2_grpc.DisciplineServiceStub')
+
+    @patch("philote_mdo.generated.disciplines_pb2_grpc.DisciplineServiceStub")
     def test_get_discipline_info(self, mock_discipline_stub):
         """
         Tests the get_discipline_info function of the Discipline Client.
         """
         mock_channel = Mock()
         mock_stub = mock_discipline_stub.return_value
-        mock_stub.GetInfo.return_value = [data.DisciplineProperties(
-            continuous=True, differentiable=True, provides_gradients=True
-        )]
+        mock_stub.GetInfo.return_value = [
+            data.DisciplineProperties(
+                continuous=True, differentiable=True, provides_gradients=True
+            )
+        ]
 
         client = DisciplineClient(mock_channel)
         client.get_discipline_info()
@@ -52,14 +65,13 @@ class TestDisciplineClient(unittest.TestCase):
         self.assertTrue(client._is_differentiable)
         self.assertTrue(client._provides_gradients)
 
-    @patch('philote_mdo.generated.disciplines_pb2_grpc.DisciplineServiceStub')
+    @patch("philote_mdo.generated.disciplines_pb2_grpc.DisciplineServiceStub")
     def test_send_stream_options(self, mock_discipline_stub):
         """
         Tests the set_stream_options function of the Discipline Client.
         """
         mock_channel = Mock()
         mock_stub = mock_discipline_stub.return_value
-
 
         client = DisciplineClient(mock_channel)
         expected_num_double = 10
@@ -78,7 +90,7 @@ class TestDisciplineClient(unittest.TestCase):
     # def test_set_options(self):
     #     pass
 
-    @patch('philote_mdo.generated.disciplines_pb2_grpc.DisciplineServiceStub')
+    @patch("philote_mdo.generated.disciplines_pb2_grpc.DisciplineServiceStub")
     def test_run_setup(self, mock_discipline_stub):
         """
         Tests the run_setup function of the Discipline Client.
@@ -92,7 +104,7 @@ class TestDisciplineClient(unittest.TestCase):
         self.assertTrue(mock_stub.Setup.called)
         mock_stub.Setup.assert_called_with(Empty())
 
-    @patch('philote_mdo.generated.disciplines_pb2_grpc.DisciplineServiceStub')
+    @patch("philote_mdo.generated.disciplines_pb2_grpc.DisciplineServiceStub")
     def test_get_variable_definitions(self, mock_discipline_stub):
         """
         Tests the get_variable_definitions function of the Discipline Client.
@@ -135,7 +147,7 @@ class TestDisciplineClient(unittest.TestCase):
         self.assertEqual(output.units, "m**2")
         self.assertEqual(output.type, data.kOutput)
 
-    @patch('philote_mdo.generated.disciplines_pb2_grpc.DisciplineServiceStub')
+    @patch("philote_mdo.generated.disciplines_pb2_grpc.DisciplineServiceStub")
     def test_get_partial_definitions(self, mock_discipline_stub):
         """
         Tests the get_partial_definitions function of the Discipline Client.
@@ -165,7 +177,6 @@ class TestDisciplineClient(unittest.TestCase):
         self.assertEqual(client._partials_meta[1].name, "input2")
         self.assertEqual(client._partials_meta[1].subname, "output2")
 
-
     def test_assemble_input_messages(self):
         """
         Tests the _assemble_input_messages function of the Discipline Client.
@@ -183,33 +194,21 @@ class TestDisciplineClient(unittest.TestCase):
 
         expected_messages = [
             data.Array(
-                name="x",
-                start=0,
-                end=1,
-                type=data.VariableType.kInput,
-                data=[1.0, 2.0]
+                name="x", start=0, end=1, type=data.VariableType.kInput, data=[1.0, 2.0]
             ),
             data.Array(
-                name="x",
-                start=2,
-                end=3,
-                type=data.VariableType.kInput,
-                data=[3.0, 4.0]
+                name="x", start=2, end=3, type=data.VariableType.kInput, data=[3.0, 4.0]
             ),
             data.Array(
                 name="f",
                 start=0,
                 end=1,
                 type=data.VariableType.kOutput,
-                data=[5.0, 6.0]
+                data=[5.0, 6.0],
             ),
             data.Array(
-                name="f",
-                start=2,
-                end=2,
-                type=data.VariableType.kOutput,
-                data=[7.0]
-            )
+                name="f", start=2, end=2, type=data.VariableType.kOutput, data=[7.0]
+            ),
         ]
 
         messages = client._assemble_input_messages(input_data, output_data)
@@ -219,7 +218,6 @@ class TestDisciplineClient(unittest.TestCase):
         for msg, expected_msg in zip(messages, expected_messages):
             self.assertEqual(msg, expected_msg)
 
-
     def test_recover_outputs(self):
         """
         Tests the _recover_outputs function of the Discipline Client.
@@ -228,9 +226,9 @@ class TestDisciplineClient(unittest.TestCase):
         client = DisciplineClient(mock_channel)
 
         client._var_meta = [
-            data.VariableMetaData(name="f", type=data.kOutput, shape=(2,2)),
-            data.VariableMetaData(name="g", type=data.kOutput, shape=(3,))
-            ]
+            data.VariableMetaData(name="f", type=data.kOutput, shape=(2, 2)),
+            data.VariableMetaData(name="g", type=data.kOutput, shape=(3,)),
+        ]
 
         response1 = data.Array(
             name="f", start=0, end=1, type=data.kOutput, data=[1.0, 2.0]
@@ -256,7 +254,6 @@ class TestDisciplineClient(unittest.TestCase):
             self.assertTrue(output_name in outputs)
             np.testing.assert_array_equal(outputs[output_name], expected_data)
 
-
     def test_recover_residuals(self):
         """
         Tests the _recover_residuals function of the Discipline Client.
@@ -265,9 +262,9 @@ class TestDisciplineClient(unittest.TestCase):
         client = DisciplineClient(mock_channel)
 
         client._var_meta = [
-            data.VariableMetaData(name="f", type=data.kOutput, shape=(2,2)),
-            data.VariableMetaData(name="g", type=data.kOutput, shape=(3,))
-            ]
+            data.VariableMetaData(name="f", type=data.kOutput, shape=(2, 2)),
+            data.VariableMetaData(name="g", type=data.kOutput, shape=(3,)),
+        ]
 
         response1 = data.Array(
             name="f", start=0, end=1, type=data.kResidual, data=[1.0, 2.0]
@@ -300,26 +297,39 @@ class TestDisciplineClient(unittest.TestCase):
         mock_channel = Mock()
         client = DisciplineClient(mock_channel)
 
-        client._var_meta = [data.VariableMetaData(name="f", type=data.kOutput, shape=(1,)),
-                            data.VariableMetaData(name="x", type=data.kInput, shape=(2,2)),
-                            data.VariableMetaData(name="g", type=data.kOutput, shape=(3,)),
-                            data.VariableMetaData(name="y", type=data.kInput, shape=(1,))]
+        client._var_meta = [
+            data.VariableMetaData(name="f", type=data.kOutput, shape=(1,)),
+            data.VariableMetaData(name="x", type=data.kInput, shape=(2, 2)),
+            data.VariableMetaData(name="g", type=data.kOutput, shape=(3,)),
+            data.VariableMetaData(name="y", type=data.kInput, shape=(1,)),
+        ]
 
         partial_metadata1 = data.PartialsMetaData(name="f", subname="x")
         partial_metadata2 = data.PartialsMetaData(name="g", subname="y")
         client._partials_meta = [partial_metadata1, partial_metadata2]
 
         # Define mock responses
-        response1 = data.Array(name="f", subname="x", type=data.kPartial, start=0, end=1, data=[1.0, 2.0])
-        response2 = data.Array(name="f", subname="x", type=data.kPartial, start=2, end=3, data=[3.0, 4.0])
-        response3 = data.Array(name="g", subname="y", type=data.kPartial, start=0, end=2, data=[4.0, 5.0, 6.0])
+        response1 = data.Array(
+            name="f", subname="x", type=data.kPartial, start=0, end=1, data=[1.0, 2.0]
+        )
+        response2 = data.Array(
+            name="f", subname="x", type=data.kPartial, start=2, end=3, data=[3.0, 4.0]
+        )
+        response3 = data.Array(
+            name="g",
+            subname="y",
+            type=data.kPartial,
+            start=0,
+            end=2,
+            data=[4.0, 5.0, 6.0],
+        )
         mock_responses = [response1, response2, response3]
 
         # Define expected partial data
         expected_partials = utils.PairDict()
         expected_flat_p = utils.PairDict()
 
-        expected_partials[("f", "x")] = np.array([1.0, 2.0, 3.0, 4.0]).reshape((2,2))
+        expected_partials[("f", "x")] = np.array([1.0, 2.0, 3.0, 4.0]).reshape((2, 2))
         expected_partials[("g", "y")] = np.array([4.0, 5.0, 6.0])
 
         expected_flat_p[("f", "x")] = expected_partials[("f", "x")].ravel()

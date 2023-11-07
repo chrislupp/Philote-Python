@@ -1,3 +1,5 @@
+# Philote-Python
+#
 # Copyright 2022-2023 Christopher A. Lupp
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,9 +20,6 @@
 # necessarily reflect the official policy or position of the Department of the
 # Air Force, the Department of Defense, or the U.S. government.
 import philote_mdo as pmdo
-
-
-
 
 
 pmdo.run_server(RemoteParabaloid())

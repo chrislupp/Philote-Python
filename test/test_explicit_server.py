@@ -1,3 +1,5 @@
+# Philote-Python
+#
 # Copyright 2022-2023 Christopher A. Lupp
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,9 +16,17 @@
 #
 #
 # This work has been cleared for public release, distribution unlimited, case
-# number: AFRL-2023-XXXX. The views expressed are those of the author and do not
-# necessarily reflect the official policy or position of the Department of the
-# Air Force, the Department of Defense, or the U.S. government.
+# number: AFRL-2023-XXXX.
+#
+# The views expressed are those of the authors and do not reflect the
+# official guidance or position of the United States Government, the
+# Department of Defense or of the United States Air Force.
+#
+# Statement from DoD: The Appearance of external hyperlinks does not
+# constitute endorsement by the United States Department of Defense (DoD) of
+# the linked websites, of the information, products, or services contained
+# therein. The DoD does not exercise any editorial, security, or other
+# control over the information you may find at these locations.
 import unittest
 from unittest.mock import Mock
 
@@ -33,6 +43,7 @@ class TestExplicitServer(unittest.TestCase):
     """
     Unit tests for the discipline server.
     """
+
     def test_compute_function(self):
         """
         Tests the ComputeFunction RPC of the Explicit Server.
@@ -45,15 +56,22 @@ class TestExplicitServer(unittest.TestCase):
 
         context = Mock()
         request_iterator = [
-            data.Array(start=0, end=2, data=[0.5, 1.5, 3.5],
-                       type=data.VariableType.kInput, name="x"),
-            data.Array(start=3, end=4, data=[4.5, 5.5],
-                       type=data.VariableType.kInput, name="x")
+            data.Array(
+                start=0,
+                end=2,
+                data=[0.5, 1.5, 3.5],
+                type=data.VariableType.kInput,
+                name="x",
+            ),
+            data.Array(
+                start=3, end=4, data=[4.5, 5.5], type=data.VariableType.kInput, name="x"
+            ),
         ]
 
         # mock function call
         def compute(inputs, outputs):
-            outputs["f"] = np.array([rosen(inputs['x']), rosen(inputs['x'].T - 2.0)])
+            outputs["f"] = np.array([rosen(inputs["x"]), rosen(inputs["x"].T - 2.0)])
+
         server._discipline.compute = compute
 
         # call the function
@@ -82,18 +100,24 @@ class TestExplicitServer(unittest.TestCase):
         discipline.add_output("f", shape=(1,), units="")
         discipline.declare_partials("f", "x")
 
-
         context = Mock()
         request_iterator = [
-            data.Array(start=0, end=2, data=[0.5, 1.5, 3.5],
-                       type=data.VariableType.kInput, name="x"),
-            data.Array(start=3, end=4, data=[4.5, 5.5],
-                       type=data.VariableType.kInput, name="x")
+            data.Array(
+                start=0,
+                end=2,
+                data=[0.5, 1.5, 3.5],
+                type=data.VariableType.kInput,
+                name="x",
+            ),
+            data.Array(
+                start=3, end=4, data=[4.5, 5.5], type=data.VariableType.kInput, name="x"
+            ),
         ]
 
         # mock function call
         def compute_partials(inputs, jac):
-            jac["f", "x"] = rosen_der(inputs['x'])
+            jac["f", "x"] = rosen_der(inputs["x"])
+
         server._discipline.compute_partials = compute_partials
 
         # call the function
@@ -113,4 +137,6 @@ class TestExplicitServer(unittest.TestCase):
 
         response = responses[1]
         grad = np.append(grad, np.array(response.data))
-        self.assertTrue(np.array_equal(grad, np.array([ -251.,  -499., 11105., 25007., -2950.])))
+        self.assertTrue(
+            np.array_equal(grad, np.array([-251.0, -499.0, 11105.0, 25007.0, -2950.0]))
+        )

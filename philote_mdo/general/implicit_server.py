@@ -1,3 +1,5 @@
+# Philote-Python
+#
 # Copyright 2022-2023 Christopher A. Lupp
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,9 +16,17 @@
 #
 #
 # This work has been cleared for public release, distribution unlimited, case
-# number: AFRL-2023-XXXX. The views expressed are those of the author and do not
-# necessarily reflect the official policy or position of the Department of the
-# Air Force, the Department of Defense, or the U.S. government.
+# number: AFRL-2023-XXXX.
+#
+# The views expressed are those of the authors and do not reflect the
+# official guidance or position of the United States Government, the
+# Department of Defense or of the United States Air Force.
+#
+# Statement from DoD: The Appearance of external hyperlinks does not
+# constitute endorsement by the United States Department of Defense (DoD) of
+# the linked websites, of the information, products, or services contained
+# therein. The DoD does not exercise any editorial, security, or other
+# control over the information you may find at these locations.
 import philote_mdo.generated.disciplines_pb2_grpc as disc
 import philote_mdo.generated.data_pb2 as data
 import philote_mdo.general as pmdo
@@ -52,11 +62,13 @@ class ImplicitServer(pmdo.DisciplineServer, disc.ImplicitDisciplineServicer):
 
         for res_name, value in residuals.items():
             for b, e in get_chunk_indices(value.size, self.num_double):
-                yield data.Array(name=res_name,
-                                      start=b,
-                                      end=e,
-                                      type=data.kResidual,
-                                      continuous=value.ravel()[b:e])
+                yield data.Array(
+                    name=res_name,
+                    start=b,
+                    end=e,
+                    type=data.kResidual,
+                    continuous=value.ravel()[b:e],
+                )
 
     def Solve(self, request_iterator, context):
         """
@@ -77,10 +89,9 @@ class ImplicitServer(pmdo.DisciplineServer, disc.ImplicitDisciplineServicer):
 
         for output_name, value in outputs.items():
             for b, e in get_chunk_indices(value.size, self.num_double):
-                yield data.Array(name=output_name,
-                                      start=b,
-                                      end=e,
-                                      continuous=value.ravel()[b:e])
+                yield data.Array(
+                    name=output_name, start=b, end=e, continuous=value.ravel()[b:e]
+                )
 
     def ResidualGradients(self, request_iterator, context):
         """
@@ -102,11 +113,13 @@ class ImplicitServer(pmdo.DisciplineServer, disc.ImplicitDisciplineServicer):
 
         for jac, value in jac.items():
             for b, e in get_chunk_indices(value.size, self.num_double):
-                yield data.Array(name=jac[0],
-                                      subname=jac[1],
-                                      start=b,
-                                      end=e,
-                                      continuous=value.ravel()[b:e])
+                yield data.Array(
+                    name=jac[0],
+                    subname=jac[1],
+                    start=b,
+                    end=e,
+                    continuous=value.ravel()[b:e],
+                )
 
     # def MatrixFreeGradients(self, request_iterator, context):
     #     """

@@ -1,3 +1,5 @@
+# Philote-Python
+#
 # Copyright 2022-2023 Christopher A. Lupp
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -23,7 +25,7 @@ from philote_mdo.general import ImplicitClient
 from philote_mdo.utils import PairDict
 
 
-client = ImplicitClient(channel=grpc.insecure_channel('localhost:50051'))
+client = ImplicitClient(channel=grpc.insecure_channel("localhost:50051"))
 
 # transfer the stream options to the server
 client.stream_options()
@@ -32,14 +34,8 @@ client.stream_options()
 client.remote_setup()
 
 # define some inputs
-inputs = {
-    "a": np.array([1.0]),
-    "b": np.array([2.0]),
-    "c": np.array([2.0])
-}
-outputs = {
-    "x": np.array([1.0])
-}
+inputs = {"a": np.array([1.0]), "b": np.array([2.0]), "c": np.array([2.0])}
+outputs = {"x": np.array([1.0])}
 
 # run a function evaluation
 residuals = client.remote_compute_residuals(inputs, outputs)

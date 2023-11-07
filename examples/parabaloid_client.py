@@ -1,3 +1,5 @@
+# Philote-Python
+#
 # Copyright 2022-2023 Christopher A. Lupp
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +24,7 @@ import numpy as np
 from philote_mdo.general import ExplicitClient
 
 
-client = ExplicitClient(channel=grpc.insecure_channel('localhost:50051'))
+client = ExplicitClient(channel=grpc.insecure_channel("localhost:50051"))
 
 # transfer the stream options to the server
 client.stream_options()
@@ -31,10 +33,7 @@ client.stream_options()
 client.remote_setup()
 
 # define some inputs
-inputs = {
-    "x": np.array([1.0]),
-    "y": np.array([2.0])
-}
+inputs = {"x": np.array([1.0]), "y": np.array([2.0])}
 outputs = {}
 
 # run a function evaluation

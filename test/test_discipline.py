@@ -1,3 +1,5 @@
+# Philote-Python
+#
 # Copyright 2022-2023 Christopher A. Lupp
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,9 +16,17 @@
 #
 #
 # This work has been cleared for public release, distribution unlimited, case
-# number: AFRL-2023-XXXX. The views expressed are those of the author and do not
-# necessarily reflect the official policy or position of the Department of the
-# Air Force, the Department of Defense, or the U.S. government.
+# number: AFRL-2023-XXXX.
+#
+# The views expressed are those of the authors and do not reflect the
+# official guidance or position of the United States Government, the
+# Department of Defense or of the United States Air Force.
+#
+# Statement from DoD: The Appearance of external hyperlinks does not
+# constitute endorsement by the United States Department of Defense (DoD) of
+# the linked websites, of the information, products, or services contained
+# therein. The DoD does not exercise any editorial, security, or other
+# control over the information you may find at these locations.
 import unittest
 from unittest.mock import Mock
 
@@ -28,6 +38,7 @@ class TestDiscipline(unittest.TestCase):
     """
     Unit tests for the discipline base class.
     """
+
     def test_add_input(self):
         """
         Tests the add input member function.
@@ -44,7 +55,6 @@ class TestDiscipline(unittest.TestCase):
         self.assertEqual(disc._var_meta[0].shape, [2, 2])
         self.assertEqual(disc._var_meta[0].units, "m**2")
         self.assertEqual(disc._var_meta[0].type, data.kInput)
-
 
     def test_add_output(self):
         """
