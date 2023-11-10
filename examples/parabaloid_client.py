@@ -35,22 +35,23 @@ from philote_mdo.general import ExplicitClient
 client = ExplicitClient(channel=grpc.insecure_channel("localhost:50051"))
 
 # transfer the stream options to the server
-client.stream_options()
+client.send_stream_options()
 
 # run setup
-client.remote_setup()
+client.run_setup()
+client.get_variable_definitions()
+client.get_partials_definitions()
 
 # define some inputs
 inputs = {"x": np.array([1.0]), "y": np.array([2.0])}
 outputs = {}
 
 # run a function evaluation
-outputs, discrete_outputs = client.remote_compute(inputs)
+outputs = client.run_compute(inputs)
 
 print(outputs)
 
 # run a gradient evaluation
-client.remote_setup_partials()
-partials = client.remote_compute_partials(inputs)
+partials = client.run_compute_partials(inputs)
 
 print(partials)
