@@ -1,3 +1,5 @@
+# Philote-Python
+#
 # Copyright 2022-2023 Christopher A. Lupp
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -11,10 +13,25 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+#
+#
+# This work has been cleared for public release, distribution unlimited, case
+# number: AFRL-2023-XXXX.
+#
+# The views expressed are those of the authors and do not reflect the
+# official guidance or position of the United States Government, the
+# Department of Defense or of the United States Air Force.
+#
+# Statement from DoD: The Appearance of external hyperlinks does not
+# constitute endorsement by the United States Department of Defense (DoD) of
+# the linked websites, of the information, products, or services contained
+# therein. The DoD does not exercise any editorial, security, or other
+# control over the information you may find at these locations.
 import numpy as np
 
 import philote_mdo.generated.data_pb2 as data
 import philote_mdo.generated.disciplines_pb2_grpc as disc
+from google.protobuf.empty_pb2 import Empty
 from philote_mdo.utils import PairDict, get_flattened_view
 
 
@@ -24,8 +41,7 @@ class DisciplineServer(disc.DisciplineService):
     """
 
     def __init__(self, discipline=None):
-        """
-        """
+        """ """
         self.verbose = False
 
         # user/developer supplied discipline
@@ -44,9 +60,11 @@ class DisciplineServer(disc.DisciplineService):
         """
         RPC that sends the discipline information/properties to the client.
         """
-        yield data.DisciplineProperties(continuous=self._discipline._is_continuous,
-                                        differentiable=self._discipline._is_differentiable,
-                                        provides_gradients=self._discipline._provides_gradients)
+        yield data.DisciplineProperties(
+            continuous=self._discipline._is_continuous,
+            differentiable=self._discipline._is_differentiable,
+            provides_gradients=self._discipline._provides_gradients,
+        )
 
     def SetStreamOptions(self, request, context):
         """
@@ -55,6 +73,7 @@ class DisciplineServer(disc.DisciplineService):
         compute routines.
         """
         self._stream_opts = request
+        return Empty()
 
     def SetOptions(self, request, context):
         """
@@ -68,20 +87,23 @@ class DisciplineServer(disc.DisciplineService):
         """
         self._discipline.setup()
         self._discipline.setup_partials()
+        return Empty()
 
     def GetVariableDefinitions(self, request, context):
         """
-        Transmits setup information about the analysis discipline to the client.
+        Transmits variable metadata about the analysis discipline to the client.
         """
         for var in self._discipline._var_meta:
             yield var
 
     def GetPartialDefinitions(self, request, context):
+        """
+        Transmits partials metadata about the analysis discipline to the client.
+        """
         for jac in self._discipline._partials_meta:
             yield jac
 
-    def preallocate_inputs(self, inputs, flat_inputs,
-                           outputs={}, flat_outputs={}):
+    def preallocate_inputs(self, inputs, flat_inputs, outputs={}, flat_outputs={}):
         """
         Preallocates the inputs before receiving data from the client.
 
@@ -108,11 +130,15 @@ class DisciplineServer(disc.DisciplineService):
         jac = PairDict()
 
         for pair in self._discipline._partials_meta:
-            shapef = tuple([d.shape
-                           for d in self._discipline._var_meta if d.name == pair.name][0])
-            shapex = tuple([d.shape
-                           for d in self._discipline._var_meta if d.name == pair.subname][0])
-            
+            shapef = tuple(
+                [d.shape for d in self._discipline._var_meta if d.name == pair.name][0]
+            )
+            shapex = tuple(
+                [d.shape for d in self._discipline._var_meta if d.name == pair.subname][
+                    0
+                ]
+            )
+
             if shapef == (1,):
                 if shapex == (1,):
                     shape = (1,)
@@ -122,13 +148,12 @@ class DisciplineServer(disc.DisciplineService):
                 shape = shapef
             else:
                 shape = shapef + shapex
-                
+
             jac[(pair.name, pair.subname)] = np.zeros(shape)
 
         return jac
 
-    def process_inputs(self, request_iterator, flat_inputs,
-                       flat_outputs=None):
+    def process_inputs(self, request_iterator, flat_inputs, flat_outputs=None):
         """
         Processes the message inputs from a gRPC stream.
 
@@ -144,10 +169,11 @@ class DisciplineServer(disc.DisciplineService):
             # assign either continuous or discrete data
             if len(message.data) > 0:
                 if message.type == data.VariableType.kInput:
-                    flat_inputs[message.name][b:e+1] = message.data
+                    flat_inputs[message.name][b : e + 1] = message.data
                 elif message.type == data.VariableType.kOutput:
-                    flat_outputs[message.name][b:e+1] = message.data
+                    flat_outputs[message.name][b : e + 1] = message.data
             else:
-                raise ValueError('Expected continuous variables but arrays were'
-                                 ' empty for variable %s.' %
-                                 (message.name))
+                raise ValueError(
+                    "Expected continuous variables but arrays were"
+                    " empty for variable %s." % (message.name)
+                )

@@ -1,3 +1,5 @@
+# Philote-Python
+#
 # Copyright 2022-2023 Christopher A. Lupp
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -11,26 +13,38 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+#
+#
+# This work has been cleared for public release, distribution unlimited, case
+# number: AFRL-2023-XXXX.
+#
+# The views expressed are those of the authors and do not reflect the
+# official guidance or position of the United States Government, the
+# Department of Defense or of the United States Air Force.
+#
+# Statement from DoD: The Appearance of external hyperlinks does not
+# constitute endorsement by the United States Department of Defense (DoD) of
+# the linked websites, of the information, products, or services contained
+# therein. The DoD does not exercise any editorial, security, or other
+# control over the information you may find at these locations.
 import philote_mdo.general as pmdo
 
 
 class ImplicitDiscipline(pmdo.Discipline):
-    """
-    """
+    """ """
 
     def __init__(self):
         pass
 
     def compute_residuals(self, inputs, outputs, residuals):
-        raise NotImplementedError('compute_residuals not implemented')
+        raise NotImplementedError("compute_residuals not implemented")
 
     def solve_residuals(self, inputs, outputs):
-        raise NotImplementedError('solve_residuals not implemented')
+        raise NotImplementedError("solve_residuals not implemented")
 
     def residual_partials(self, inputs, outputs, partials):
-        raise NotImplementedError('residual_partials not implemented')
+        raise NotImplementedError("residual_partials not implemented")
 
     def apply_linear(self, inputs, outputs, mode):
-        """
-        """
-        raise NotImplementedError('apply_linear not implemented')
+        """ """
+        raise NotImplementedError("apply_linear not implemented")

@@ -1,3 +1,5 @@
+# Philote-Python
+#
 # Copyright 2022-2023 Christopher A. Lupp
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -11,40 +13,93 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+#
+#
+# This work has been cleared for public release, distribution unlimited, case
+# number: AFRL-2023-XXXX.
+#
+# The views expressed are those of the authors and do not reflect the
+# official guidance or position of the United States Government, the
+# Department of Defense or of the United States Air Force.
+#
+# Statement from DoD: The Appearance of external hyperlinks does not
+# constitute endorsement by the United States Department of Defense (DoD) of
+# the linked websites, of the information, products, or services contained
+# therein. The DoD does not exercise any editorial, security, or other
+# control over the information you may find at these locations.
 import unittest
-from unittest.mock import Mock
-
-import philote_mdo.examples.paraboloid as par
+import philote_mdo.general as pmdo
+import philote_mdo.utils as utils
+from philote_mdo.examples import Paraboloid
 
 
 class TestParaboloid(unittest.TestCase):
     """
-    Unit tests for the paraboloid example discipline.
+    Unit tests for the paraboloid discipline.
     """
+
     def test_setup(self):
         """
-        Tests the setup function for the paraboloid.
+        Tests the setup function of the Paraboloid server.
         """
-        parab = par.Parabaloid()
-        parab.setup()
+        disc = Paraboloid()
+        disc.setup()
+
+        self.assertEqual(disc._var_meta[0].name, "x")
+        self.assertEqual(disc._var_meta[1].name, "y")
+        self.assertEqual(disc._var_meta[2].name, "f_xy")
 
     def test_setup_partials(self):
         """
-        Tests the setup_partials function for the paraboloid.
+        Tests the setup function of the Paraboloid server.
         """
-        parab = par.Parabaloid()
-        parab.setup_partials()
+        disc = Paraboloid()
+        disc.setup_partials()
+
+        self.assertEqual(disc._partials_meta[0].name, "f_xy")
+        self.assertEqual(disc._partials_meta[0].subname, "x")
+
+        self.assertEqual(disc._partials_meta[1].name, "f_xy")
+        self.assertEqual(disc._partials_meta[1].subname, "y")
 
     def test_compute(self):
         """
-        Tests the compute function for the paraboloid.
+        Tests the compute function of the Paraboloid server.
         """
-        parab = par.Parabaloid()
-        parab.compute()
+        inputs = {"x": 2.0, "y": 3.0}
+        outputs = {"f_xy": 0.0}
+        disc = Paraboloid()
+        disc.compute(inputs, outputs)
+
+        self.assertEqual(outputs["f_xy"], 53.0)
 
     def test_compute_partials(self):
         """
-        Tests the compute_partials function for the paraboloid.
+        Tests the compute function of the Paraboloid server.
         """
-        parab = par.Parabaloid()
-        parab.compute_partials()
+        inputs = {"x": 2.0, "y": 3.0}
+        jac = utils.PairDict()
+        jac["f_xy", "x"] = 0.0
+        jac["f_xy", "y"] = 0.0
+        disc = Paraboloid()
+        disc.compute_partials(inputs, jac)
+
+        self.assertEqual(jac["f_xy", "x"], 1.0)
+        self.assertEqual(jac["f_xy", "y"], 16.0)
+
+
+class TestParaboloidIntegration(unittest.TestCase):
+    """
+    Integration tests for the paraboloid discipline.
+    """
+
+    def test_compute(self):
+        """
+        Tests the compute function of the Paraboloid server.
+        """
+        # server code
+        server = pmdo.ExplicitServer()
+        server.attach_discipline(Paraboloid())
+
+        # client code
+        client = pmdo.ExplicitClient()

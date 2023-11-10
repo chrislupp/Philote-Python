@@ -1,3 +1,5 @@
+# Philote-Python
+#
 # Copyright 2022-2023 Christopher A. Lupp
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -11,6 +13,20 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+#
+#
+# This work has been cleared for public release, distribution unlimited, case
+# number: AFRL-2023-XXXX.
+#
+# The views expressed are those of the authors and do not reflect the
+# official guidance or position of the United States Government, the
+# Department of Defense or of the United States Air Force.
+#
+# Statement from DoD: The Appearance of external hyperlinks does not
+# constitute endorsement by the United States Department of Defense (DoD) of
+# the linked websites, of the information, products, or services contained
+# therein. The DoD does not exercise any editorial, security, or other
+# control over the information you may find at these locations.
 import grpc
 import openmdao.api as om
 import philote_mdo as pm
@@ -23,7 +39,7 @@ class RemoteExplicitComponent(om.ExplicitComponent):
 
     def initialize(self):
         # host and port
-        self.options.declare('channel')
+        self.options.declare("channel")
 
     def setup(self):
         # create the client
@@ -34,23 +50,23 @@ class RemoteExplicitComponent(om.ExplicitComponent):
 
         # define inputs
         for input in self.client._vars:
-            self.add_input(input['name'], shape=input['shape'],
-                           units=input['units'])
+            self.add_input(input["name"], shape=input["shape"], units=input["units"])
 
         # define discrete inputs
         for dinput in self.client._vars:
-            self.add_discrete_input(dinput['name'], shape=dinput['shape'],
-                                    units=dinput['units'])
+            self.add_discrete_input(
+                dinput["name"], shape=dinput["shape"], units=dinput["units"]
+            )
 
         # define outputs
         for out in self.client._funcs:
-            self.add_output(input['name'], shape=input['shape'],
-                            units=input['units'])
+            self.add_output(input["name"], shape=input["shape"], units=input["units"])
 
         # define discrete outputs
         for dout in self.client._funcs:
-            self.add_discrete_output(input['name'], shape=input['shape'],
-                                     units=input['units'])
+            self.add_discrete_output(
+                input["name"], shape=input["shape"], units=input["units"]
+            )
 
     def setup_partials(self):
         # setup the partials on the server
@@ -58,8 +74,9 @@ class RemoteExplicitComponent(om.ExplicitComponent):
 
     def compute(self, inputs, discrete_inputs, outputs, discrete_outputs):
         # call the remote compute method
-        out, discrete_out = self.client.remote_compute(inputs, discrete_inputs,
-                                                       discrete_outputs)
+        out, discrete_out = self.client.remote_compute(
+            inputs, discrete_inputs, discrete_outputs
+        )
 
         # assign the values to the openmdao dict type
         for key, val in out.items():
