@@ -27,4 +27,22 @@
 # the linked websites, of the information, products, or services contained
 # therein. The DoD does not exercise any editorial, security, or other
 # control over the information you may find at these locations.
-from .explicit import RemoteExplicitComponent
+import grpc
+import openmdao.api as om
+import philote_mdo.openmdao as pmom
+
+prob = om.Problem()
+model = prob.model
+
+model.add_subsystem(
+    "Paraboloid",
+    pmom.RemoteExplicitComponent(channel=grpc.insecure_channel("localhost:50051")),
+    promotes=["*"],
+)
+
+prob.setup()
+
+prob["x"] = [1.0, 1.0]
+prob.run_model()
+
+# print(prob["f"])

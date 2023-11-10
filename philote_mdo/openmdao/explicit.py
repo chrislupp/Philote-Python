@@ -29,12 +29,13 @@
 # control over the information you may find at these locations.
 import grpc
 import openmdao.api as om
-import philote_mdo as pm
+import philote_mdo.general as pm
+import philote_mdo.generated.data_pb2 as data
 
 
 class RemoteExplicitComponent(om.ExplicitComponent):
     """
-    An OpenMDAO component that acts as a client to an explicit analysis server.
+    OpenMDAO component that acts as a client to an explicit analysis server.
     """
 
     def initialize(self):
@@ -43,53 +44,38 @@ class RemoteExplicitComponent(om.ExplicitComponent):
 
     def setup(self):
         # create the client
-        self.client = pm.ExplicitClient(channel=self.channel)
+        self._client = pm.ExplicitClient(channel=self.options["channel"])
 
-        # set up the remote server
-        self.client.remote_setup()
+        # set up the remote discipline and get the variable definitions
+        self._client.run_setup()
+        self._client.get_variable_definitions()
 
-        # define inputs
-        for input in self.client._vars:
-            self.add_input(input["name"], shape=input["shape"], units=input["units"])
+        # define inputs and outputs based on the discipline meta data
+        for var in self._client._var_meta:
+            if not var.units:
+                units = None
+            else:
+                units = var.units
 
-        # define discrete inputs
-        for dinput in self.client._vars:
-            self.add_discrete_input(
-                dinput["name"], shape=dinput["shape"], units=dinput["units"]
-            )
+            if var.type == data.kInput:
+                self.add_input(var.name, shape=tuple(var.shape), units=units)
 
-        # define outputs
-        for out in self.client._funcs:
-            self.add_output(input["name"], shape=input["shape"], units=input["units"])
+            if var.type == data.kOutput:
+                self.add_output(var.name, shape=tuple(var.shape), units=units)
 
-        # define discrete outputs
-        for dout in self.client._funcs:
-            self.add_discrete_output(
-                input["name"], shape=input["shape"], units=input["units"]
-            )
+        # set up the remote discipline and get the variable definitions
+        self._client.get_partials_definitions()
 
-    def setup_partials(self):
-        # setup the partials on the server
-        self.client.setup_remote_partials()
+        # declare partials based on the discipline meta data
+        for partial in self._client._partials_meta:
+            self.declare_partials(partial.name, partial.subname)
 
-    def compute(self, inputs, discrete_inputs, outputs, discrete_outputs):
-        # call the remote compute method
-        out, discrete_out = self.client.remote_compute(
-            inputs, discrete_inputs, discrete_outputs
-        )
+    def compute(self, inputs, outputs):
+        # out = self._client.run_compute(inputs)
 
-        # assign the values to the openmdao dict type
-        for key, val in out.items():
-            outputs[key] = val
-
-        # assign the values to the openmdao dict type
-        for key, val in discrete_out.items():
-            discrete_outputs[key] = val
+        # for key, val in out:
+        #     outputs[key] = val
+        pass
 
     def compute_partials(self, inputs, discrete_inputs, partials):
-        # call the remote analysis to get the partials
-        jac = self.client.remote_compute_partials(inputs, discrete_inputs)
-
-        # assign the values to the openmdao partials type
-        for key, val in jac.items():
-            partials[key] = val
+        partials = self._client.run_compute_partials(inputs)
