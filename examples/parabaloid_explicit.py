@@ -27,7 +27,25 @@
 # the linked websites, of the information, products, or services contained
 # therein. The DoD does not exercise any editorial, security, or other
 # control over the information you may find at these locations.
-import philote_mdo as pmdo
+from concurrent import futures
+import grpc
+import philote_mdo.general as pmdo
+from philote_mdo.examples import Paraboloid
 
 
-pmdo.run_server(RemoteParabaloid())
+def run():
+    server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
+
+    discipline = pmdo.ExplicitServer(discipline=Paraboloid())
+    discipline.attach_to_server(server)
+
+    server.add_insecure_port("[::]:50051")
+    server.start()
+    print("Server started. Listening on port 50051.")
+    server.wait_for_termination()
+
+    server
+
+
+if __name__ == "__main__":
+    run()
