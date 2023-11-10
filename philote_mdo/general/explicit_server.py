@@ -38,8 +38,15 @@ class ExplicitServer(DisciplineServer, disc.ExplicitServiceServicer):
     Base class for remote explicit components.
     """
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, discipline):
+        super().__init__(discipline=discipline)
+
+    def attach_to_server(self, server):
+        """
+        Attaches this discipline server class to a gRPC server.
+        """
+        super().attach_to_server(server)
+        disc.add_ExplicitServiceServicer_to_server(self, server)
 
     def ComputeFunction(self, request_iterator, context):
         """

@@ -31,7 +31,9 @@ import philote_mdo.general as pmdo
 
 
 class ImplicitDiscipline(pmdo.Discipline):
-    """ """
+    """
+    Implementation class for implicit disciplines.
+    """
 
     def __init__(self):
         pass

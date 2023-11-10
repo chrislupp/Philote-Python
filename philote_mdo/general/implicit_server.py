@@ -42,6 +42,13 @@ class ImplicitServer(pmdo.DisciplineServer, disc.ImplicitDisciplineServicer):
         super().__init__()
         self._implicit = True
 
+    def attach_to_server(self, server):
+        """
+        Attaches this discipline server class to a gRPC server.
+        """
+        super().attach_to_server(server)
+        disc.add_ImplicitServiceServicer_to_server(server)
+
     def Residuals(self, request_iterator, context):
         """
         Computes the residuals and sends the results to the client.

@@ -31,7 +31,9 @@ import philote_mdo.general as pmdo
 
 
 class ExplicitDiscipline(pmdo.Discipline):
-    """ """
+    """
+    Implementation class for an explicit discipline
+    """
 
     def __init__(self):
         super().__init__()

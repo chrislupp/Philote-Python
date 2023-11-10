@@ -41,7 +41,6 @@ class DisciplineServer(disc.DisciplineService):
     """
 
     def __init__(self, discipline=None):
-        """ """
         self.verbose = False
 
         # user/developer supplied discipline
@@ -49,6 +48,12 @@ class DisciplineServer(disc.DisciplineService):
 
         # discipline stream options
         self._stream_opts = data.StreamOptions(num_double=1000)
+
+    def attach_to_server(self, server):
+        """
+        Attaches this discipline server class to a gRPC server.
+        """
+        disc.add_DisciplineServiceServicer_to_server(self, server)
 
     def attach_discipline(self, impl):
         """
