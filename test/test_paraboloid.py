@@ -13,3 +13,38 @@
 # limitations under the License.
 import unittest
 from unittest.mock import Mock
+
+import philote_mdo.examples.paraboloid as par
+
+
+class TestParaboloid(unittest.TestCase):
+    """
+    Unit tests for the paraboloid example discipline.
+    """
+    def test_setup(self):
+        """
+        Tests the setup function for the paraboloid.
+        """
+        parab = par.Parabaloid()
+        parab.setup()
+
+    def test_setup_partials(self):
+        """
+        Tests the setup_partials function for the paraboloid.
+        """
+        parab = par.Parabaloid()
+        parab.setup_partials()
+
+    def test_compute(self):
+        """
+        Tests the compute function for the paraboloid.
+        """
+        parab = par.Parabaloid()
+        parab.compute()
+
+    def test_compute_partials(self):
+        """
+        Tests the compute_partials function for the paraboloid.
+        """
+        parab = par.Parabaloid()
+        parab.compute_partials()

@@ -11,9 +11,9 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import philote_mdo.general as pmdo
 
-
-class RemoteParabaloid(pmdo.general.ExplicitServer):
+class Parabaloid(pmdo.ExplicitServer):
 
     def setup(self):
         self.define_input('x', shape=(1,), units='m')

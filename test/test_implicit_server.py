@@ -12,6 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import unittest
+from unittest.mock import Mock
+
+import numpy as np
+
+from google.protobuf.empty_pb2 import Empty
+
+from philote_mdo.general import ExplicitDiscipline, ExplicitServer
+import philote_mdo.generated.data_pb2 as data
 
 
 class TestImplicitServer(unittest.TestCase):
@@ -19,18 +27,6 @@ class TestImplicitServer(unittest.TestCase):
     Unit tests for the discipline server.
     """
     def test_compute_residuals(self):
-        """
-        Tests the ComputeResiduals RPC of the Explicit Server.
-        """
-        pass
-
-    def test_solve_residuals(self):
-        """
-        Tests the ComputeResiduals RPC of the Explicit Server.
-        """
-        pass
-
-    def test_residual_partials(self):
         """
         Tests the ComputeResiduals RPC of the Explicit Server.
         """

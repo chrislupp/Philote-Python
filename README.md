@@ -1,3 +1,5 @@
+![Philote](https://github.com/chrislupp/Philote-MDO/blob/main/doc/graphics/logos/philote.svg?raw=true)
+
 # Philote-Python
 
 Python library for using and creating Philote analysis servers.
