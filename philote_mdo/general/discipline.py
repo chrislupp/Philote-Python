@@ -27,14 +27,56 @@
 # the linked websites, of the information, products, or services contained
 # therein. The DoD does not exercise any editorial, security, or other
 # control over the information you may find at these locations.
-import openmdao.api as om
-import philote_mdo as pm
+import philote_mdo.generated.data_pb2 as data
 
 
-class RemoteImplicitComponent(om.ImplicitComponent, pm.ImplicitServer):
+class Discipline:
     """
-    An OpenMDAO component that acts as a client to an implicit analysis server.
+    Base class for defining disciplines
     """
+
+    def __init__(self):
+        # discipline properties
+        self._is_continuous = False
+        self._is_differentiable = False
+        self._provides_gradients = False
+
+        # variable metadata
+        self._var_meta = []
+
+        # partials metadata
+        self._partials_meta = []
+
+    def add_input(self, name, shape=(1,), units=""):
+        """
+        Define a continuous input.
+        """
+        meta = data.VariableMetaData()
+        meta.type = data.VariableType.kInput
+        meta.name = name
+        meta.shape.extend(shape)
+        meta.units = units
+        self._var_meta += [meta]
+
+    def add_output(self, name, shape=(1,), units=""):
+        """
+        Defines a continuous output.
+        """
+        meta = data.VariableMetaData()
+        meta.type = data.VariableType.kOutput
+        meta.name = name
+        meta.shape.extend(shape)
+        meta.units = units
+        self._var_meta += [meta]
+
+    def declare_partials(self, func, var):
+        """
+        Defines partials that will be determined using the analysis server.
+        """
+        self._partials_meta += [data.PartialsMetaData(name=func, subname=var)]
+
+    def initialize(self):
+        pass
 
     def setup(self):
         pass

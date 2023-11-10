@@ -27,20 +27,34 @@
 # the linked websites, of the information, products, or services contained
 # therein. The DoD does not exercise any editorial, security, or other
 # control over the information you may find at these locations.
-import openmdao.api as om
-import philote_mdo as pm
+import philote_mdo.general as pmdo
 
+class Parabaloid(pmdo.ExplicitServer):
 
-class RemoteImplicitComponent(om.ImplicitComponent, pm.ImplicitServer):
+class Paraboloid(pmdo.ExplicitDiscipline):
     """
-    An OpenMDAO component that acts as a client to an implicit analysis server.
+    Basic two-dimensional paraboloid example (explicit) discipline.
     """
 
     def setup(self):
-        pass
+        self.add_input("x", shape=(1,), units="m")
+        self.add_input("y", shape=(1,), units="m")
+
+        self.add_output("f_xy", shape=(1,), units="m**2")
 
     def setup_partials(self):
-        pass
+        self.declare_partials("f_xy", "x")
+        self.declare_partials("f_xy", "y")
 
-    def configure(self):
-        pass
+    def compute(self, inputs, outputs):
+        x = inputs["x"]
+        y = inputs["y"]
+
+        outputs["f_xy"] = (x - 3.0) ** 2 + x * y + (y + 4.0) ** 2 - 3.0
+
+    def compute_partials(self, inputs, partials):
+        x = inputs["x"]
+        y = inputs["y"]
+
+        partials["f_xy", "x"] = 2.0 * x - 6.0 + y
+        partials["f_xy", "y"] = 2.0 * y + 8.0 + x

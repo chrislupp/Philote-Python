@@ -27,20 +27,17 @@
 # the linked websites, of the information, products, or services contained
 # therein. The DoD does not exercise any editorial, security, or other
 # control over the information you may find at these locations.
-import openmdao.api as om
-import philote_mdo as pm
+import philote_mdo.general as pmdo
 
 
-class RemoteImplicitComponent(om.ImplicitComponent, pm.ImplicitServer):
-    """
-    An OpenMDAO component that acts as a client to an implicit analysis server.
-    """
+class ExplicitDiscipline(pmdo.Discipline):
+    """ """
 
-    def setup(self):
-        pass
+    def __init__(self):
+        super().__init__()
 
-    def setup_partials(self):
-        pass
+    def compute(self):
+        raise NotImplementedError("compute not implemented")
 
-    def configure(self):
-        pass
+    def compute_partials(self):
+        raise NotImplementedError("compute_partials not implemented")

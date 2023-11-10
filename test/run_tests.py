@@ -27,20 +27,16 @@
 # the linked websites, of the information, products, or services contained
 # therein. The DoD does not exercise any editorial, security, or other
 # control over the information you may find at these locations.
-import openmdao.api as om
-import philote_mdo as pm
+import unittest
+
+from test_discipline import TestDiscipline
+
+from test_discipline_server import TestDisciplineServer
+from test_explicit_server import TestExplicitServer
+
+from test_discipline_client import TestDisciplineClient
+from test_explicit_client import TestExplicitClient
 
 
-class RemoteImplicitComponent(om.ImplicitComponent, pm.ImplicitServer):
-    """
-    An OpenMDAO component that acts as a client to an implicit analysis server.
-    """
-
-    def setup(self):
-        pass
-
-    def setup_partials(self):
-        pass
-
-    def configure(self):
-        pass
+if __name__ == "__main__":
+    unittest.main(verbosity=2)

@@ -1,5 +1,11 @@
 # Change Log
 
+## Version 0.4.0
+- [feature] Updated API and logic to conform with newer Philote definition.
+- [feature] Added unit testing suite.
+- [fix] Added edge case handling for partials of variables that are scalar.
+
+
 ## Version 0.3.0
 
 This release is one of the biggest changes to the code to date. It contains a
