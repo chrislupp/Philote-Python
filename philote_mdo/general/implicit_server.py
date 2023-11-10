@@ -33,21 +33,20 @@ import philote_mdo.general as pmdo
 from philote_mdo.utils import get_chunk_indices
 
 
-class ImplicitServer(pmdo.DisciplineServer, disc.ImplicitDisciplineServicer):
+class ImplicitServer(pmdo.DisciplineServer, disc.ImplicitServiceServicer):
     """
     Base class for creating an implicit discipline server.
     """
 
-    def __init__(self):
-        super().__init__()
-        self._implicit = True
+    def __init__(self, discipline=None):
+        super().__init__(discipline=discipline)
 
     def attach_to_server(self, server):
         """
         Attaches this discipline server class to a gRPC server.
         """
         super().attach_to_server(server)
-        disc.add_ImplicitServiceServicer_to_server(server)
+        disc.add_ImplicitServiceServicer_to_server(self, server)
 
     def Residuals(self, request_iterator, context):
         """
