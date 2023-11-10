@@ -29,7 +29,6 @@
 # control over the information you may find at these locations.
 import philote_mdo.general as pmdo
 
-class Parabaloid(pmdo.ExplicitServer):
 
 class Paraboloid(pmdo.ExplicitDiscipline):
     """
