@@ -44,8 +44,6 @@ def run():
     print("Server started. Listening on port 50051.")
     server.wait_for_termination()
 
-    server
-
 
 if __name__ == "__main__":
     run()
