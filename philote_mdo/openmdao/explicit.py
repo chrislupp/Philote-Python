@@ -97,4 +97,10 @@ class RemoteExplicitComponent(om.ExplicitComponent):
         for var in self._client._var_meta:
             if var.type == data.kInput:
                 local_inputs[var.name] = inputs[var.name]
-        partials = self._client.run_compute_partials(inputs)
+        jac = self._client.run_compute_partials(inputs)
+
+        # assign the jacobians reference dictionary
+        # note: merely assigning the outputs from the run_compute function will
+        # overwrite the outputs reference and therefore not work
+        for key, val in jac.items():
+            partials[key] = val
