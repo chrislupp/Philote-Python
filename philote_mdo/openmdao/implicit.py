@@ -30,6 +30,7 @@
 import openmdao.api as om
 import philote_mdo.general as pm
 import philote_mdo.generated.data_pb2 as data
+from .utils import create_local_inputs, assign_global_outputs
 
 
 class RemoteImplicitComponent(om.ImplicitComponent):
@@ -38,7 +39,7 @@ class RemoteImplicitComponent(om.ImplicitComponent):
     """
 
     def initialize(self):
-        # host and port
+        # gRPC channel
         self.options.declare("channel")
 
     def setup(self):
@@ -70,25 +71,14 @@ class RemoteImplicitComponent(om.ImplicitComponent):
             self.declare_partials(partial.name, partial.subname)
 
     def apply_nonlinear(self, inputs, residuals):
-        # need to assign a local input dictionary, as the openmdao Vector class
-        # returns the absolute variable name (including all parent system). The
-        # remote client is unaware of any of the parent systems, so the relative
-        # name of all variables is required.
-        local_inputs = {}
-        for var in self._client._var_meta:
-            if var.type == data.kInput:
-                local_inputs[var.name] = inputs[var.name]
-
+        local_inputs = create_local_inputs(inputs, self._client._var_meta)
         res = self._client.run_compute_residuals(local_inputs)
-
-        # assign the outputs reference dictionary
-        # note: merely assigning the outputs from the run_compute function will
-        # overwrite the outputs reference and therefore not work
-        for key, val in res.items():
-            residuals[key] = val
+        assign_global_outputs(res, residuals)
 
     def solve_nonlinear(self, inputs, outputs):
-        pass
+        local_inputs = create_local_inputs(inputs, self._client._var_meta)
+        out = self._client.run_solve_nonlinear(local_inputs)
+        assign_global_outputs(out, outputs)
 
     def linearize(self, inputs, outputs, jacobian):
         pass
