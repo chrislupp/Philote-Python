@@ -39,39 +39,31 @@ class ImplicitClient(DisciplineClient):
     """
 
     def __init__(self, channel):
-        super().__init__()
-        self.stub = disc.ImplicitDisciplineStub(channel)
+        super().__init__(channel=channel)
+        self._impl_stub = disc.ImplicitServiceStub(channel)
 
-    def remote_compute_residuals(
+    def run_compute_residuals(
         self, inputs, outputs, discrete_inputs=None, discrete_outputs=None
     ):
         """
         Requests and receives the residual evaluation from the analysis server
         for a set of inputs and outputs (sent to the server).
         """
-        if self.verbose:
-            print("Started apply nonlinear method.", end="")
-
         # assemble the inputs that need to be sent to the server
-        messages = self.assemble_input_messages(
-            inputs, discrete_inputs, outputs, discrete_outputs
-        )
+        messages = self._assemble_input_messages(inputs, outputs)
 
         # stream the messages to the server and receive the stream of results
-        responses = self.stub.Residuals(iter(messages))
+        responses = self._impl_stub.ComputeResiduals(iter(messages))
 
         # parse the outputs
-        residuals = self.recover_residuals(responses)
-
-        if self.verbose:
-            print("    [Complete]")
+        residuals = self._recover_residuals(responses)
 
         return residuals
 
-    def remote_solve_nonlinear(self):
+    def run_solve_nonlinear(self):
         """ """
         pass
 
-    def remote_linearize(self):
+    def run_linearize(self):
         """ """
         pass

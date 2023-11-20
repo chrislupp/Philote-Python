@@ -32,14 +32,17 @@ import philote_mdo.general as pmdo
 
 class QuadradicImplicit(pmdo.ImplicitDiscipline):
     def setup(self):
-        self.define_input("a", shape=(1,))
-        self.define_input("b", shape=(1,))
-        self.define_input("c", shape=(1,))
+        self.add_input("a", shape=(1,))
+        self.add_input("b", shape=(1,))
+        self.add_input("c", shape=(1,))
 
-        self.define_output("x", shape=(1,))
+        self.add_output("x", shape=(1,))
 
     def setup_partials(self):
-        self.define_partials("x", "*")
+        self.declare_partials("x", "a")
+        self.declare_partials("x", "b")
+        self.declare_partials("x", "c")
+        self.declare_partials("x", "x")
 
     def compute_residuals(self, inputs, outputs, residuals):
         a = inputs["a"]

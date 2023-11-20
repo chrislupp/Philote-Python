@@ -47,6 +47,9 @@ class Discipline:
         # partials metadata
         self._partials_meta = []
 
+        # flag that indicates the discipline is implicit
+        self._is_implicit = False
+
     def add_input(self, name, shape=(1,), units=""):
         """
         Define a continuous input.
@@ -69,6 +72,10 @@ class Discipline:
         meta.units = units
         self._var_meta += [meta]
 
+        if self._is_implicit:
+            meta.type = data.VariableType.kResidual
+            self._var_meta += [meta]
+
     def declare_partials(self, func, var):
         """
         Defines partials that will be determined using the analysis server.
@@ -86,3 +93,12 @@ class Discipline:
 
     def configure(self):
         pass
+
+    def _clear_data(self):
+        """
+        Clears all meta data of the discipline.
+
+        This function is invoked from the Setup function of the server.
+        """
+        self._var_meta = []
+        self._partials_meta = []

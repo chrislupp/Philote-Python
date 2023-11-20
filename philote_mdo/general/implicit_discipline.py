@@ -36,7 +36,8 @@ class ImplicitDiscipline(pmdo.Discipline):
     """
 
     def __init__(self):
-        pass
+        super().__init__()
+        self._is_implicit = True
 
     def compute_residuals(self, inputs, outputs, residuals):
         raise NotImplementedError("compute_residuals not implemented")

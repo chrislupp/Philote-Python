@@ -90,6 +90,7 @@ class DisciplineServer(disc.DisciplineService):
         """
         RPC that runs the setup function
         """
+        self._discipline._clear_data()
         self._discipline.setup()
         self._discipline.setup_partials()
         return Empty()

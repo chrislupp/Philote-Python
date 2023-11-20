@@ -48,7 +48,7 @@ class ImplicitServer(pmdo.DisciplineServer, disc.ImplicitServiceServicer):
         super().attach_to_server(server)
         disc.add_ImplicitServiceServicer_to_server(self, server)
 
-    def Residuals(self, request_iterator, context):
+    def ComputeResiduals(self, request_iterator, context):
         """
         Computes the residuals and sends the results to the client.
         """
@@ -67,16 +67,16 @@ class ImplicitServer(pmdo.DisciplineServer, disc.ImplicitServiceServicer):
         self._discipline.compute_residuals(inputs, outputs, residuals)
 
         for res_name, value in residuals.items():
-            for b, e in get_chunk_indices(value.size, self.num_double):
+            for b, e in get_chunk_indices(value.size, self._stream_opts.num_double):
                 yield data.Array(
                     name=res_name,
                     start=b,
                     end=e,
                     type=data.kResidual,
-                    continuous=value.ravel()[b:e],
+                    data=value.ravel()[b:e],
                 )
 
-    def Solve(self, request_iterator, context):
+    def SolveResiduals(self, request_iterator, context):
         """
         Solves the implicit discipline so that the residuals are driven to zero.
         """
@@ -94,9 +94,9 @@ class ImplicitServer(pmdo.DisciplineServer, disc.ImplicitServiceServicer):
         self._discipline.solve_residuals(inputs, outputs)
 
         for output_name, value in outputs.items():
-            for b, e in get_chunk_indices(value.size, self.num_double):
+            for b, e in get_chunk_indices(value.size, self._stream_opts.num_double):
                 yield data.Array(
-                    name=output_name, start=b, end=e, continuous=value.ravel()[b:e]
+                    name=output_name, start=b, end=e, data=value.ravel()[b:e]
                 )
 
     def ResidualGradients(self, request_iterator, context):
@@ -118,13 +118,14 @@ class ImplicitServer(pmdo.DisciplineServer, disc.ImplicitServiceServicer):
         self._discipline.linearize(inputs, jac)
 
         for jac, value in jac.items():
-            for b, e in get_chunk_indices(value.size, self.num_double):
+            for b, e in get_chunk_indices(value.size, self._stream_opts.num_double):
                 yield data.Array(
                     name=jac[0],
                     subname=jac[1],
+                    type=data.kResidual,
                     start=b,
                     end=e,
-                    continuous=value.ravel()[b:e],
+                    data=value.ravel()[b:e],
                 )
 
     # def MatrixFreeGradients(self, request_iterator, context):

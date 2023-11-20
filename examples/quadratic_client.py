@@ -36,19 +36,19 @@ from philote_mdo.utils import PairDict
 client = ImplicitClient(channel=grpc.insecure_channel("localhost:50051"))
 
 # transfer the stream options to the server
-client.stream_options()
+client.send_stream_options()
 
 # run setup
-client.remote_setup()
+client.run_setup()
 
 # define some inputs
 inputs = {"a": np.array([1.0]), "b": np.array([2.0]), "c": np.array([2.0])}
 outputs = {"x": np.array([1.0])}
 
 # run a function evaluation
-residuals = client.remote_compute_residuals(inputs, outputs)
+residuals = client.run_compute_residuals(inputs, outputs)
 
-print(residuals)
+# print(residuals)
 
 # run a gradient evaluation
 # partials = PairDict()

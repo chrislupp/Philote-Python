@@ -31,6 +31,9 @@ import grpc
 import openmdao.api as om
 import philote_mdo.openmdao as pmom
 
+
+# this script should be run with the corresponding paraboloid server
+# (paraboloid_explicit.py)
 prob = om.Problem()
 model = prob.model
 
@@ -42,7 +45,8 @@ model.add_subsystem(
 
 prob.setup()
 
-prob["x"] = [1.0, 1.0]
+prob["x"] = 1.0
+prob["y"] = 2.0
 prob.run_model()
 
-# print(prob["f"])
+print(prob["f_xy"])

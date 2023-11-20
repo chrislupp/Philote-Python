@@ -27,7 +27,7 @@
 # the linked websites, of the information, products, or services contained
 # therein. The DoD does not exercise any editorial, security, or other
 # control over the information you may find at these locations.
-import grpc
+import numpy as np
 import openmdao.api as om
 import philote_mdo.general as pm
 import philote_mdo.generated.data_pb2 as data
@@ -71,11 +71,30 @@ class RemoteExplicitComponent(om.ExplicitComponent):
             self.declare_partials(partial.name, partial.subname)
 
     def compute(self, inputs, outputs):
-        # out = self._client.run_compute(inputs)
+        # need to assign a local input dictionary, as the openmdao Vector class
+        # returns the absolute variable name (including all parent system). The
+        # remote client is unaware of any of the parent systems, so the relative
+        # name of all variables is required.
+        local_inputs = {}
+        for var in self._client._var_meta:
+            if var.type == data.kInput:
+                local_inputs[var.name] = inputs[var.name]
 
-        # for key, val in out:
-        #     outputs[key] = val
-        pass
+        out = self._client.run_compute(local_inputs)
 
-    def compute_partials(self, inputs, discrete_inputs, partials):
+        # assign the outputs reference dictionary
+        # note: merely assigning the outputs from the run_compute function will
+        # overwrite the outputs reference and therefore not work
+        for key, val in out.items():
+            outputs[key] = val
+
+    def compute_partials(self, inputs, partials):
+        # need to assign a local input dictionary, as the openmdao Vector class
+        # returns the absolute variable name (including all parent system). The
+        # remote client is unaware of any of the parent systems, so the relative
+        # name of all variables is required.
+        local_inputs = {}
+        for var in self._client._var_meta:
+            if var.type == data.kInput:
+                local_inputs[var.name] = inputs[var.name]
         partials = self._client.run_compute_partials(inputs)
