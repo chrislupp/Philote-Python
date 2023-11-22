@@ -11,6 +11,12 @@ copyright: 2022-2023
 execute:
   execute_notebooks: force
 
+parse:
+  myst_enable_extensions:  # default extensions to enable in the myst parser. See https://myst-parser.readthedocs.io/en/latest/using/syntax-optional.html
+    - dollarmath
+    - amsmath
+    - colon_fence
+
 # Define the name of the latex output file for PDF builds
 latex:
   latex_documents:
@@ -29,6 +35,6 @@ repository:
 # Add GitHub buttons to your book
 # See https://jupyterbook.org/customize/config.html#add-a-link-to-your-repository
 html:
-  favicon: graphics/favicons/favicon-32x32.png
+  favicon: graphics/favicons/favicon.ico
   use_issues_button: true
   use_repository_button: true
