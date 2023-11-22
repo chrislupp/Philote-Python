@@ -63,7 +63,7 @@ class ImplicitServer(pmdo.DisciplineServer, disc.ImplicitServiceServicer):
         self.preallocate_inputs(inputs, flat_inputs, outputs, flat_outputs)
         self.process_inputs(request_iterator, flat_inputs, flat_outputs)
 
-        # call the user-defined compute function
+        # call the user-defined compute_residuals function
         self._discipline.compute_residuals(inputs, outputs, residuals)
 
         for res_name, value in residuals.items():

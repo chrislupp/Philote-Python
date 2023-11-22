@@ -310,3 +310,7 @@ class TestDisciplineServer(unittest.TestCase):
         # check the results
         self.assertEqual(flat_inputs["x"].tolist(), [1.0, 2.0, 3.0, 4.0, 5.0, 0.0])
         self.assertEqual(flat_outputs["f"].tolist(), [0.1, 0.2, 0.0])
+
+
+if __name__ == "__main__":
+    unittest.main(verbosity=2)

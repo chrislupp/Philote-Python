@@ -38,7 +38,7 @@ class ExplicitServer(DisciplineServer, disc.ExplicitServiceServicer):
     Base class for remote explicit components.
     """
 
-    def __init__(self, discipline):
+    def __init__(self, discipline=None):
         super().__init__(discipline=discipline)
 
     def attach_to_server(self, server):
