@@ -26,6 +26,7 @@ class TestImplicitServer(unittest.TestCase):
     """
     Unit tests for the discipline server.
     """
+
     def test_compute_residuals(self):
         """
         Tests the ComputeResiduals RPC of the Explicit Server.
