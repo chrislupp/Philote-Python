@@ -109,7 +109,7 @@ class DisciplineServer(disc.DisciplineService):
         for jac in self._discipline._partials_meta:
             yield jac
 
-    def preallocate_inputs(self, inputs, flat_inputs, outputs={}, flat_outputs={}):
+    def preallocate_inputs(self, inputs, flat_inputs, outputs=None, flat_outputs=None):
         """
         Preallocates the inputs before receiving data from the client.
 
@@ -121,7 +121,11 @@ class DisciplineServer(disc.DisciplineService):
                 inputs[var.name] = np.zeros(var.shape)
                 flat_inputs[var.name] = get_flattened_view(inputs[var.name])
 
-            if var.type == data.kOutput:
+            if (
+                var.type == data.kOutput
+                and outputs is not None
+                and flat_outputs is not None
+            ):
                 outputs[var.name] = np.zeros(var.shape)
                 flat_outputs[var.name] = get_flattened_view(outputs[var.name])
 

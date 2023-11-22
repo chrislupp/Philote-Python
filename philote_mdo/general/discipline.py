@@ -65,16 +65,21 @@ class Discipline:
         """
         Defines a continuous output.
         """
-        meta = data.VariableMetaData()
-        meta.type = data.VariableType.kOutput
-        meta.name = name
-        meta.shape.extend(shape)
-        meta.units = units
-        self._var_meta += [meta]
+        out_meta = data.VariableMetaData()
+        out_meta.type = data.VariableType.kOutput
+        out_meta.name = name
+        out_meta.shape.extend(shape)
+        out_meta.units = units
+        self._var_meta += [out_meta]
 
         if self._is_implicit:
-            meta.type = data.VariableType.kResidual
-            self._var_meta += [meta]
+            res_meta = data.VariableMetaData()
+            res_meta.type = data.VariableType.kOutput
+            res_meta.name = name
+            res_meta.shape.extend(shape)
+            res_meta.units = units
+            res_meta.type = data.VariableType.kResidual
+            self._var_meta += [res_meta]
 
     def declare_partials(self, func, var):
         """

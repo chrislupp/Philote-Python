@@ -4,7 +4,8 @@
 - [feature] Updated API and logic to conform with newer Philote definition.
 - [feature] Added unit testing suite.
 - [fix] Added edge case handling for partials of variables that are scalar.
-
+- [fix] Corrected the preallocate_inputs function for the implicit case to
+  resolve variable copy issues.
 
 ## Version 0.3.0
 
