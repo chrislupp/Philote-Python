@@ -42,28 +42,29 @@ class ImplicitClient(DisciplineClient):
         super().__init__(channel=channel)
         self._impl_stub = disc.ImplicitServiceStub(channel)
 
-    def run_compute_residuals(
-        self, inputs, outputs, discrete_inputs=None, discrete_outputs=None
-    ):
+    def run_compute_residuals(self, inputs, outputs):
         """
         Requests and receives the residual evaluation from the analysis server
         for a set of inputs and outputs (sent to the server).
         """
-        # assemble the inputs that need to be sent to the server
         messages = self._assemble_input_messages(inputs, outputs)
-
-        # stream the messages to the server and receive the stream of results
         responses = self._impl_stub.ComputeResiduals(iter(messages))
-
-        # parse the outputs
         residuals = self._recover_residuals(responses)
 
         return residuals
 
-    def run_solve_nonlinear(self):
-        """ """
-        pass
+    def run_solve_residuals(self, inputs):
+        """
+        Calls the RPC that solves the residual equations on the remote
+        discipline server.
+        """
+        messages = self._assemble_input_messages(inputs, outputs)
+        responses = self._impl_stub.SolveResiduals(iter(messages))
+        outputs = self._recover_outputs(responses)
+        return outputs
 
     def run_linearize(self):
-        """ """
+        """
+        Calls the RPC to compute the gradients of the residual equations.
+        """
         pass
