@@ -63,8 +63,11 @@ class ImplicitClient(DisciplineClient):
         outputs = self._recover_outputs(responses)
         return outputs
 
-    def run_residual_gradients(self):
+    def run_residual_gradients(self, inputs, outputs):
         """
         Calls the RPC to compute the gradients of the residual equations.
         """
-        pass
+        messages = self._assemble_input_messages(inputs, outputs)
+        responses = self._impl_stub.ResidualGradients(iter(messages))
+        partials = self._recover_partials(responses)
+        return partials

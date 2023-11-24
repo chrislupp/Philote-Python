@@ -43,12 +43,12 @@ class TestImplicitClient(unittest.TestCase):
     """
 
     @patch("philote_mdo.generated.disciplines_pb2_grpc.ImplicitServiceStub")
-    def test_compute(self, mock_explicit_stub):
+    def test_compute(self, mock_implicit_stub):
         """
         Tests the compute function of the Implicit Client.
         """
         mock_channel = Mock()
-        mock_stub = mock_explicit_stub.return_value
+        mock_stub = mock_implicit_stub.return_value
         client = ImplicitClient(mock_channel)
         client._var_meta = [
             data.VariableMetaData(name="f", type=data.kOutput, shape=(3,)),
@@ -89,50 +89,57 @@ class TestImplicitClient(unittest.TestCase):
             self.assertTrue(output_name in outputs)
             np.testing.assert_array_equal(outputs[output_name], expected_data)
 
-    # @patch("philote_mdo.generated.disciplines_pb2_grpc.ExplicitServiceStub")
-    # def test_compute_partials(self, mock_explicit_stub):
-    #     """
-    #     Tests the compute_partials function of the Explicit Client.
-    #     """
-    #     mock_channel = Mock()
-    #     mock_stub = mock_explicit_stub.return_value
-    #     client = ExplicitClient(mock_channel)
-    #     client._var_meta = [
-    #         data.VariableMetaData(name="f", type=data.kOutput, shape=(1,)),
-    #         data.VariableMetaData(name="x", type=data.kInput, shape=(2, 2)),
-    #     ]
-    #     client._partials_meta = [data.PartialsMetaData(name="f", subname="x")]
+    @patch("philote_mdo.generated.disciplines_pb2_grpc.ImplicitServiceStub")
+    def test_residual_partials(self, mock_implicit_stub):
+        """
+        Tests the residual_partials function of the Implicit Client.
+        """
+        mock_channel = Mock()
+        mock_stub = mock_implicit_stub.return_value
+        client = ImplicitClient(mock_channel)
+        client._var_meta = [
+            data.VariableMetaData(name="f", type=data.kOutput, shape=(2,)),
+            data.VariableMetaData(name="f", type=data.kResidual, shape=(2,)),
+            data.VariableMetaData(name="x", type=data.kInput, shape=(2,)),
+            data.VariableMetaData(name="g", type=data.kOutput, shape=(3,)),
+            data.VariableMetaData(name="g", type=data.kResidual, shape=(3,)),
+        ]
+        client._partials_meta = [data.PartialsMetaData(name="f", subname="x")]
 
-    #     input_data = {
-    #         "x": np.array([1.0, 2.0, 3.0, 4.0]).reshape(2, 2),
-    #     }
+        input_data = {
+            "x": np.array([1.0, 2.0]),
+        }
 
-    #     response1 = data.Array(
-    #         name="f",
-    #         subname="x",
-    #         type=data.kPartial,
-    #         start=0,
-    #         end=2,
-    #         data=[5.0, 6.0, 7.0],
-    #     )
-    #     response2 = data.Array(
-    #         name="f", subname="x", type=data.kPartial, start=3, end=3, data=[4.0]
-    #     )
-    #     mock_responses = [response1, response2]
+        output_data = {
+            "f": np.array([5.0, 6.0]),
+        }
 
-    #     mock_stub.ComputeGradient.return_value = mock_responses
+        response1 = data.Array(
+            name="f",
+            subname="x",
+            type=data.kPartial,
+            start=0,
+            end=2,
+            data=[5.0, 6.0, 7.0],
+        )
+        response2 = data.Array(
+            name="f", subname="x", type=data.kPartial, start=3, end=3, data=[4.0]
+        )
+        mock_responses = [response1, response2]
 
-    #     outputs = client.run_compute_partials(input_data)
+        mock_stub.ResidualGradients.return_value = mock_responses
 
-    #     # checks
-    #     self.assertTrue(mock_stub.ComputeGradient.called)
+        partials = client.run_residual_gradients(input_data, output_data)
 
-    #     expected_outputs = utils.PairDict()
-    #     expected_outputs[("f", "x")] = np.array([5.0, 6.0, 7.0, 4.0]).reshape((2, 2))
+        # checks
+        self.assertTrue(mock_stub.ResidualGradients.called)
 
-    #     for output_name, expected_data in expected_outputs.items():
-    #         self.assertTrue(output_name in outputs)
-    #         np.testing.assert_array_equal(outputs[output_name], expected_data)
+        expected_partials = utils.PairDict()
+        expected_partials[("f", "x")] = np.array([5.0, 6.0, 7.0, 4.0]).reshape((2, 2))
+
+        for key, expected_data in expected_partials.items():
+            self.assertTrue(key in partials)
+            np.testing.assert_array_equal(partials[key], expected_data)
 
 
 if __name__ == "__main__":
