@@ -101,7 +101,7 @@ class ImplicitServer(pmdo.DisciplineServer, disc.ImplicitServiceServicer):
                     data=value.ravel()[b:e],
                 )
 
-    def ResidualGradients(self, request_iterator, context):
+    def ComputeResidualGradients(self, request_iterator, context):
         """
         Computes the residual gradients and sends the results to the client.
         """

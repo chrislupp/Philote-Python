@@ -40,6 +40,8 @@ client.send_stream_options()
 
 # run setup
 client.run_setup()
+client.get_variable_definitions()
+client.get_partials_definitions()
 
 # define some inputs
 inputs = {"a": np.array([1.0]), "b": np.array([2.0]), "c": np.array([2.0])}
@@ -48,11 +50,10 @@ outputs = {"x": np.array([1.0])}
 # run a function evaluation
 residuals = client.run_compute_residuals(inputs, outputs)
 
-# print(residuals)
+print(residuals)
 
 # run a gradient evaluation
-# partials = PairDict()
-# client.remote_setup_partials()
-# partials = client.remote_compute_partials(inputs)
+partials = PairDict()
+partials = client.run_residual_gradients(inputs, outputs)
 
-# print(partials)
+print(partials)

@@ -175,7 +175,7 @@ class TestImplicitServer(unittest.TestCase):
         server._discipline.residual_partials = residual_partials
 
         # call the function
-        response_generator = server.ResidualGradients(request_iterator, context)
+        response_generator = server.ComputeResidualGradients(request_iterator, context)
         responses = list(response_generator)
 
         # check that there is only one response

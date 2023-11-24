@@ -27,6 +27,7 @@
 # the linked websites, of the information, products, or services contained
 # therein. The DoD does not exercise any editorial, security, or other
 # control over the information you may find at these locations.
+import numpy as np
 import philote_mdo.general as pmdo
 
 
@@ -56,18 +57,18 @@ class QuadradicImplicit(pmdo.ImplicitDiscipline):
         a = inputs["a"]
         b = inputs["b"]
         c = inputs["c"]
-        outputs["x"] = (-b + (b**2 - 4 * a * c) ** 0.5) / (2 * a)
+        outputs["x"] = np.array([(-b + (b**2 - 4 * a * c) ** 0.5) / (2 * a)])
 
-    def linearize(self, inputs, outputs, partials):
+    def residual_partials(self, inputs, outputs, partials):
         a = inputs["a"]
         b = inputs["b"]
         c = inputs["c"]
         x = outputs["x"]
 
-        partials["x", "a"] = x**2
-        partials["x", "b"] = x
-        partials["x", "c"] = 1.0
-        partials["x", "x"] = 2 * a * x + b
+        partials["x", "a"] = np.array([x**2])
+        partials["x", "b"] = np.array([x])
+        partials["x", "c"] = np.array([1.0])
+        partials["x", "x"] = np.array([2 * a * x + b])
 
         self.inv_jac = 1.0 / (2 * a * x + b)
 

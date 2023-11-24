@@ -174,12 +174,12 @@ class TestImplicitClient(unittest.TestCase):
         )
         mock_responses = [response1, response2]
 
-        mock_stub.ResidualGradients.return_value = mock_responses
+        mock_stub.ComputeResidualGradients.return_value = mock_responses
 
         partials = client.run_residual_gradients(input_data, output_data)
 
         # checks
-        self.assertTrue(mock_stub.ResidualGradients.called)
+        self.assertTrue(mock_stub.ComputeResidualGradients.called)
 
         expected_partials = utils.PairDict()
         expected_partials[("f", "x")] = np.array([5.0, 6.0, 7.0, 4.0]).reshape((2, 2))

@@ -68,6 +68,6 @@ class ImplicitClient(DisciplineClient):
         Calls the RPC to compute the gradients of the residual equations.
         """
         messages = self._assemble_input_messages(inputs, outputs)
-        responses = self._impl_stub.ResidualGradients(iter(messages))
+        responses = self._impl_stub.ComputeResidualGradients(iter(messages))
         partials = self._recover_partials(responses)
         return partials
