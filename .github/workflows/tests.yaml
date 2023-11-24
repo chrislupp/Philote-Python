@@ -34,6 +34,7 @@ jobs:
         python -m pip install --upgrade pip
         pip install flake8 pytest grpcio grpcio-tools protoletariat
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+        sudo apt install -y protobuf-compiler
     - name: Install Package
       run: |
         python setup.py compile_proto
