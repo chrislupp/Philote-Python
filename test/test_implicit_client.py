@@ -43,7 +43,7 @@ class TestImplicitClient(unittest.TestCase):
     """
 
     @patch("philote_mdo.generated.disciplines_pb2_grpc.ImplicitServiceStub")
-    def test_compute(self, mock_implicit_stub):
+    def test_compute_residuals(self, mock_implicit_stub):
         """
         Tests the compute function of the Implicit Client.
         """
@@ -76,10 +76,57 @@ class TestImplicitClient(unittest.TestCase):
 
         mock_stub.ComputeResiduals.return_value = mock_responses
 
-        outputs = client.run_compute_residuals(input_data, output_data)
+        residuals = client.run_compute_residuals(input_data, output_data)
 
         # checks
         self.assertTrue(mock_stub.ComputeResiduals.called)
+
+        expected_residuals = {
+            "f": np.array([5.0, 6.0, 7.0]),
+            "g": np.array([8.0, 9.0, 10.0]),
+        }
+        for output_name, expected_data in expected_residuals.items():
+            self.assertTrue(output_name in residuals)
+            np.testing.assert_array_equal(residuals[output_name], expected_data)
+
+    @patch("philote_mdo.generated.disciplines_pb2_grpc.ImplicitServiceStub")
+    def test_solve_residuals(self, mock_implicit_stub):
+        """
+        Tests the compute function of the Implicit Client.
+        """
+        mock_channel = Mock()
+        mock_stub = mock_implicit_stub.return_value
+        client = ImplicitClient(mock_channel)
+        client._var_meta = [
+            data.VariableMetaData(name="f", type=data.kOutput, shape=(3,)),
+            data.VariableMetaData(name="f", type=data.kResidual, shape=(3,)),
+            data.VariableMetaData(name="x", type=data.kInput, shape=(2, 2)),
+            data.VariableMetaData(name="g", type=data.kOutput, shape=(3,)),
+            data.VariableMetaData(name="g", type=data.kResidual, shape=(3,)),
+        ]
+
+        input_data = {
+            "x": np.array([1.0, 2.0, 3.0, 4.0]).reshape(2, 2),
+        }
+
+        output_data = {
+            "f": np.array([5.0, 6.0, 7.0]),
+        }
+
+        response1 = data.Array(
+            name="f", type=data.kOutput, start=0, end=2, data=[5.0, 6.0, 7.0]
+        )
+        response2 = data.Array(
+            name="g", type=data.kOutput, start=0, end=2, data=[8.0, 9.0, 10.0]
+        )
+        mock_responses = [response1, response2]
+
+        mock_stub.SolveResiduals.return_value = mock_responses
+
+        outputs = client.run_solve_residuals(input_data)
+
+        # checks
+        self.assertTrue(mock_stub.SolveResiduals.called)
 
         expected_outputs = {
             "f": np.array([5.0, 6.0, 7.0]),

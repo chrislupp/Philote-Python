@@ -58,7 +58,7 @@ class ImplicitClient(DisciplineClient):
         Calls the RPC that solves the residual equations on the remote
         discipline server.
         """
-        messages = self._assemble_input_messages(inputs, outputs)
+        messages = self._assemble_input_messages(inputs)
         responses = self._impl_stub.SolveResiduals(iter(messages))
         outputs = self._recover_outputs(responses)
         return outputs
