@@ -116,7 +116,7 @@ class ImplicitServer(pmdo.DisciplineServer, disc.ImplicitServiceServicer):
         self.process_inputs(request_iterator, flat_inputs, flat_outputs)
 
         # call the user-defined residual partials function
-        self._discipline.residual_partials(inputs, jac)
+        self._discipline.residual_partials(inputs, outputs, jac)
 
         for jac, value in jac.items():
             for b, e in get_chunk_indices(value.size, self._stream_opts.num_double):

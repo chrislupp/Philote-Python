@@ -139,11 +139,61 @@ class TestImplicitServer(unittest.TestCase):
         ]
         self.assertEqual(result, expected_result)
 
-    # def test_residual_gradients(self):
-    #     """
-    #     Tests the ComputeResiduals RPC of the Implicit Server.
-    #     """
-    #     pass
+    def test_residual_gradients(self):
+        """
+        Tests the ComputeResiduals RPC of the Implicit Server.
+        """
+        server = ImplicitServer()
+        discipline = server._discipline = ImplicitDiscipline()
+        server._stream_opts.num_double = 3
+        discipline.add_input("x", shape=(5,), units="")
+        discipline.add_output("f", shape=(1,), units="")
+        discipline.declare_partials("f", "x")
+
+        context = Mock()
+        request_iterator = [
+            data.Array(
+                start=0,
+                end=2,
+                data=[0.5, 1.5, 3.5],
+                type=data.VariableType.kInput,
+                name="x",
+            ),
+            data.Array(
+                start=3,
+                end=4,
+                data=[4.5, 5.5],
+                type=data.VariableType.kInput,
+                name="x",
+            ),
+        ]
+
+        # mock function call
+        def residual_partials(inputs, residuals, jac):
+            jac["f", "x"] = np.array([-251.0, -499.0, 11105.0, 25007.0, -2950.0])
+
+        server._discipline.residual_partials = residual_partials
+
+        # call the function
+        response_generator = server.ResidualGradients(request_iterator, context)
+        responses = list(response_generator)
+
+        # check that there is only one response
+        self.assertEqual(len(responses), 2)
+
+        # check the function value
+        response = responses[0]
+        self.assertEqual(response.name, "f")
+        self.assertEqual(response.subname, "x")
+        self.assertEqual(response.start, 0)
+        self.assertEqual(response.end, 3)
+        grad = np.array(response.data)
+
+        response = responses[1]
+        grad = np.append(grad, np.array(response.data))
+        self.assertTrue(
+            np.array_equal(grad, np.array([-251.0, -499.0, 11105.0, 25007.0, -2950.0]))
+        )
 
 
 if __name__ == "__main__":
