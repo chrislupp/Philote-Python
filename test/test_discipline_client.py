@@ -121,13 +121,16 @@ class TestDisciplineClient(unittest.TestCase):
         )
 
         # configure the stub to return the mock input and output definitions
-        mock_stub.DefineVariables.return_value = [input_definition, output_definition]
+        mock_stub.GetVariableDefinitions.return_value = [
+            input_definition,
+            output_definition,
+        ]
 
         # call the get_variables_definitions method
         client.get_variable_definitions()
 
         # assert that the gRPC call was made
-        self.assertTrue(mock_stub.DefineVariables.called)
+        self.assertTrue(mock_stub.GetVariableDefinitions.called)
 
         # assert that the _var_meta attribute is updated with the expected input
         # and output definitions
@@ -161,12 +164,12 @@ class TestDisciplineClient(unittest.TestCase):
             data.PartialsMetaData(name="input2", subname="output2"),
         ]
 
-        mock_stub.DefinePartials.return_value = partials_metadata
+        mock_stub.GetPartialDefinitions.return_value = partials_metadata
 
         client.get_partials_definitions()
 
         # check that the client function was called
-        self.assertTrue(mock_stub.DefinePartials.called)
+        self.assertTrue(mock_stub.GetPartialDefinitions.called)
 
         # check that the number of entries is correct
         self.assertEqual(len(client._partials_meta), 2)
@@ -262,8 +265,8 @@ class TestDisciplineClient(unittest.TestCase):
         client = DisciplineClient(mock_channel)
 
         client._var_meta = [
-            data.VariableMetaData(name="f", type=data.kOutput, shape=(2, 2)),
-            data.VariableMetaData(name="g", type=data.kOutput, shape=(3,)),
+            data.VariableMetaData(name="f", type=data.kResidual, shape=(2, 2)),
+            data.VariableMetaData(name="g", type=data.kResidual, shape=(3,)),
         ]
 
         response1 = data.Array(
@@ -343,3 +346,7 @@ class TestDisciplineClient(unittest.TestCase):
         for (name, subname), expected_data in expected_partials.items():
             self.assertTrue((name, subname) in partials)
             np.testing.assert_array_equal(partials[(name, subname)], expected_data)
+
+
+if __name__ == "__main__":
+    unittest.main(verbosity=2)
