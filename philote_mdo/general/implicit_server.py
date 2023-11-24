@@ -59,7 +59,6 @@ class ImplicitServer(pmdo.DisciplineServer, disc.ImplicitServiceServicer):
         flat_outputs = {}
         residuals = {}
 
-        # preallocate the inputs for the implicit discipline
         self.preallocate_inputs(inputs, flat_inputs, outputs, flat_outputs)
         self.process_inputs(request_iterator, flat_inputs, flat_outputs)
 
@@ -87,16 +86,19 @@ class ImplicitServer(pmdo.DisciplineServer, disc.ImplicitServiceServicer):
         flat_outputs = {}
 
         self.preallocate_inputs(inputs, flat_inputs, outputs, flat_outputs)
-
         self.process_inputs(request_iterator, flat_inputs, flat_outputs)
 
-        # call the user-defined compute function
+        # call the user-defined solve function
         self._discipline.solve_residuals(inputs, outputs)
 
         for output_name, value in outputs.items():
             for b, e in get_chunk_indices(value.size, self._stream_opts.num_double):
                 yield data.Array(
-                    name=output_name, start=b, end=e, data=value.ravel()[b:e]
+                    name=output_name,
+                    start=b,
+                    end=e,
+                    type=data.kOutput,
+                    data=value.ravel()[b:e],
                 )
 
     def ResidualGradients(self, request_iterator, context):
@@ -109,20 +111,19 @@ class ImplicitServer(pmdo.DisciplineServer, disc.ImplicitServiceServicer):
         outputs = {}
         flat_outputs = {}
 
-        # preallocate the input and discrete input arrays
         self.preallocate_inputs(inputs, flat_inputs, outputs, flat_outputs)
         jac = self.preallocate_partials()
         self.process_inputs(request_iterator, flat_inputs, flat_outputs)
 
-        # call the user-defined compute_partials function
-        self._discipline.linearize(inputs, jac)
+        # call the user-defined residual partials function
+        self._discipline.residual_partials(inputs, jac)
 
         for jac, value in jac.items():
             for b, e in get_chunk_indices(value.size, self._stream_opts.num_double):
                 yield data.Array(
                     name=jac[0],
                     subname=jac[1],
-                    type=data.kResidual,
+                    type=data.kPartial,
                     start=b,
                     end=e,
                     data=value.ravel()[b:e],

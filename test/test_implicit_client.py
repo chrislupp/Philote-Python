@@ -42,88 +42,88 @@ class TestImplicitClient(unittest.TestCase):
     Unit tests for the implicit client.
     """
 
-    @patch("philote_mdo.generated.disciplines_pb2_grpc.ExplicitServiceStub")
-    def test_compute(self, mock_explicit_stub):
-        """
-        Tests the compute function of the Explicit Client.
-        """
-        mock_channel = Mock()
-        mock_stub = mock_explicit_stub.return_value
-        client = ExplicitClient(mock_channel)
-        client._var_meta = [
-            data.VariableMetaData(name="f", type=data.kOutput, shape=(3,)),
-            data.VariableMetaData(name="x", type=data.kInput, shape=(2, 2)),
-            data.VariableMetaData(name="g", type=data.kOutput, shape=(3,)),
-        ]
+    # @patch("philote_mdo.generated.disciplines_pb2_grpc.ExplicitServiceStub")
+    # def test_compute(self, mock_explicit_stub):
+    #     """
+    #     Tests the compute function of the Explicit Client.
+    #     """
+    #     mock_channel = Mock()
+    #     mock_stub = mock_explicit_stub.return_value
+    #     client = ExplicitClient(mock_channel)
+    #     client._var_meta = [
+    #         data.VariableMetaData(name="f", type=data.kOutput, shape=(3,)),
+    #         data.VariableMetaData(name="x", type=data.kInput, shape=(2, 2)),
+    #         data.VariableMetaData(name="g", type=data.kOutput, shape=(3,)),
+    #     ]
 
-        input_data = {
-            "x": np.array([1.0, 2.0, 3.0, 4.0]).reshape(2, 2),
-        }
+    #     input_data = {
+    #         "x": np.array([1.0, 2.0, 3.0, 4.0]).reshape(2, 2),
+    #     }
 
-        response1 = data.Array(
-            name="f", type=data.kOutput, start=0, end=2, data=[5.0, 6.0, 7.0]
-        )
-        response2 = data.Array(
-            name="g", type=data.kOutput, start=0, end=2, data=[8.0, 9.0, 10.0]
-        )
-        mock_responses = [response1, response2]
+    #     response1 = data.Array(
+    #         name="f", type=data.kOutput, start=0, end=2, data=[5.0, 6.0, 7.0]
+    #     )
+    #     response2 = data.Array(
+    #         name="g", type=data.kOutput, start=0, end=2, data=[8.0, 9.0, 10.0]
+    #     )
+    #     mock_responses = [response1, response2]
 
-        mock_stub.ComputeFunction.return_value = mock_responses
+    #     mock_stub.ComputeFunction.return_value = mock_responses
 
-        outputs = client.run_compute(input_data)
+    #     outputs = client.run_compute(input_data)
 
-        # checks
-        self.assertTrue(mock_stub.ComputeFunction.called)
+    #     # checks
+    #     self.assertTrue(mock_stub.ComputeFunction.called)
 
-        expected_outputs = {
-            "f": np.array([5.0, 6.0, 7.0]),
-            "g": np.array([8.0, 9.0, 10.0]),
-        }
-        for output_name, expected_data in expected_outputs.items():
-            self.assertTrue(output_name in outputs)
-            np.testing.assert_array_equal(outputs[output_name], expected_data)
+    #     expected_outputs = {
+    #         "f": np.array([5.0, 6.0, 7.0]),
+    #         "g": np.array([8.0, 9.0, 10.0]),
+    #     }
+    #     for output_name, expected_data in expected_outputs.items():
+    #         self.assertTrue(output_name in outputs)
+    #         np.testing.assert_array_equal(outputs[output_name], expected_data)
 
-    @patch("philote_mdo.generated.disciplines_pb2_grpc.ExplicitServiceStub")
-    def test_compute_partials(self, mock_explicit_stub):
-        """
-        Tests the compute_partials function of the Explicit Client.
-        """
-        mock_channel = Mock()
-        mock_stub = mock_explicit_stub.return_value
-        client = ExplicitClient(mock_channel)
-        client._var_meta = [
-            data.VariableMetaData(name="f", type=data.kOutput, shape=(1,)),
-            data.VariableMetaData(name="x", type=data.kInput, shape=(2, 2)),
-        ]
-        client._partials_meta = [data.PartialsMetaData(name="f", subname="x")]
+    # @patch("philote_mdo.generated.disciplines_pb2_grpc.ExplicitServiceStub")
+    # def test_compute_partials(self, mock_explicit_stub):
+    #     """
+    #     Tests the compute_partials function of the Explicit Client.
+    #     """
+    #     mock_channel = Mock()
+    #     mock_stub = mock_explicit_stub.return_value
+    #     client = ExplicitClient(mock_channel)
+    #     client._var_meta = [
+    #         data.VariableMetaData(name="f", type=data.kOutput, shape=(1,)),
+    #         data.VariableMetaData(name="x", type=data.kInput, shape=(2, 2)),
+    #     ]
+    #     client._partials_meta = [data.PartialsMetaData(name="f", subname="x")]
 
-        input_data = {
-            "x": np.array([1.0, 2.0, 3.0, 4.0]).reshape(2, 2),
-        }
+    #     input_data = {
+    #         "x": np.array([1.0, 2.0, 3.0, 4.0]).reshape(2, 2),
+    #     }
 
-        response1 = data.Array(
-            name="f",
-            subname="x",
-            type=data.kPartial,
-            start=0,
-            end=2,
-            data=[5.0, 6.0, 7.0],
-        )
-        response2 = data.Array(
-            name="f", subname="x", type=data.kPartial, start=3, end=3, data=[4.0]
-        )
-        mock_responses = [response1, response2]
+    #     response1 = data.Array(
+    #         name="f",
+    #         subname="x",
+    #         type=data.kPartial,
+    #         start=0,
+    #         end=2,
+    #         data=[5.0, 6.0, 7.0],
+    #     )
+    #     response2 = data.Array(
+    #         name="f", subname="x", type=data.kPartial, start=3, end=3, data=[4.0]
+    #     )
+    #     mock_responses = [response1, response2]
 
-        mock_stub.ComputeGradient.return_value = mock_responses
+    #     mock_stub.ComputeGradient.return_value = mock_responses
 
-        outputs = client.run_compute_partials(input_data)
+    #     outputs = client.run_compute_partials(input_data)
 
-        # checks
-        self.assertTrue(mock_stub.ComputeGradient.called)
+    #     # checks
+    #     self.assertTrue(mock_stub.ComputeGradient.called)
 
-        expected_outputs = utils.PairDict()
-        expected_outputs[("f", "x")] = np.array([5.0, 6.0, 7.0, 4.0]).reshape((2, 2))
+    #     expected_outputs = utils.PairDict()
+    #     expected_outputs[("f", "x")] = np.array([5.0, 6.0, 7.0, 4.0]).reshape((2, 2))
 
-        for output_name, expected_data in expected_outputs.items():
-            self.assertTrue(output_name in outputs)
-            np.testing.assert_array_equal(outputs[output_name], expected_data)
+    #     for output_name, expected_data in expected_outputs.items():
+    #         self.assertTrue(output_name in outputs)
+    #         np.testing.assert_array_equal(outputs[output_name], expected_data)
