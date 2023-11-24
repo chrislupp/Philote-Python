@@ -1,4 +1,6 @@
 doxer.*
+examples/reports/
+**/reports/
 *.DS_Store
 doc/_build
 dist/

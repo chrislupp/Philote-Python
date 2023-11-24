@@ -16,7 +16,7 @@
 #
 #
 # This work has been cleared for public release, distribution unlimited, case
-# number: AFRL-2023-XXXX.
+# number: AFRL-2023-5713.
 #
 # The views expressed are those of the authors and do not reflect the
 # official guidance or position of the United States Government, the
@@ -28,49 +28,46 @@
 # therein. The DoD does not exercise any editorial, security, or other
 # control over the information you may find at these locations.
 import grpc
-from philote_mdo.general.client_base import ClientBase
-import philote_mdo.generated.implicit_pb2_grpc as implicit_pb2_grpc
+from philote_mdo.general.discipline_client import DisciplineClient
+import philote_mdo.generated.data_pb2 as data
+import philote_mdo.generated.disciplines_pb2_grpc as disc
 
 
-class ImplicitClient(ClientBase):
+class ImplicitClient(DisciplineClient):
     """
     Python client for implicit Philote discipline servers.
     """
 
     def __init__(self, channel):
-        super().__init__()
-        self.stub = implicit_pb2_grpc.ImplicitDisciplineStub(channel)
+        super().__init__(channel=channel)
+        self._impl_stub = disc.ImplicitServiceStub(channel)
 
-    def remote_compute_residuals(
-        self, inputs, outputs, discrete_inputs=None, discrete_outputs=None
-    ):
+    def run_compute_residuals(self, inputs, outputs):
         """
         Requests and receives the residual evaluation from the analysis server
         for a set of inputs and outputs (sent to the server).
         """
-        if self.verbose:
-            print("Started apply nonlinear method.", end="")
-
-        # assemble the inputs that need to be sent to the server
-        messages = self.assemble_input_messages(
-            inputs, discrete_inputs, outputs, discrete_outputs
-        )
-
-        # stream the messages to the server and receive the stream of results
-        responses = self.stub.Residuals(iter(messages))
-
-        # parse the outputs
-        residuals = self.recover_residuals(responses)
-
-        if self.verbose:
-            print("    [Complete]")
+        messages = self._assemble_input_messages(inputs, outputs)
+        responses = self._impl_stub.ComputeResiduals(iter(messages))
+        residuals = self._recover_residuals(responses)
 
         return residuals
 
-    def remote_solve_nonlinear(self):
-        """ """
-        pass
+    def run_solve_residuals(self, inputs):
+        """
+        Calls the RPC that solves the residual equations on the remote
+        discipline server.
+        """
+        messages = self._assemble_input_messages(inputs)
+        responses = self._impl_stub.SolveResiduals(iter(messages))
+        outputs = self._recover_outputs(responses)
+        return outputs
 
-    def remote_linearize(self):
-        """ """
-        pass
+    def run_residual_gradients(self, inputs, outputs):
+        """
+        Calls the RPC to compute the gradients of the residual equations.
+        """
+        messages = self._assemble_input_messages(inputs, outputs)
+        responses = self._impl_stub.ComputeResidualGradients(iter(messages))
+        partials = self._recover_partials(responses)
+        return partials

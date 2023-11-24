@@ -16,7 +16,7 @@
 #
 #
 # This work has been cleared for public release, distribution unlimited, case
-# number: AFRL-2023-XXXX.
+# number: AFRL-2023-5713.
 #
 # The views expressed are those of the authors and do not reflect the
 # official guidance or position of the United States Government, the
@@ -31,7 +31,9 @@ import philote_mdo.general as pmdo
 
 
 class ExplicitDiscipline(pmdo.Discipline):
-    """ """
+    """
+    Implementation class for an explicit discipline
+    """
 
     def __init__(self):
         super().__init__()

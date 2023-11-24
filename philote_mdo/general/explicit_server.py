@@ -16,7 +16,7 @@
 #
 #
 # This work has been cleared for public release, distribution unlimited, case
-# number: AFRL-2023-XXXX.
+# number: AFRL-2023-5713.
 #
 # The views expressed are those of the authors and do not reflect the
 # official guidance or position of the United States Government, the
@@ -38,8 +38,15 @@ class ExplicitServer(DisciplineServer, disc.ExplicitServiceServicer):
     Base class for remote explicit components.
     """
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, discipline=None):
+        super().__init__(discipline=discipline)
+
+    def attach_to_server(self, server):
+        """
+        Attaches this discipline server class to a gRPC server.
+        """
+        super().attach_to_server(server)
+        disc.add_ExplicitServiceServicer_to_server(self, server)
 
     def ComputeFunction(self, request_iterator, context):
         """

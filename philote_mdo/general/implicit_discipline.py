@@ -16,7 +16,7 @@
 #
 #
 # This work has been cleared for public release, distribution unlimited, case
-# number: AFRL-2023-XXXX.
+# number: AFRL-2023-5713.
 #
 # The views expressed are those of the authors and do not reflect the
 # official guidance or position of the United States Government, the
@@ -31,10 +31,13 @@ import philote_mdo.general as pmdo
 
 
 class ImplicitDiscipline(pmdo.Discipline):
-    """ """
+    """
+    Implementation class for implicit disciplines.
+    """
 
     def __init__(self):
-        pass
+        super().__init__()
+        self._is_implicit = True
 
     def compute_residuals(self, inputs, outputs, residuals):
         raise NotImplementedError("compute_residuals not implemented")

@@ -16,7 +16,7 @@
 #
 #
 # This work has been cleared for public release, distribution unlimited, case
-# number: AFRL-2023-XXXX.
+# number: AFRL-2023-5713.
 #
 # The views expressed are those of the authors and do not reflect the
 # official guidance or position of the United States Government, the
@@ -41,7 +41,6 @@ class DisciplineServer(disc.DisciplineService):
     """
 
     def __init__(self, discipline=None):
-        """ """
         self.verbose = False
 
         # user/developer supplied discipline
@@ -49,6 +48,12 @@ class DisciplineServer(disc.DisciplineService):
 
         # discipline stream options
         self._stream_opts = data.StreamOptions(num_double=1000)
+
+    def attach_to_server(self, server):
+        """
+        Attaches this discipline server class to a gRPC server.
+        """
+        disc.add_DisciplineServiceServicer_to_server(self, server)
 
     def attach_discipline(self, impl):
         """
@@ -85,6 +90,7 @@ class DisciplineServer(disc.DisciplineService):
         """
         RPC that runs the setup function
         """
+        self._discipline._clear_data()
         self._discipline.setup()
         self._discipline.setup_partials()
         return Empty()
@@ -103,7 +109,7 @@ class DisciplineServer(disc.DisciplineService):
         for jac in self._discipline._partials_meta:
             yield jac
 
-    def preallocate_inputs(self, inputs, flat_inputs, outputs={}, flat_outputs={}):
+    def preallocate_inputs(self, inputs, flat_inputs, outputs=None, flat_outputs=None):
         """
         Preallocates the inputs before receiving data from the client.
 
@@ -115,7 +121,11 @@ class DisciplineServer(disc.DisciplineService):
                 inputs[var.name] = np.zeros(var.shape)
                 flat_inputs[var.name] = get_flattened_view(inputs[var.name])
 
-            if var.type == data.kOutput:
+            if (
+                var.type == data.kOutput
+                and outputs is not None
+                and flat_outputs is not None
+            ):
                 outputs[var.name] = np.zeros(var.shape)
                 flat_outputs[var.name] = get_flattened_view(outputs[var.name])
 

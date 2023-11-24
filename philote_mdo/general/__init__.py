@@ -16,7 +16,7 @@
 #
 #
 # This work has been cleared for public release, distribution unlimited, case
-# number: AFRL-2023-XXXX.
+# number: AFRL-2023-5713.
 #
 # The views expressed are those of the authors and do not reflect the
 # official guidance or position of the United States Government, the
@@ -29,9 +29,11 @@
 # control over the information you may find at these locations.
 from .discipline_client import DisciplineClient
 from .explicit_client import ExplicitClient
+from .implicit_client import ImplicitClient
 
 from .discipline_server import DisciplineServer
 from .explicit_server import ExplicitServer
+from .implicit_server import ImplicitServer
 
 from .discipline import Discipline
 from .explicit_discipline import ExplicitDiscipline

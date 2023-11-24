@@ -16,7 +16,7 @@
 #
 #
 # This work has been cleared for public release, distribution unlimited, case
-# number: AFRL-2023-XXXX.
+# number: AFRL-2023-5713.
 #
 # The views expressed are those of the authors and do not reflect the
 # official guidance or position of the United States Government, the
@@ -47,6 +47,9 @@ class Discipline:
         # partials metadata
         self._partials_meta = []
 
+        # flag that indicates the discipline is implicit
+        self._is_implicit = False
+
     def add_input(self, name, shape=(1,), units=""):
         """
         Define a continuous input.
@@ -62,12 +65,21 @@ class Discipline:
         """
         Defines a continuous output.
         """
-        meta = data.VariableMetaData()
-        meta.type = data.VariableType.kOutput
-        meta.name = name
-        meta.shape.extend(shape)
-        meta.units = units
-        self._var_meta += [meta]
+        out_meta = data.VariableMetaData()
+        out_meta.type = data.VariableType.kOutput
+        out_meta.name = name
+        out_meta.shape.extend(shape)
+        out_meta.units = units
+        self._var_meta += [out_meta]
+
+        if self._is_implicit:
+            res_meta = data.VariableMetaData()
+            res_meta.type = data.VariableType.kOutput
+            res_meta.name = name
+            res_meta.shape.extend(shape)
+            res_meta.units = units
+            res_meta.type = data.VariableType.kResidual
+            self._var_meta += [res_meta]
 
     def declare_partials(self, func, var):
         """
@@ -86,3 +98,12 @@ class Discipline:
 
     def configure(self):
         pass
+
+    def _clear_data(self):
+        """
+        Clears all meta data of the discipline.
+
+        This function is invoked from the Setup function of the server.
+        """
+        self._var_meta = []
+        self._partials_meta = []

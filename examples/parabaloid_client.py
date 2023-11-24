@@ -16,9 +16,17 @@
 #
 #
 # This work has been cleared for public release, distribution unlimited, case
-# number: AFRL-2023-XXXX. The views expressed are those of the author and do not
-# necessarily reflect the official policy or position of the Department of the
-# Air Force, the Department of Defense, or the U.S. government.
+# number: AFRL-2023-5713.
+#
+# The views expressed are those of the authors and do not reflect the
+# official guidance or position of the United States Government, the
+# Department of Defense or of the United States Air Force.
+#
+# Statement from DoD: The Appearance of external hyperlinks does not
+# constitute endorsement by the United States Department of Defense (DoD) of
+# the linked websites, of the information, products, or services contained
+# therein. The DoD does not exercise any editorial, security, or other
+# control over the information you may find at these locations.
 import grpc
 import numpy as np
 from philote_mdo.general import ExplicitClient
@@ -27,22 +35,23 @@ from philote_mdo.general import ExplicitClient
 client = ExplicitClient(channel=grpc.insecure_channel("localhost:50051"))
 
 # transfer the stream options to the server
-client.stream_options()
+client.send_stream_options()
 
 # run setup
-client.remote_setup()
+client.run_setup()
+client.get_variable_definitions()
+client.get_partials_definitions()
 
 # define some inputs
 inputs = {"x": np.array([1.0]), "y": np.array([2.0])}
 outputs = {}
 
 # run a function evaluation
-outputs, discrete_outputs = client.remote_compute(inputs)
+outputs = client.run_compute(inputs)
 
 print(outputs)
 
 # run a gradient evaluation
-client.remote_setup_partials()
-partials = client.remote_compute_partials(inputs)
+partials = client.run_compute_partials(inputs)
 
 print(partials)

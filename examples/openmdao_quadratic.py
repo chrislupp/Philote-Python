@@ -27,34 +27,28 @@
 # the linked websites, of the information, products, or services contained
 # therein. The DoD does not exercise any editorial, security, or other
 # control over the information you may find at these locations.
+import grpc
 import openmdao.api as om
-import philote_mdo.general as pm
-import philote_mdo.generated.data_pb2 as data
-from .utils import client_setup, create_local_inputs, assign_global_outputs
+import philote_mdo.openmdao as pmom
 
 
-class RemoteImplicitComponent(om.ImplicitComponent):
-    """
-    An OpenMDAO component that acts as a client to an implicit analysis server.
-    """
+# this script should be run with the corresponding paraboloid server
+# (quadratic_implicit.py)
+prob = om.Problem()
+model = prob.model
 
-    def initialize(self):
-        # gRPC channel
-        self.options.declare("channel")
+model.add_subsystem(
+    "Quadratic",
+    pmom.RemoteImplicitComponent(channel=grpc.insecure_channel("localhost:50051")),
+    promotes=["*"],
+)
 
-    def setup(self):
-        self._client = pm.ImplicitClient(channel=self.options["channel"])
-        client_setup(self)
+prob.setup()
 
-    def apply_nonlinear(self, inputs, residuals):
-        local_inputs = create_local_inputs(inputs, self._client._var_meta)
-        res = self._client.run_compute_residuals(local_inputs)
-        assign_global_outputs(res, residuals)
+prob["a"] = 1.0
+prob["b"] = 1.0
+prob["c"] = 1.0
 
-    def solve_nonlinear(self, inputs, outputs):
-        local_inputs = create_local_inputs(inputs, self._client._var_meta)
-        out = self._client.run_solve_nonlinear(local_inputs)
-        assign_global_outputs(out, outputs)
+prob.run_model()
 
-    def linearize(self, inputs, outputs, jacobian):
-        pass
+print(prob["x"])
