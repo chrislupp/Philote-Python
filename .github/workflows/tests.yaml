@@ -34,6 +34,7 @@ jobs:
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
     - name: Install Package
       run: |
+        python setup.py compile_proto
         pip install .
     - name: Lint with flake8
       run: |
