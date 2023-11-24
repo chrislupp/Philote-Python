@@ -32,7 +32,7 @@ from unittest.mock import Mock, patch
 
 import numpy as np
 
-from philote_mdo.general import ExplicitClient
+from philote_mdo.general import ImplicitClient
 import philote_mdo.generated.data_pb2 as data
 import philote_mdo.utils as utils
 
@@ -42,46 +42,52 @@ class TestImplicitClient(unittest.TestCase):
     Unit tests for the implicit client.
     """
 
-    # @patch("philote_mdo.generated.disciplines_pb2_grpc.ExplicitServiceStub")
-    # def test_compute(self, mock_explicit_stub):
-    #     """
-    #     Tests the compute function of the Explicit Client.
-    #     """
-    #     mock_channel = Mock()
-    #     mock_stub = mock_explicit_stub.return_value
-    #     client = ExplicitClient(mock_channel)
-    #     client._var_meta = [
-    #         data.VariableMetaData(name="f", type=data.kOutput, shape=(3,)),
-    #         data.VariableMetaData(name="x", type=data.kInput, shape=(2, 2)),
-    #         data.VariableMetaData(name="g", type=data.kOutput, shape=(3,)),
-    #     ]
+    @patch("philote_mdo.generated.disciplines_pb2_grpc.ImplicitServiceStub")
+    def test_compute(self, mock_explicit_stub):
+        """
+        Tests the compute function of the Implicit Client.
+        """
+        mock_channel = Mock()
+        mock_stub = mock_explicit_stub.return_value
+        client = ImplicitClient(mock_channel)
+        client._var_meta = [
+            data.VariableMetaData(name="f", type=data.kOutput, shape=(3,)),
+            data.VariableMetaData(name="f", type=data.kResidual, shape=(3,)),
+            data.VariableMetaData(name="x", type=data.kInput, shape=(2, 2)),
+            data.VariableMetaData(name="g", type=data.kOutput, shape=(3,)),
+            data.VariableMetaData(name="g", type=data.kResidual, shape=(3,)),
+        ]
 
-    #     input_data = {
-    #         "x": np.array([1.0, 2.0, 3.0, 4.0]).reshape(2, 2),
-    #     }
+        input_data = {
+            "x": np.array([1.0, 2.0, 3.0, 4.0]).reshape(2, 2),
+        }
 
-    #     response1 = data.Array(
-    #         name="f", type=data.kOutput, start=0, end=2, data=[5.0, 6.0, 7.0]
-    #     )
-    #     response2 = data.Array(
-    #         name="g", type=data.kOutput, start=0, end=2, data=[8.0, 9.0, 10.0]
-    #     )
-    #     mock_responses = [response1, response2]
+        output_data = {
+            "f": np.array([5.0, 6.0, 7.0]),
+        }
 
-    #     mock_stub.ComputeFunction.return_value = mock_responses
+        response1 = data.Array(
+            name="f", type=data.kResidual, start=0, end=2, data=[5.0, 6.0, 7.0]
+        )
+        response2 = data.Array(
+            name="g", type=data.kResidual, start=0, end=2, data=[8.0, 9.0, 10.0]
+        )
+        mock_responses = [response1, response2]
 
-    #     outputs = client.run_compute(input_data)
+        mock_stub.ComputeResiduals.return_value = mock_responses
 
-    #     # checks
-    #     self.assertTrue(mock_stub.ComputeFunction.called)
+        outputs = client.run_compute_residuals(input_data, output_data)
 
-    #     expected_outputs = {
-    #         "f": np.array([5.0, 6.0, 7.0]),
-    #         "g": np.array([8.0, 9.0, 10.0]),
-    #     }
-    #     for output_name, expected_data in expected_outputs.items():
-    #         self.assertTrue(output_name in outputs)
-    #         np.testing.assert_array_equal(outputs[output_name], expected_data)
+        # checks
+        self.assertTrue(mock_stub.ComputeResiduals.called)
+
+        expected_outputs = {
+            "f": np.array([5.0, 6.0, 7.0]),
+            "g": np.array([8.0, 9.0, 10.0]),
+        }
+        for output_name, expected_data in expected_outputs.items():
+            self.assertTrue(output_name in outputs)
+            np.testing.assert_array_equal(outputs[output_name], expected_data)
 
     # @patch("philote_mdo.generated.disciplines_pb2_grpc.ExplicitServiceStub")
     # def test_compute_partials(self, mock_explicit_stub):
@@ -127,3 +133,7 @@ class TestImplicitClient(unittest.TestCase):
     #     for output_name, expected_data in expected_outputs.items():
     #         self.assertTrue(output_name in outputs)
     #         np.testing.assert_array_equal(outputs[output_name], expected_data)
+
+
+if __name__ == "__main__":
+    unittest.main(verbosity=2)
