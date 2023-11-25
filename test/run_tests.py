@@ -42,6 +42,7 @@ from test_implicit_client import TestImplicitClient
 
 # example unit tests
 from test_paraboloid import TestParaboloid
+from test_quadratic import TestQuadradicImplicit
 
 # integrations tests
 from test_integration import IntegrationTests
