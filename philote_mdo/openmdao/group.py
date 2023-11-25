@@ -31,20 +31,45 @@ import openmdao.api as om
 import philote_mdo.general as pm
 
 
-class OmGroupServer(pm.ExplicitServer):
-    """PhiloteDiscipline that calls an OpenMDAO group."""
+class OpenMdaoSubproblem(pm.ExplicitDiscipline):
+    """
+    PhiloteDiscipline that calls an OpenMDAO group.
+    """
 
-    def __init__(self):
+    def __init__(self, group=None):
         super().__init__()
 
-        self._prob = om.Problem()
-        self.model = self._prob.model
+        self.add_group(group)
+        self.clear_mapped_variables()
 
-        self._inputs = {}
-        self._discrete_inputs = {}
+    def add_group(self, group):
+        """
+        Adds an OpenMDAO group to the discipline.
 
-        self._outputs = {}
-        self._discrete_outputs = {}
+        Warning: This will delete any previous problem settings and attached
+        models.
+        """
+        self._prob = om.Problem(model=group)
+        self._model = self._prob.model
+
+    def add_mapped_input(self, local_var, subprob_var):
+        """
+        Adds an input that is mapped from the discipline to the sub-problem.
+        """
+        self._input_map[local_var] = subprob_var
+
+    def add_mapped_output(self, local_var, subprob_var):
+        """
+        Adds an output that is mapped from the discipline to the sub-problem.
+        """
+        self._output_map[local_var] = subprob_var
+
+    def clear_mapped_variables(self):
+        """
+        Clears the variable map and sets it to an empty dictionary.
+        """
+        self._input_map = {}
+        self._output_map = {}
 
     def initialize(self):
         pass
@@ -52,38 +77,28 @@ class OmGroupServer(pm.ExplicitServer):
     def setup(self):
         self._prob.setup()
 
+        for local, sub in self._input_map.items():
+            self.add_input(local)
+
+        for local, sub in self._output_map.items():
+            self.add_output(local)
+
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         # assign continuous and discrete inputs of the nested group
-        for comp_var, var in enumerate(self._inputs):
-            self._prob[var] = inputs[comp_var]
-        for comp_dvar, dvar in enumerate(self._discrete_inputs):
-            self._prob[dvar] = discrete_inputs[comp_dvar]
+        for local, sub in self._input_map:
+            self._prob[sub] = inputs[local]
 
         self._prob.run_model()
 
         # assign continuous and discrete outputs of the component
-        for comp_out, out in enumerate(self._outputs):
-            outputs[comp_out] = self._prob[out]
-        for comp_dout, dout in enumerate(self._discrete_outputs):
-            discrete_outputs[comp_dout] = self._prob[dout]
+        for local, sub in self._output_map.items():
+            outputs[local] = self._prob[sub]
 
-    def compute_partials(self, inputs, partials, discrete_inputs=None):
-        # assign continuous and discrete inputs of the nested group
-        for comp_var, var in enumerate(self._inputs):
-            self._prob[var] = inputs[comp_var]
-        for comp_dvar, dvar in enumerate(self._discrete_inputs):
-            self._prob[dvar] = discrete_inputs[comp_dvar]
+    # def compute_partials(self, inputs, partials, discrete_inputs=None):
+    #     # assign continuous and discrete inputs of the nested group
+    #     for comp_var, var in enumerate(self._inputs):
+    #         self._prob[var] = inputs[comp_var]
+    #     for comp_dvar, dvar in enumerate(self._discrete_inputs):
+    #         self._prob[dvar] = discrete_inputs[comp_dvar]
 
-        # self._prob.compute_totals()
-
-    def define_input(self, name, model_input):
-        self._inputs[name] = model_input
-
-    def define_discrete_input(self, name, model_input):
-        self._discrete_inputs[name] = model_input
-
-    def define_output(self, name, model_output):
-        self._outputs[name] = model_output
-
-    def define_discrete_output(self, name, model_output):
-        self._discrete_outputs[name] = model_output
+    #     # self._prob.compute_totals()
