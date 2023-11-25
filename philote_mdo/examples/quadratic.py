@@ -57,7 +57,7 @@ class QuadradicImplicit(pmdo.ImplicitDiscipline):
         a = inputs["a"]
         b = inputs["b"]
         c = inputs["c"]
-        outputs["x"] = np.array([(-b + (b**2 - 4 * a * c) ** 0.5) / (2 * a)])
+        outputs["x"] = np.array((-b + (b**2 - 4 * a * c) ** 0.5) / (2 * a))
 
     def residual_partials(self, inputs, outputs, partials):
         a = inputs["a"]
