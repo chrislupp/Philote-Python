@@ -100,13 +100,48 @@ class IntegrationTests(unittest.TestCase):
         client.get_partials_definitions()
 
         # define some inputs
-        inputs = {"a": np.array([1.0]), "b": np.array([2.0]), "c": np.array([2.0])}
+        inputs = {"a": np.array([1.0]), "b": np.array([2.0]), "c": np.array([-2.0])}
         outputs = {"x": np.array([4.0])}
 
         # run a function evaluation
         residuals = client.run_compute_residuals(inputs, outputs)
 
-        self.assertEqual(residuals["x"][0], 26.0)
+        self.assertEqual(residuals["x"][0], 22.0)
+
+        # end the server
+        server.stop(0)
+
+    def test_quadratic_solve_residuals(self):
+        """
+        Integration test for the QuadraticImplicit compute function.
+        """
+        # server code
+        server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
+
+        discipline = pmdo.ImplicitServer(discipline=QuadradicImplicit())
+        discipline.attach_to_server(server)
+
+        server.add_insecure_port("[::]:50051")
+        server.start()
+
+        # client code
+        client = pmdo.ImplicitClient(channel=grpc.insecure_channel("localhost:50051"))
+
+        # transfer the stream options to the server
+        client.send_stream_options()
+
+        # run setup
+        client.run_setup()
+        client.get_variable_definitions()
+        client.get_partials_definitions()
+
+        # define some inputs
+        inputs = {"a": np.array([1.0]), "b": np.array([2.0]), "c": np.array([-2.0])}
+
+        # run a function evaluation
+        outputs = client.run_solve_residuals(inputs)
+
+        self.assertAlmostEqual(outputs["x"][0], 0.73205081, places=8)
 
         # end the server
         server.stop(0)
@@ -136,7 +171,7 @@ class IntegrationTests(unittest.TestCase):
         client.get_partials_definitions()
 
         # define some inputs
-        inputs = {"a": np.array([1.0]), "b": np.array([2.0]), "c": np.array([2.0])}
+        inputs = {"a": np.array([1.0]), "b": np.array([2.0]), "c": np.array([-2.0])}
         outputs = {"x": np.array([4.0])}
 
         # run a function evaluation

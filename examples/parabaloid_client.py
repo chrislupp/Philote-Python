@@ -48,10 +48,8 @@ outputs = {}
 
 # run a function evaluation
 outputs = client.run_compute(inputs)
-
 print(outputs)
 
 # run a gradient evaluation
 partials = client.run_compute_partials(inputs)
-
 print(partials)

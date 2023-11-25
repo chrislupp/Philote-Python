@@ -44,16 +44,17 @@ client.get_variable_definitions()
 client.get_partials_definitions()
 
 # define some inputs
-inputs = {"a": np.array([1.0]), "b": np.array([2.0]), "c": np.array([2.0])}
+inputs = {"a": np.array([1.0]), "b": np.array([2.0]), "c": np.array([-2.0])}
 outputs = {"x": np.array([4.0])}
 
 # run a function evaluation
 residuals = client.run_compute_residuals(inputs, outputs)
-
 print(residuals)
 
-# run a gradient evaluation
-partials = PairDict()
-partials = client.run_residual_gradients(inputs, outputs)
+# solve the residuals
+out = client.run_solve_residuals(inputs)
+print(out)
 
+# run a gradient evaluation
+partials = client.run_residual_gradients(inputs, outputs)
 print(partials)
