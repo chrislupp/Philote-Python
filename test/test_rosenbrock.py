@@ -28,4 +28,68 @@
 # therein. The DoD does not exercise any editorial, security, or other
 # control over the information you may find at these locations.
 import unittest
-from unittest.mock import Mock
+import numpy as np
+from scipy.optimize import rosen, rosen_der
+import philote_mdo.utils as utils
+from philote_mdo.examples import Rosenbrock
+import philote_mdo.generated.data_pb2 as data
+
+
+class TestRosenbrock(unittest.TestCase):
+    """
+    Unit tests for the Rosenbrock discipline.
+    """
+
+    def test_setup(self):
+        """
+        Tests the setup function of the Rosenbrock discipline.
+        """
+        disc = Rosenbrock()
+        disc.initialize()
+        disc.setup()
+
+        self.assertEqual(disc._var_meta[0].name, "x")
+        self.assertEqual(disc._var_meta[1].name, "f")
+
+        self.assertEqual(disc._var_meta[0].type, data.kInput)
+        self.assertEqual(disc._var_meta[1].type, data.kOutput)
+
+        self.assertEqual(disc._var_meta[0].shape, [2])
+        self.assertEqual(disc._var_meta[1].shape, [1])
+
+    def test_setup_partials(self):
+        """
+        Tests the setup function of the Rosenbrock server.
+        """
+        disc = Rosenbrock()
+        disc.setup_partials()
+
+        self.assertEqual(disc._partials_meta[0].name, "f")
+        self.assertEqual(disc._partials_meta[0].subname, "x")
+
+    def test_compute(self):
+        """
+        Tests the compute function of the Rosenbrock server.
+        """
+        inputs = {"x": np.array([1.0, 2.0])}
+        outputs = {"f": 0.0}
+        disc = Rosenbrock()
+        disc.compute(inputs, outputs)
+
+        self.assertEqual(outputs["f"], rosen(inputs["x"]))
+
+    def test_compute_partials(self):
+        """
+        Tests the compute_partials function of the Rosenbrock server.
+        """
+        inputs = {"x": np.array([1.0, 2.0])}
+        jac = utils.PairDict()
+        jac["f", "x"] = 0.0
+        disc = Rosenbrock()
+        disc.compute_partials(inputs, jac)
+
+        np.testing.assert_array_equal(jac["f", "x"], rosen_der(inputs["x"]))
+
+
+if __name__ == "__main__":
+    unittest.main(verbosity=2)

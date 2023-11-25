@@ -29,10 +29,10 @@
 # control over the information you may find at these locations.
 import grpc
 import numpy as np
-from philote_mdo.general import ExplicitClient
+import philote_mdo.general as pmdo
 
 
-client = ExplicitClient(channel=grpc.insecure_channel("localhost:50051"))
+client = pmdo.ExplicitClient(channel=grpc.insecure_channel("localhost:50051"))
 
 # transfer the stream options to the server
 client.send_stream_options()
@@ -48,10 +48,8 @@ outputs = {}
 
 # run a function evaluation
 outputs = client.run_compute(inputs)
-
 print(outputs)
 
 # run a gradient evaluation
 partials = client.run_compute_partials(inputs)
-
 print(partials)

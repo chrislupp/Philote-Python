@@ -27,3 +27,27 @@
 # the linked websites, of the information, products, or services contained
 # therein. The DoD does not exercise any editorial, security, or other
 # control over the information you may find at these locations.
+from scipy.optimize import rosen, rosen_der
+import philote_mdo.general as pmdo
+
+
+class Rosenbrock(pmdo.ExplicitDiscipline):
+    """
+    Explicit discipline implementation of the Rosenbrock function.
+    """
+
+    def initialize(self):
+        self.dimension = 2
+
+    def setup(self):
+        self.add_input("x", shape=(self.dimension,), units="")
+        self.add_output("f", shape=(1,), units="")
+
+    def setup_partials(self):
+        self.declare_partials("f", "x")
+
+    def compute(self, inputs, outputs):
+        outputs["f"] = rosen(inputs["x"])
+
+    def compute_partials(self, inputs, partials):
+        partials["f", "x"] = rosen_der(inputs["x"])

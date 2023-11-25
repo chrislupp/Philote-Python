@@ -28,9 +28,9 @@
 # therein. The DoD does not exercise any editorial, security, or other
 # control over the information you may find at these locations.
 import unittest
-import philote_mdo.general as pmdo
 import philote_mdo.utils as utils
 from philote_mdo.examples import Paraboloid
+import philote_mdo.generated.data_pb2 as data
 
 
 class TestParaboloid(unittest.TestCase):
@@ -40,7 +40,7 @@ class TestParaboloid(unittest.TestCase):
 
     def test_setup(self):
         """
-        Tests the setup function of the Paraboloid server.
+        Tests the setup function of the Paraboloid discipline.
         """
         disc = Paraboloid()
         disc.setup()
@@ -49,9 +49,17 @@ class TestParaboloid(unittest.TestCase):
         self.assertEqual(disc._var_meta[1].name, "y")
         self.assertEqual(disc._var_meta[2].name, "f_xy")
 
+        self.assertEqual(disc._var_meta[0].type, data.kInput)
+        self.assertEqual(disc._var_meta[1].type, data.kInput)
+        self.assertEqual(disc._var_meta[2].type, data.kOutput)
+
+        self.assertEqual(disc._var_meta[0].shape, [1])
+        self.assertEqual(disc._var_meta[1].shape, [1])
+        self.assertEqual(disc._var_meta[2].shape, [1])
+
     def test_setup_partials(self):
         """
-        Tests the setup function of the Paraboloid server.
+        Tests the setup function of the Paraboloid discipline.
         """
         disc = Paraboloid()
         disc.setup_partials()
@@ -64,7 +72,7 @@ class TestParaboloid(unittest.TestCase):
 
     def test_compute(self):
         """
-        Tests the compute function of the Paraboloid server.
+        Tests the compute function of the Paraboloid discipline.
         """
         inputs = {"x": 2.0, "y": 3.0}
         outputs = {"f_xy": 0.0}
@@ -75,7 +83,7 @@ class TestParaboloid(unittest.TestCase):
 
     def test_compute_partials(self):
         """
-        Tests the compute function of the Paraboloid server.
+        Tests the compute function of the Paraboloid discipline.
         """
         inputs = {"x": 2.0, "y": 3.0}
         jac = utils.PairDict()
@@ -86,20 +94,3 @@ class TestParaboloid(unittest.TestCase):
 
         self.assertEqual(jac["f_xy", "x"], 1.0)
         self.assertEqual(jac["f_xy", "y"], 16.0)
-
-
-class TestParaboloidIntegration(unittest.TestCase):
-    """
-    Integration tests for the paraboloid discipline.
-    """
-
-    def test_compute(self):
-        """
-        Tests the compute function of the Paraboloid server.
-        """
-        # server code
-        server = pmdo.ExplicitServer()
-        server.attach_discipline(Paraboloid())
-
-        # client code
-        client = pmdo.ExplicitClient()

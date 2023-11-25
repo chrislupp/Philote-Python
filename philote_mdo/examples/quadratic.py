@@ -53,11 +53,11 @@ class QuadradicImplicit(pmdo.ImplicitDiscipline):
 
         residuals["x"] = a * x**2.0 + b * x + c
 
-    def solve_nonlinear(self, inputs, outputs):
+    def solve_residuals(self, inputs, outputs):
         a = inputs["a"]
         b = inputs["b"]
         c = inputs["c"]
-        outputs["x"] = np.array([(-b + (b**2 - 4 * a * c) ** 0.5) / (2 * a)])
+        outputs["x"] = np.array((-b + (b**2 - 4 * a * c) ** 0.5) / (2 * a))
 
     def residual_partials(self, inputs, outputs, partials):
         a = inputs["a"]
