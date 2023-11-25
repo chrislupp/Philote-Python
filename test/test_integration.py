@@ -27,31 +27,55 @@
 # the linked websites, of the information, products, or services contained
 # therein. The DoD does not exercise any editorial, security, or other
 # control over the information you may find at these locations.
+from concurrent import futures
+import unittest
 import grpc
 import numpy as np
 import philote_mdo.general as pmdo
+from philote_mdo.examples import Paraboloid
 
 
-client = pmdo.ExplicitClient(channel=grpc.insecure_channel("localhost:50051"))
+class IntegrationTests(unittest.TestCase):
+    """
+    Integration tests for the paraboloid discipline.
+    """
 
-# transfer the stream options to the server
-client.send_stream_options()
+    def test_paraboloid_compute(self):
+        """
+        Tests the compute function of the Paraboloid server.
+        """
+        # server code
+        server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
 
-# run setup
-client.run_setup()
-client.get_variable_definitions()
-client.get_partials_definitions()
+        discipline = pmdo.ExplicitServer(discipline=Paraboloid())
+        discipline.attach_to_server(server)
 
-# define some inputs
-inputs = {"x": np.array([1.0]), "y": np.array([2.0])}
-outputs = {}
+        server.add_insecure_port("[::]:50051")
+        server.start()
 
-# run a function evaluation
-outputs = client.run_compute(inputs)
+        # client code
+        client = pmdo.ExplicitClient(channel=grpc.insecure_channel("localhost:50051"))
 
-print(outputs)
+        # transfer the stream options to the server
+        client.send_stream_options()
 
-# run a gradient evaluation
-partials = client.run_compute_partials(inputs)
+        # run setup
+        client.run_setup()
+        client.get_variable_definitions()
+        client.get_partials_definitions()
 
-print(partials)
+        # define some inputs
+        inputs = {"x": np.array([1.0]), "y": np.array([2.0])}
+        outputs = {}
+
+        # run a function evaluation
+        outputs = client.run_compute(inputs)
+
+        self.assertEqual(outputs["f_xy"][0], 39.0)
+
+        # end the server
+        server.stop(0)
+
+
+if __name__ == "__main__":
+    unittest.main(verbosity=2)
