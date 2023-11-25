@@ -45,7 +45,7 @@ client.get_partials_definitions()
 
 # define some inputs
 inputs = {"a": np.array([1.0]), "b": np.array([2.0]), "c": np.array([2.0])}
-outputs = {"x": np.array([1.0])}
+outputs = {"x": np.array([4.0])}
 
 # run a function evaluation
 residuals = client.run_compute_residuals(inputs, outputs)

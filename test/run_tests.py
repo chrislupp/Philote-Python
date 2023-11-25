@@ -29,7 +29,7 @@
 # control over the information you may find at these locations.
 import unittest
 
-# unit tests
+# general unit tests
 from test_discipline import TestDiscipline
 
 from test_discipline_server import TestDisciplineServer
@@ -40,9 +40,11 @@ from test_discipline_client import TestDisciplineClient
 from test_explicit_client import TestExplicitClient
 from test_implicit_client import TestImplicitClient
 
-# integration tests
+# example unit tests
 from test_paraboloid import TestParaboloid
 
+# integrations tests
+from test_integration import IntegrationTests
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)
