@@ -29,6 +29,7 @@
 # control over the information you may find at these locations.
 import unittest
 
+# unit tests
 from test_discipline import TestDiscipline
 
 from test_discipline_server import TestDisciplineServer
@@ -38,6 +39,9 @@ from test_implicit_server import TestImplicitServer
 from test_discipline_client import TestDisciplineClient
 from test_explicit_client import TestExplicitClient
 from test_implicit_client import TestImplicitClient
+
+# integration tests
+from test_paraboloid import TestParaboloid
 
 
 if __name__ == "__main__":
