@@ -40,7 +40,7 @@ class TestParaboloid(unittest.TestCase):
 
     def test_setup(self):
         """
-        Tests the setup function of the Paraboloid server.
+        Tests the setup function of the Paraboloid discipline.
         """
         disc = Paraboloid()
         disc.setup()
@@ -59,7 +59,7 @@ class TestParaboloid(unittest.TestCase):
 
     def test_setup_partials(self):
         """
-        Tests the setup function of the Paraboloid server.
+        Tests the setup function of the Paraboloid discipline.
         """
         disc = Paraboloid()
         disc.setup_partials()
@@ -72,7 +72,7 @@ class TestParaboloid(unittest.TestCase):
 
     def test_compute(self):
         """
-        Tests the compute function of the Paraboloid server.
+        Tests the compute function of the Paraboloid discipline.
         """
         inputs = {"x": 2.0, "y": 3.0}
         outputs = {"f_xy": 0.0}
@@ -83,7 +83,7 @@ class TestParaboloid(unittest.TestCase):
 
     def test_compute_partials(self):
         """
-        Tests the compute function of the Paraboloid server.
+        Tests the compute function of the Paraboloid discipline.
         """
         inputs = {"x": 2.0, "y": 3.0}
         jac = utils.PairDict()

@@ -29,3 +29,4 @@
 # control over the information you may find at these locations.
 from .paraboloid import Paraboloid
 from .quadratic import QuadradicImplicit
+from .rosenbrock import Rosenbrock
