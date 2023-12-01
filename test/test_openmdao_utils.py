@@ -27,3 +27,19 @@
 # the linked websites, of the information, products, or services contained
 # therein. The DoD does not exercise any editorial, security, or other
 # control over the information you may find at these locations.
+import unittest
+import philote_mdo.utils as utils
+from philote_mdo.examples import Paraboloid
+import philote_mdo.generated.data_pb2 as data
+
+
+class TestParaboloid(unittest.TestCase):
+    """
+    Unit tests for the OpenMDAO utilities.
+    """
+
+    def test_client_setup(self):
+        """
+        Tests the setup function of the Paraboloid discipline.
+        """
+        pass
