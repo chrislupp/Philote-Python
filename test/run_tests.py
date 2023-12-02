@@ -40,12 +40,16 @@ from test_discipline_client import TestDisciplineClient
 from test_explicit_client import TestExplicitClient
 from test_implicit_client import TestImplicitClient
 
+# openmdao unit tests
+from test_openmdao_utils import TestOpenMdaoUtils
+
 # example unit tests
 from test_paraboloid import TestParaboloid
 from test_quadratic import TestQuadradicImplicit
 
 # integrations tests
 from test_integration import IntegrationTests
+
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)

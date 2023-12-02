@@ -58,8 +58,8 @@ def client_setup(comp):
     comp._client.get_partials_definitions()
 
     # declare partials based on the discipline meta data
-    # for partial in comp._client._partials_meta:
-    #     comp.declare_partials(partial.name, partial.subname)
+    for partial in comp._client._partials_meta:
+        comp.declare_partials(partial.name, partial.subname)
 
 
 def create_local_inputs(inputs, var_meta):

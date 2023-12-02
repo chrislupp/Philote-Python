@@ -28,18 +28,64 @@
 # therein. The DoD does not exercise any editorial, security, or other
 # control over the information you may find at these locations.
 import unittest
-import philote_mdo.utils as utils
-from philote_mdo.examples import Paraboloid
+from unittest.mock import patch
+import philote_mdo.general as pmdo
+from philote_mdo.openmdao.utils import client_setup
 import philote_mdo.generated.data_pb2 as data
 
 
-class TestParaboloid(unittest.TestCase):
+class TestOpenMdaoUtils(unittest.TestCase):
     """
     Unit tests for the OpenMDAO utilities.
     """
 
-    def test_client_setup(self):
+    @patch('philote_mdo.general.DisciplineClient')
+    @patch('philote_mdo.openmdao.RemoteExplicitComponent', autospec=True)
+    def test_client_setup(self, mock_component_class, mock_discipline_client):
         """
-        Tests the setup function of the Paraboloid discipline.
+        Tests the client setup utility function.
+        """
+        # Create an instance of YourComponentClass with a mock client
+        comp = mock_component_class.return_value
+        comp._client = mock_discipline_client
+
+        # Mock variable and partial metadata
+        mock_var_metadata = [data.VariableMetaData(name="x", shape=[2, 2], units="m", type=data.VariableType.kInput)]
+        mock_partial_metadata = [data.PartialsMetaData(name="x", subname="y")]
+
+        # configure the mock client to return the mock metadata
+        comp._client.get_variable_definitions.return_value = mock_var_metadata
+        comp._client._var_meta = mock_var_metadata
+        comp._client.get_partials_definitions.return_value = mock_partial_metadata
+        comp._client._partials_meta = mock_partial_metadata
+
+        # call the client_setup function
+        client_setup(comp)
+
+        # assert that the necessary methods on the mock client were called
+        comp._client.run_setup.assert_called_once()
+        comp._client.get_variable_definitions.assert_called_once()
+        comp._client.get_partials_definitions.assert_called_once()
+
+        # assert that the inputs and outputs were added based on the variable metadata
+        comp.add_input.assert_called_once_with("x", shape=(2, 2), units="m")
+
+        # assert that the declare_partials method was called based on the partials metadata
+        comp.declare_partials.assert_called_once_with("x", "y")
+
+    def test_create_local_inputs(self):
+        """
+        Tests the function for creating local inputs.
         """
         pass
+
+    def test_assign_global_outputs(self):
+        """
+        Tests the function for assigning global outputs.
+        """
+        pass
+
+
+
+if __name__ == "__main__":
+    unittest.main(verbosity=2)

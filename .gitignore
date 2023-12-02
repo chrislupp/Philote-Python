@@ -1,4 +1,5 @@
 doxer.*
+.idea/
 examples/reports/
 **/reports/
 *.DS_Store
