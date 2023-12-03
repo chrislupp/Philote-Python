@@ -30,7 +30,7 @@
 import unittest
 from unittest.mock import patch
 import philote_mdo.general as pmdo
-from philote_mdo.openmdao.utils import client_setup
+from philote_mdo.openmdao.utils import client_setup, create_local_inputs, assign_global_outputs
 import philote_mdo.generated.data_pb2 as data
 
 
@@ -77,13 +77,33 @@ class TestOpenMdaoUtils(unittest.TestCase):
         """
         Tests the function for creating local inputs.
         """
-        pass
+        # mock input data and variable metadata
+        inputs = {'x': 1, 'y': 2, 'z': 3}
+        var_meta = [
+            data.VariableMetaData(name="x", type=data.VariableType.kInput),
+            data.VariableMetaData(name="y", type=data.VariableType.kOutput),  # should be ignored
+            data.VariableMetaData(name="z", type=data.VariableType.kInput),
+        ]
+
+        # call the create_local_inputs function
+        result = create_local_inputs(inputs, var_meta)
+
+        # assert that the local inputs dictionary contains only the expected variables
+        self.assertEqual(result, {'x': 1, 'z': 3})
 
     def test_assign_global_outputs(self):
         """
         Tests the function for assigning global outputs.
         """
-        pass
+        # mock output data and OpenMDAO outputs dictionary
+        out = {'x': 1, 'y': 2, 'z': 3}
+        outputs = {'x': None, 'y': None, 'z': None}
+
+        # call the assign_global_outputs function
+        assign_global_outputs(out, outputs)
+
+        # assert that the OpenMDAO outputs dictionary has been updated
+        self.assertEqual(outputs, {'x': 1, 'y': 2, 'z': 3})
 
 
 
