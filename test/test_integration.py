@@ -161,54 +161,45 @@ class IntegrationTests(unittest.TestCase):
         # stop the server
         server.stop(0)
 
-    # def test_openmdao_paraboloid_compute_partials(self):
-    #     """
-    #     Tests the OpenMDAO compute_partials function using the Paraboloid.
-    #     """
-    #     # server code
-    #     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
+    def test_openmdao_paraboloid_compute_partials(self):
+        """
+        Tests the OpenMDAO compute_partials function using the Paraboloid.
+        """
+        # server code
+        server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
 
-    #     discipline = pmdo.ExplicitServer(discipline=Paraboloid())
-    #     discipline.attach_to_server(server)
+        discipline = pmdo.ExplicitServer(discipline=Paraboloid())
+        discipline.attach_to_server(server)
 
-    #     server.add_insecure_port("[::]:50051")
-    #     server.start()
+        server.add_insecure_port("[::]:50051")
+        server.start()
 
-    #     # client code
-    #     client = pmdo.ExplicitClient(channel=grpc.insecure_channel("localhost:50051"))
+        # client code
+        prob = om.Problem()
+        model = prob.model
 
-    #     # transfer the stream options to the server
-    #     client.send_stream_options()
+        model.add_subsystem(
+            "Paraboloid",
+            pmom.RemoteExplicitComponent(
+                channel=grpc.insecure_channel("localhost:50051")
+            ),
+            promotes=["*"],
+        )
 
-    #     # run setup
-    #     client.run_setup()
-    #     client.get_variable_definitions()
-    #     client.get_partials_definitions()
+        prob.setup()
 
-    #     # client code
-    #     prob = om.Problem()
-    #     model = prob.model
+        prob["x"] = 1.0
+        prob["y"] = 2.0
+        prob.run_model()
 
-    #     model.add_subsystem(
-    #         "Paraboloid",
-    #         pmom.RemoteExplicitComponent(
-    #             channel=grpc.insecure_channel("localhost:50051")
-    #         ),
-    #         promotes=["*"],
-    #     )
+        data = prob.check_partials(out_stream=None)
 
-    #     prob.setup()
+        # check the data
+        self.assertEqual(data["Paraboloid"][("f_xy", "x")]["J_fwd"], -2.0)
+        self.assertEqual(data["Paraboloid"][("f_xy", "y")]["J_fwd"], 13.0)
 
-    #     prob["x"] = 1.0
-    #     prob["y"] = 2.0
-    #     prob.run_model()
-
-    #     data = prob.check_partials(out_stream=None)
-
-    #     assert_check_partials(data, atol=1.0e-6, rtol=1.0e-6)
-
-    #     # stop the server
-    #     server.stop(0)
+        # stop the server
+        server.stop(0)
 
     def test_quadratic_compute_residuals(self):
         """

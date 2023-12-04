@@ -54,5 +54,5 @@ class RemoteExplicitComponent(om.ExplicitComponent):
 
     def compute_partials(self, inputs, partials):
         local_inputs = create_local_inputs(inputs, self._client._var_meta)
-        jac = self._client.run_compute_partials(inputs)
+        jac = self._client.run_compute_partials(local_inputs)
         assign_global_outputs(jac, partials)

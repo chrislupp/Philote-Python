@@ -39,7 +39,10 @@ class TestOpenMdaoClients(unittest.TestCase):
     """
 
     @patch('philote_mdo.openmdao.utils.assign_global_outputs')
-    def test_compute_after_setup(self, mock_assign_global_outputs):
+    def test_explicit_compute(self, mock_assign_global_outputs):
+        """
+        Tests the compute function for the OpenMDAO explicit component.
+        """
         # Mock gRPC channel
         channel_mock = Mock()
 
@@ -69,7 +72,10 @@ class TestOpenMdaoClients(unittest.TestCase):
 
 
     @patch('philote_mdo.openmdao.utils.assign_global_outputs')
-    def test_compute_partials_after_setup(self, mock_assign_global_outputs):
+    def test_explicit_compute_partials(self, mock_assign_global_outputs):
+        """
+        Tests the compute_partials function for the OpenMDAO explicit component.
+        """
         # Mock gRPC channel
         channel_mock = Mock()
 
