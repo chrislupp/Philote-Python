@@ -57,9 +57,6 @@ class TestOpenMdaoClients(unittest.TestCase):
         inputs = {'x': 1}
         outputs = {'y': None}
 
-        # Set up the behavior of mock_assign_global_outputs
-        # mock_assign_global_outputs.side_effect = lambda out, o: o.update(out)
-
         # Configure the Mock object to support iteration
         comp._client.run_compute.return_value = {'y': 42}
 
@@ -69,6 +66,36 @@ class TestOpenMdaoClients(unittest.TestCase):
         # Assert that the necessary methods were called
         comp._client.run_compute.assert_called_once_with({'x': 1})
         self.assertEqual(outputs["y"], 42.0)
+
+
+    @patch('philote_mdo.openmdao.utils.assign_global_outputs')
+    def test_compute_partials_after_setup(self, mock_assign_global_outputs):
+        # Mock gRPC channel
+        channel_mock = Mock()
+
+        # Create an instance of RemoteExplicitComponent
+        comp = RemoteExplicitComponent(channel=channel_mock)
+
+        # Mock client and set the _var_meta attribute
+        comp._client = Mock()
+        comp._client._var_meta = [
+            data.VariableMetaData(name="x", type=data.kInput),
+            data.VariableMetaData(name="y", type=data.kOutput),
+        ]
+
+        # Mock inputs and partials dictionaries
+        inputs = {'x': 1}
+        partials = {'y': None}
+
+        # Configure the Mock object to support iteration
+        comp._client.run_compute_partials.return_value = {('y', 'x'): 42}
+
+        # Call the compute_partials method
+        comp.compute_partials(inputs, partials)
+
+        # Assert that the necessary methods were called
+        comp._client.run_compute_partials.assert_called_once_with({'x': 1})
+        self.assertEqual(partials[("y", "x")], 42.0)
 
 
 if __name__ == "__main__":
