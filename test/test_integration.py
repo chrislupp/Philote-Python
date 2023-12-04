@@ -201,6 +201,64 @@ class IntegrationTests(unittest.TestCase):
         # stop the server
         server.stop(0)
 
+    def test_openmdao_paraboloid_opt(self):
+        """
+        Integration test that checks the ability to run a gradient-based
+        optimization with an OpenMDAO explicit component.
+        """
+        # server code
+        server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
+
+        discipline = pmdo.ExplicitServer(discipline=Paraboloid())
+        discipline.attach_to_server(server)
+
+        server.add_insecure_port("[::]:50051")
+        server.start()
+
+        # client code
+        client = pmdo.ExplicitClient(channel=grpc.insecure_channel("localhost:50051"))
+
+        # transfer the stream options to the server
+        client.send_stream_options()
+
+        # run setup
+        client.run_setup()
+        client.get_variable_definitions()
+        client.get_partials_definitions()
+
+        # client code
+        prob = om.Problem()
+        prob.driver = om.ScipyOptimizeDriver()
+        prob.driver.options['optimizer'] = 'SLSQP'
+        prob.driver.options['disp'] = False
+        model = prob.model
+
+        model.add_subsystem(
+            "Paraboloid",
+            pmom.RemoteExplicitComponent(
+                channel=grpc.insecure_channel("localhost:50051")
+            ),
+            promotes=["*"],
+        )
+        model.add_design_var("x")
+        model.add_design_var("y")
+
+        model.add_objective("f_xy")
+
+        prob.setup()
+        prob.set_val('x', 50.0)
+        prob.set_val('y', 50.0)
+
+        prob.run_driver()
+
+        # check the optimization results
+        self.assertAlmostEqual(prob["x"][0], 6.6666666, 6)
+        self.assertAlmostEqual(prob["y"][0], -7.33333333, 6)
+        self.assertAlmostEqual(prob["f_xy"][0], -27.3333333333, 6)
+
+        # stop the server
+        server.stop(0)
+
     def test_quadratic_compute_residuals(self):
         """
         Integration test for the QuadraticImplicit compute function.
