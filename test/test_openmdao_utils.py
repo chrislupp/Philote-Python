@@ -29,7 +29,6 @@
 # control over the information you may find at these locations.
 import unittest
 from unittest.mock import patch
-import philote_mdo.general as pmdo
 from philote_mdo.openmdao.utils import client_setup, create_local_inputs, assign_global_outputs
 import philote_mdo.generated.data_pb2 as data
 
