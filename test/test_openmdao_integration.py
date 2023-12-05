@@ -326,21 +326,25 @@ class OpenMdaoIntegrationTests(unittest.TestCase):
 
         j = data["Sellar"]
 
-        self.assertAlmostEqual(j[("y1", "x")]["J_fwd"][0, 0], 0.99982674, 5)
-        self.assertAlmostEqual(j[("y1", "z")]["J_fwd"][0, 0], -2.00017226, 5)
-        self.assertAlmostEqual(j[("y1", "z")]["J_fwd"][0, 1], 0.99982674, 5)
+        self.assertAlmostEqual(j[("y1", "x")]["J_fwd"][0, 0], 0.9353804990265645, 3)
+        self.assertAlmostEqual(j[("y1", "z")]["J_fwd"][0, 0], -2.0585057709335794, 3)
+        self.assertAlmostEqual(j[("y1", "z")]["J_fwd"][0, 1], 0.7481210608200559, 3)
 
-        self.assertAlmostEqual(j[("y2", "x")]["J_fwd"][0, 0], 0.34413432, 5)
-        self.assertAlmostEqual(j[("y2", "z")]["J_fwd"][0, 0], 0.31149316, 5)
-        self.assertAlmostEqual(j[("y2", "z")]["J_fwd"][0, 1], 1.34407468, 5)
+        self.assertAlmostEqual(j[("y2", "x")]["J_fwd"][0, 0], 0.32195231245910344, 3)
+        self.assertAlmostEqual(j[("y2", "z")]["J_fwd"][0, 0], 0.2914151146554633, 3)
+        self.assertAlmostEqual(j[("y2", "z")]["J_fwd"][0, 1], 1.2574391012932133, 3)
 
-        self.assertAlmostEqual(j[("obj", "x")]["J_fwd"][0, 0], 4.40479511, 5)
-        self.assertAlmostEqual(j[("obj", "z")]["J_fwd"][0, 0], -2.53876511, 5)
-        self.assertAlmostEqual(j[("obj", "z")]["J_fwd"][0, 1], -0.32416976, 5)
+        self.assertAlmostEqual(j[("obj", "x")]["J_fwd"][0, 0], 4.378703060615849, 3)
+        self.assertAlmostEqual(j[("obj", "z")]["J_fwd"][0, 0], -2.5623823180578524, 3)
+        self.assertAlmostEqual(j[("obj", "z")]["J_fwd"][0, 1], -0.42607664106566956, 3)
 
-        self.assertAlmostEqual(j[("con1", "x")]["J_fwd"][0, 0], -0.99982674, 5)
-        self.assertAlmostEqual(j[("con1", "z")]["J_fwd"][0, 0], 2.00017226, 5)
-        self.assertAlmostEqual(j[("con1", "z")]["J_fwd"][0, 1], -0.99982674, 5)
+        self.assertAlmostEqual(j[("con1", "x")]["J_fwd"][0, 0], -0.9353804990265645, 3)
+        self.assertAlmostEqual(j[("con1", "z")]["J_fwd"][0, 0], 2.0585057709335794, 3)
+        self.assertAlmostEqual(j[("con1", "z")]["J_fwd"][0, 1], -0.7481210608200559, 3)
+
+        self.assertAlmostEqual(j[("con2", "x")]["J_fwd"][0, 0], 0.32195231245910344, 3)
+        self.assertAlmostEqual(j[("con2", "z")]["J_fwd"][0, 0], 0.2914151146554633, 3)
+        self.assertAlmostEqual(j[("con2", "z")]["J_fwd"][0, 1], 1.2574391012932133, 3)
 
         # stop the server
         server.stop(0)

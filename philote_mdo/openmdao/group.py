@@ -120,6 +120,9 @@ class OpenMdaoSubProblem(pm.ExplicitDiscipline):
         for local, var in self._output_map.items():
             self.add_output(local, shape=var["shape"], units=var["units"])
 
+        for pair in self._partials_map.keys():
+            self.declare_partials(pair[0], pair[1])
+
     def compute(self, inputs, outputs):
         for local, var in self._input_map.items():
             sub = var["sub_prob_name"]
