@@ -31,7 +31,7 @@ import openmdao.api as om
 import philote_mdo.general as pm
 
 
-class OpenMdaoSubproblem(pm.ExplicitDiscipline):
+class OpenMdaoSubProblem(pm.ExplicitDiscipline):
     """
     PhiloteDiscipline that calls an OpenMDAO group.
     """
@@ -39,8 +39,13 @@ class OpenMdaoSubproblem(pm.ExplicitDiscipline):
     def __init__(self, group=None):
         super().__init__()
 
+        self._prob = None
+        self._model = None
+
+        self._input_map = {}
+        self._output_map = {}
+
         self.add_group(group)
-        self.clear_mapped_variables()
 
     def add_group(self, group):
         """
@@ -83,9 +88,9 @@ class OpenMdaoSubproblem(pm.ExplicitDiscipline):
         for local, sub in self._output_map.items():
             self.add_output(local)
 
-    def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
+    def compute(self, inputs, outputs):
         # assign continuous and discrete inputs of the nested group
-        for local, sub in self._input_map:
+        for local, sub in self._input_map.items():
             self._prob[sub] = inputs[local]
 
         self._prob.run_model()

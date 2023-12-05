@@ -42,6 +42,7 @@ from test_implicit_client import TestImplicitClient
 
 # openmdao unit tests
 from test_openmdao_utils import TestOpenMdaoUtils
+from test_openmdao_group import TestOpenMdaoGroup
 
 # example unit tests
 from test_paraboloid import TestParaboloid
