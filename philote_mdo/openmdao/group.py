@@ -61,17 +61,25 @@ class OpenMdaoSubProblem(pm.ExplicitDiscipline):
         self._prob = om.Problem(model=group)
         self._model = self._prob.model
 
-    def add_mapped_input(self, local_var, subprob_var):
+    def add_mapped_input(self, local_var, subprob_var, shape=(1,), units=""):
         """
         Adds an input that is mapped from the discipline to the sub-problem.
         """
-        self._input_map[local_var] = subprob_var
+        self._input_map[local_var] = {
+            "sub_prob_name": subprob_var,
+            "shape": shape,
+            "units": units
+        }
 
-    def add_mapped_output(self, local_var, subprob_var):
+    def add_mapped_output(self, local_var, subprob_var, shape=(1,), units=""):
         """
         Adds an output that is mapped from the discipline to the sub-problem.
         """
-        self._output_map[local_var] = subprob_var
+        self._output_map[local_var] = {
+            "sub_prob_name": subprob_var,
+            "shape": shape,
+            "units": units
+        }
 
     def clear_mapped_variables(self):
         """
@@ -95,8 +103,10 @@ class OpenMdaoSubProblem(pm.ExplicitDiscipline):
         -------
             None
         """
-        self._partials_map[(local_func, local_var)] = \
-            (self._output_map[local_func], self._input_map[local_var])
+        self._partials_map[(local_func, local_var)] =\
+            (self._output_map[local_func]["sub_prob_name"],
+             self._input_map[local_var]["sub_prob_name"]
+             )
 
     def initialize(self):
         pass
@@ -104,25 +114,26 @@ class OpenMdaoSubProblem(pm.ExplicitDiscipline):
     def setup(self):
         self._prob.setup()
 
-        for local, sub in self._input_map.items():
-            self.add_input(local)
+        for local, var in self._input_map.items():
+            self.add_input(local, shape=var["shape"], units=var["units"])
 
-        for local, sub in self._output_map.items():
-            self.add_output(local)
-
-
+        for local, var in self._output_map.items():
+            self.add_output(local, shape=var["shape"], units=var["units"])
 
     def compute(self, inputs, outputs):
-        for local, sub in self._input_map.items():
+        for local, var in self._input_map.items():
+            sub = var["sub_prob_name"]
             self._prob[sub] = inputs[local]
 
         self._prob.run_model()
 
-        for local, sub in self._output_map.items():
+        for local, var in self._output_map.items():
+            sub = var["sub_prob_name"]
             outputs[local] = self._prob[sub]
 
     def compute_partials(self, inputs, partials):
-        for local, sub in self._input_map.items():
+        for local, var in self._input_map.items():
+            sub = var["sub_prob_name"]
             self._prob[sub] = inputs[local]
 
         self._prob.run_model()

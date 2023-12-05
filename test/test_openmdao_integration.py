@@ -30,11 +30,12 @@
 from concurrent import futures
 import unittest
 import grpc
+import numpy as np
 import openmdao.api as om
 import philote_mdo.general as pmdo
 import philote_mdo.openmdao as pmom
-from philote_mdo.examples import Paraboloid, QuadradicImplicit
-
+from philote_mdo.examples import Paraboloid, QuadradicImplicit, SellarMDA
+from philote_mdo.openmdao import OpenMdaoSubProblem
 
 class OpenMdaoIntegrationTests(unittest.TestCase):
     """
@@ -182,6 +183,73 @@ class OpenMdaoIntegrationTests(unittest.TestCase):
         self.assertAlmostEqual(prob["x"][0], 6.6666666, 6)
         self.assertAlmostEqual(prob["y"][0], -7.33333333, 6)
         self.assertAlmostEqual(prob["f_xy"][0], -27.3333333333, 6)
+
+        # stop the server
+        server.stop(0)
+
+
+    def test_sellar_compute(self):
+        """
+        Integration test for the OpenMDAO sub-problem compute function.
+        """
+        # server code
+        server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
+
+        disc = OpenMdaoSubProblem()
+
+        # add the Sellar group and turn off the solver debug print
+        disc.add_group(SellarMDA())
+
+        disc.add_mapped_input("x", "x")
+        disc.add_mapped_input("z", "z", shape=(2,))
+
+        disc.add_mapped_output("y1", "y1")
+        disc.add_mapped_output("y2", "y2")
+        disc.add_mapped_output("obj", "obj")
+        disc.add_mapped_output("con1", "con1")
+        disc.add_mapped_output("con2", "con2")
+
+        discipline = pmdo.ExplicitServer(discipline=disc)
+        discipline.attach_to_server(server)
+
+        server.add_insecure_port("[::]:50051")
+        server.start()
+
+        # client code
+        client = pmdo.ExplicitClient(channel=grpc.insecure_channel("localhost:50051"))
+
+        # transfer the stream options to the server
+        client.send_stream_options()
+
+        # run setup
+        client.run_setup()
+        client.get_variable_definitions()
+        client.get_partials_definitions()
+
+        # client code
+        prob = om.Problem()
+        model = prob.model
+
+        model.add_subsystem(
+            "Sellar",
+            pmom.RemoteExplicitComponent(
+                channel=grpc.insecure_channel("localhost:50051")
+            ),
+            promotes=["*"],
+        )
+
+        prob.setup()
+
+        prob["x"] = np.array([2.0])
+        prob["z"] = np.array([-1., -1.])
+
+        prob.run_model()
+
+        self.assertAlmostEqual(prob["y1"][0], 2.10951651, 5)
+        self.assertAlmostEqual(prob["y2"][0], -0.54758253, 5)
+        self.assertAlmostEqual(prob["obj"][0], 6.8385845, 5)
+        self.assertAlmostEqual(prob["con1"][0], 1.05048349, 5)
+        self.assertAlmostEqual(prob["con2"][0], -24.54758253, 5)
 
         # stop the server
         server.stop(0)
