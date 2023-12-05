@@ -254,6 +254,97 @@ class OpenMdaoIntegrationTests(unittest.TestCase):
         # stop the server
         server.stop(0)
 
+    def test_sellar_compute_partials(self):
+        """
+        Integration test for the OpenMDAO sub-problem compute_partials function.
+        """
+        # server code
+        server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
+
+        disc = OpenMdaoSubProblem()
+
+        # add the Sellar group and turn off the solver debug print
+        disc.add_group(SellarMDA())
+
+        disc.add_mapped_input("x", "x")
+        disc.add_mapped_input("z", "z", shape=(2,))
+
+        disc.add_mapped_output("y1", "y1")
+        disc.add_mapped_output("y2", "y2")
+        disc.add_mapped_output("obj", "obj")
+        disc.add_mapped_output("con1", "con1")
+        disc.add_mapped_output("con2", "con2")
+
+        disc.declare_subproblem_partial("y1", "x")
+        disc.declare_subproblem_partial("y1", "z")
+        disc.declare_subproblem_partial("y2", "x")
+        disc.declare_subproblem_partial("y2", "z")
+        disc.declare_subproblem_partial("obj", "x")
+        disc.declare_subproblem_partial("obj", "z")
+        disc.declare_subproblem_partial("con1", "x")
+        disc.declare_subproblem_partial("con1", "z")
+        disc.declare_subproblem_partial("con2", "x")
+        disc.declare_subproblem_partial("con2", "z")
+
+        discipline = pmdo.ExplicitServer(discipline=disc)
+        discipline.attach_to_server(server)
+
+        server.add_insecure_port("[::]:50051")
+        server.start()
+
+        # client code
+        client = pmdo.ExplicitClient(channel=grpc.insecure_channel("localhost:50051"))
+
+        # transfer the stream options to the server
+        client.send_stream_options()
+
+        # run setup
+        client.run_setup()
+        client.get_variable_definitions()
+        client.get_partials_definitions()
+
+        # client code
+        prob = om.Problem()
+        model = prob.model
+
+        model.add_subsystem(
+            "Sellar",
+            pmom.RemoteExplicitComponent(
+                channel=grpc.insecure_channel("localhost:50051")
+            ),
+            promotes=["*"],
+        )
+
+        prob.setup()
+
+        prob["x"] = np.array([2.0])
+        prob["z"] = np.array([-1., -1.])
+
+        prob.run_model()
+
+        data = prob.check_partials(out_stream=None)
+
+        j = data["Sellar"]
+
+        self.assertAlmostEqual(j[("y1", "x")]["J_fwd"][0, 0], 0.99982674, 5)
+        self.assertAlmostEqual(j[("y1", "z")]["J_fwd"][0, 0], -2.00017226, 5)
+        self.assertAlmostEqual(j[("y1", "z")]["J_fwd"][0, 1], 0.99982674, 5)
+
+        self.assertAlmostEqual(j[("y2", "x")]["J_fwd"][0, 0], 0.34413432, 5)
+        self.assertAlmostEqual(j[("y2", "z")]["J_fwd"][0, 0], 0.31149316, 5)
+        self.assertAlmostEqual(j[("y2", "z")]["J_fwd"][0, 1], 1.34407468, 5)
+
+        self.assertAlmostEqual(j[("obj", "x")]["J_fwd"][0, 0], 4.40479511, 5)
+        self.assertAlmostEqual(j[("obj", "z")]["J_fwd"][0, 0], -2.53876511, 5)
+        self.assertAlmostEqual(j[("obj", "z")]["J_fwd"][0, 1], -0.32416976, 5)
+
+        self.assertAlmostEqual(j[("con1", "x")]["J_fwd"][0, 0], -0.99982674, 5)
+        self.assertAlmostEqual(j[("con1", "z")]["J_fwd"][0, 0], 2.00017226, 5)
+        self.assertAlmostEqual(j[("con1", "z")]["J_fwd"][0, 1], -0.99982674, 5)
+
+        # stop the server
+        server.stop(0)
+
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)
