@@ -128,25 +128,25 @@ class TestOpenMdaoGroup(unittest.TestCase):
 
         disc.compute_partials(inputs, partials)
 
-        self.assertAlmostEqual(partials[("y1", "x")][0, 0], 0.99982674, 5)
-        self.assertAlmostEqual(partials[("y1", "z")][0, 0], -2.00017226, 5)
-        self.assertAlmostEqual(partials[("y1", "z")][0, 1], 0.99982674, 5)
+        self.assertAlmostEqual(partials[("y1", "x")][0, 0], 0.9353804990265645, 5)
+        self.assertAlmostEqual(partials[("y1", "z")][0, 0], -2.0585057709335794, 5)
+        self.assertAlmostEqual(partials[("y1", "z")][0, 1], 0.7481210608200559, 5)
 
-        self.assertAlmostEqual(partials[("y2", "x")][0, 0], 0.34413432, 5)
-        self.assertAlmostEqual(partials[("y2", "z")][0, 0], 0.31149316, 5)
-        self.assertAlmostEqual(partials[("y2", "z")][0, 1], 1.34407468, 5)
+        self.assertAlmostEqual(partials[("y2", "x")][0, 0], 0.32195231245910344, 5)
+        self.assertAlmostEqual(partials[("y2", "z")][0, 0], 0.2914151146554633, 5)
+        self.assertAlmostEqual(partials[("y2", "z")][0, 1], 1.2574391012932133, 5)
 
-        self.assertAlmostEqual(partials[("obj", "x")][0, 0], 4.40479511, 5)
-        self.assertAlmostEqual(partials[("obj", "z")][0, 0], -2.53876511, 5)
-        self.assertAlmostEqual(partials[("obj", "z")][0, 1], -0.32416976, 5)
+        self.assertAlmostEqual(partials[("obj", "x")][0, 0], 4.378703060615849, 5)
+        self.assertAlmostEqual(partials[("obj", "z")][0, 0], -2.5623823180578524, 5)
+        self.assertAlmostEqual(partials[("obj", "z")][0, 1], -0.42607664106566956, 5)
 
-        self.assertAlmostEqual(partials[("con1", "x")][0, 0], -0.99982674, 5)
-        self.assertAlmostEqual(partials[("con1", "z")][0, 0], 2.00017226, 5)
-        self.assertAlmostEqual(partials[("con1", "z")][0, 1], -0.99982674, 5)
+        self.assertAlmostEqual(partials[("con1", "x")][0, 0], -0.9353804990265645, 5)
+        self.assertAlmostEqual(partials[("con1", "z")][0, 0], 2.0585057709335794, 5)
+        self.assertAlmostEqual(partials[("con1", "z")][0, 1], -0.7481210608200559, 5)
 
-        self.assertAlmostEqual(partials[("con2", "x")][0, 0], 0.34413432, 5)
-        self.assertAlmostEqual(partials[("con2", "z")][0, 0], 0.31149316, 5)
-        self.assertAlmostEqual(partials[("con2", "z")][0, 1], 1.34407468, 5)
+        self.assertAlmostEqual(partials[("con2", "x")][0, 0], 0.32195231245910344, 5)
+        self.assertAlmostEqual(partials[("con2", "z")][0, 0], 0.2914151146554633, 5)
+        self.assertAlmostEqual(partials[("con2", "z")][0, 1], 1.2574391012932133, 5)
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)

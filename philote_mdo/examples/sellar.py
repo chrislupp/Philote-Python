@@ -67,6 +67,7 @@ class SellarMDA(om.Group):
 
         # Nonlinear Block Gauss Seidel is a gradient free solver
         cycle.nonlinear_solver = om.NonlinearBlockGS(iprint=0)
+        cycle.linear_solver = om.LinearBlockGS(iprint=0)
 
         self.add_subsystem('obj_cmp', om.ExecComp('obj = x**2 + z[1] + y1 + exp(-y2)',
                                                   z=np.array([0.0, 0.0]), x=0.0),
