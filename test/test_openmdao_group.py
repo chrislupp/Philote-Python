@@ -30,8 +30,8 @@
 import unittest
 import numpy as np
 import openmdao.api as om
-from philote_mdo.openmdao import OpenMdaoSubProblem
 from openmdao.test_suite.components.sellar import SellarDis1, SellarDis2
+from philote_mdo.openmdao import OpenMdaoSubProblem
 
 
 class SellarMDA(om.Group):

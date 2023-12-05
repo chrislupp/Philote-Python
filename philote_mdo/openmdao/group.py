@@ -27,83 +27,90 @@
 # the linked websites, of the information, products, or services contained
 # therein. The DoD does not exercise any editorial, security, or other
 # control over the information you may find at these locations.
-import openmdao.api as om
+use_openmdao = True
+try:
+    import openmdao.api as om
+except:
+    use_openmdao = False
 import philote_mdo.general as pm
 
-
-class OpenMdaoSubProblem(pm.ExplicitDiscipline):
-    """
-    PhiloteDiscipline that calls an OpenMDAO group.
-    """
-
-    def __init__(self, group=None):
-        super().__init__()
-
-        self._prob = None
-        self._model = None
-
-        self._input_map = {}
-        self._output_map = {}
-
-        self.add_group(group)
-
-    def add_group(self, group):
+if use_openmdao:
+    class OpenMdaoSubProblem(pm.ExplicitDiscipline):
         """
-        Adds an OpenMDAO group to the discipline.
+        Philote explicit discipline that calls an OpenMDAO group.
 
-        Warning: This will delete any previous problem settings and attached
-        models.
+        While the Philote discipline is explicit, the underlying OpenMDAO
+        group may have cycles that require a nonlinear solver.
         """
-        self._prob = om.Problem(model=group)
-        self._model = self._prob.model
 
-    def add_mapped_input(self, local_var, subprob_var):
-        """
-        Adds an input that is mapped from the discipline to the sub-problem.
-        """
-        self._input_map[local_var] = subprob_var
+        def __init__(self, group=None):
+            super().__init__()
 
-    def add_mapped_output(self, local_var, subprob_var):
-        """
-        Adds an output that is mapped from the discipline to the sub-problem.
-        """
-        self._output_map[local_var] = subprob_var
+            self._prob = None
+            self._model = None
 
-    def clear_mapped_variables(self):
-        """
-        Clears the variable map and sets it to an empty dictionary.
-        """
-        self._input_map = {}
-        self._output_map = {}
+            self._input_map = {}
+            self._output_map = {}
 
-    def initialize(self):
-        pass
+            self.add_group(group)
 
-    def setup(self):
-        self._prob.setup()
+        def add_group(self, group):
+            """
+            Adds an OpenMDAO group to the discipline.
 
-        for local, sub in self._input_map.items():
-            self.add_input(local)
+            Warning: This will delete any previous problem settings and attached
+            models.
+            """
+            self._prob = om.Problem(model=group)
+            self._model = self._prob.model
 
-        for local, sub in self._output_map.items():
-            self.add_output(local)
+        def add_mapped_input(self, local_var, subprob_var):
+            """
+            Adds an input that is mapped from the discipline to the sub-problem.
+            """
+            self._input_map[local_var] = subprob_var
 
-    def compute(self, inputs, outputs):
-        # assign continuous and discrete inputs of the nested group
-        for local, sub in self._input_map.items():
-            self._prob[sub] = inputs[local]
+        def add_mapped_output(self, local_var, subprob_var):
+            """
+            Adds an output that is mapped from the discipline to the sub-problem.
+            """
+            self._output_map[local_var] = subprob_var
 
-        self._prob.run_model()
+        def clear_mapped_variables(self):
+            """
+            Clears the variable map and sets it to an empty dictionary.
+            """
+            self._input_map = {}
+            self._output_map = {}
 
-        # assign continuous and discrete outputs of the component
-        for local, sub in self._output_map.items():
-            outputs[local] = self._prob[sub]
+        def initialize(self):
+            pass
 
-    # def compute_partials(self, inputs, partials, discrete_inputs=None):
-    #     # assign continuous and discrete inputs of the nested group
-    #     for comp_var, var in enumerate(self._inputs):
-    #         self._prob[var] = inputs[comp_var]
-    #     for comp_dvar, dvar in enumerate(self._discrete_inputs):
-    #         self._prob[dvar] = discrete_inputs[comp_dvar]
+        def setup(self):
+            self._prob.setup()
 
-    #     # self._prob.compute_totals()
+            for local, sub in self._input_map.items():
+                self.add_input(local)
+
+            for local, sub in self._output_map.items():
+                self.add_output(local)
+
+        def compute(self, inputs, outputs):
+            # assign continuous and discrete inputs of the nested group
+            for local, sub in self._input_map.items():
+                self._prob[sub] = inputs[local]
+
+            self._prob.run_model()
+
+            # assign continuous and discrete outputs of the component
+            for local, sub in self._output_map.items():
+                outputs[local] = self._prob[sub]
+
+        # def compute_partials(self, inputs, partials, discrete_inputs=None):
+        #     # assign continuous and discrete inputs of the nested group
+        #     for comp_var, var in enumerate(self._inputs):
+        #         self._prob[var] = inputs[comp_var]
+        #     for comp_dvar, dvar in enumerate(self._discrete_inputs):
+        #         self._prob[dvar] = discrete_inputs[comp_dvar]
+
+        #     # self._prob.compute_totals()

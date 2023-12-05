@@ -41,8 +41,15 @@ from test_explicit_client import TestExplicitClient
 from test_implicit_client import TestImplicitClient
 
 # openmdao unit tests
-from test_openmdao_utils import TestOpenMdaoUtils
-from test_openmdao_group import TestOpenMdaoGroup
+use_openmdao = True
+try:
+    import openmdao.api as om
+except:
+    use_openmdao = False
+if use_openmdao:
+    from test_openmdao_utils import TestOpenMdaoUtils
+    from test_openmdao_group import TestOpenMdaoGroup
+    from test_openmdao_integration import OpenMdaoIntegrationTests
 
 # example unit tests
 from test_paraboloid import TestParaboloid
