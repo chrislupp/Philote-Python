@@ -125,6 +125,75 @@ class TestOpenMdaoGroup(unittest.TestCase):
         self.assertAlmostEqual(outputs["con1"][0], 1.05048349, 5)
         self.assertAlmostEqual(outputs["con2"][0], -24.54758253, 5)
 
+    def test_compute_partials(self):
+        """
+        Unit test for the OpenMDAO group discipline compute_partials function.
+        """
+        disc = OpenMdaoSubProblem()
+
+        # add the Sellar group and turn off the solver debug print
+        disc.add_group(SellarMDA())
+
+        disc.add_mapped_input("x", "x")
+        disc.add_mapped_input("z", "z")
+
+        disc.add_mapped_output("y1", "y1")
+        disc.add_mapped_output("y2", "y2")
+        disc.add_mapped_output("obj", "obj")
+        disc.add_mapped_output("con1", "con1")
+        disc.add_mapped_output("con2", "con2")
+
+        disc.declare_subproblem_partial("y1", "x")
+        disc.declare_subproblem_partial("y1", "z")
+        disc.declare_subproblem_partial("y2", "x")
+        disc.declare_subproblem_partial("y2", "z")
+        disc.declare_subproblem_partial("obj", "x")
+        disc.declare_subproblem_partial("obj", "z")
+        disc.declare_subproblem_partial("con1", "x")
+        disc.declare_subproblem_partial("con1", "z")
+        disc.declare_subproblem_partial("con2", "x")
+        disc.declare_subproblem_partial("con2", "z")
+
+        disc.setup()
+
+        inputs = {
+            "x": np.array([2.0]),
+            "z": np.array([-1., -1.])
+        }
+        partials = {
+            ("y1", "x"): np.array([0.0]),
+            ("y1", "z"): np.zeros(2),
+            ("y2", "x"): np.array([0.0]),
+            ("y2", "z"): np.zeros(2),
+            ("obj", "x"): np.array([0.0]),
+            ("obj", "z"): np.zeros(2),
+            ("con1", "x"): np.array([0.0]),
+            ("con1", "z"): np.zeros(2),
+            ("con2", "x"): np.array([0.0]),
+            ("con2", "z"): np.zeros(2)
+        }
+
+        disc.compute_partials(inputs, partials)
+
+        self.assertAlmostEqual(partials[("y1", "x")][0, 0], 0.99982674, 5)
+        self.assertAlmostEqual(partials[("y1", "z")][0, 0], -2.00017226, 5)
+        self.assertAlmostEqual(partials[("y1", "z")][0, 1], 0.99982674, 5)
+
+        self.assertAlmostEqual(partials[("y2", "x")][0, 0], 0.34413432, 5)
+        self.assertAlmostEqual(partials[("y2", "z")][0, 0], 0.31149316, 5)
+        self.assertAlmostEqual(partials[("y2", "z")][0, 1], 1.34407468, 5)
+
+        self.assertAlmostEqual(partials[("obj", "x")][0, 0], 4.40479511, 5)
+        self.assertAlmostEqual(partials[("obj", "z")][0, 0], -2.53876511, 5)
+        self.assertAlmostEqual(partials[("obj", "z")][0, 1], -0.32416976, 5)
+
+        self.assertAlmostEqual(partials[("con1", "x")][0, 0], -0.99982674, 5)
+        self.assertAlmostEqual(partials[("con1", "z")][0, 0], 2.00017226, 5)
+        self.assertAlmostEqual(partials[("con1", "z")][0, 1], -0.99982674, 5)
+
+        self.assertAlmostEqual(partials[("con2", "x")][0, 0], 0.34413432, 5)
+        self.assertAlmostEqual(partials[("con2", "z")][0, 0], 0.31149316, 5)
+        self.assertAlmostEqual(partials[("con2", "z")][0, 1], 1.34407468, 5)
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)
