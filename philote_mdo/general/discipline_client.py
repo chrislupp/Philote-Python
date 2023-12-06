@@ -29,6 +29,7 @@
 # control over the information you may find at these locations.
 import numpy as np
 from google.protobuf.empty_pb2 import Empty
+from google.protobuf.struct_pb2 import Struct
 import philote_mdo.generated.data_pb2 as data
 import philote_mdo.generated.disciplines_pb2_grpc as disc
 import philote_mdo.utils as utils
@@ -76,11 +77,22 @@ class DisciplineClient:
         """
         self._disc_stub.SetStreamOptions(self._stream_options)
 
-    def send_options(self):
+    def send_options(self, options):
         """
         Sends the discipline options to the analysis server.
+
+        Parameters
+        ----------
+        options: dict
+            Dictionary containing the discipline options
+
+        Returns
+        -------
+            None
         """
-        pass
+        proto_options = data.DisciplineOptions()
+        proto_options.options.update(options)
+        self._disc_stub.SetOptions(proto_options)
 
     def run_setup(self):
         """
