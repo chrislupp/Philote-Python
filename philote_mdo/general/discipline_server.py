@@ -84,7 +84,8 @@ class DisciplineServer(disc.DisciplineService):
         """
         RPC that sets the discipline options.
         """
-        pass
+        options = request.options
+        self._discipline.initialize(options)
 
     def Setup(self, request, context):
         """
