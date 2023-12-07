@@ -30,6 +30,7 @@
 import unittest
 
 # general unit tests
+from test_utils import TestUtils
 from test_discipline import TestDiscipline
 
 from test_discipline_server import TestDisciplineServer
@@ -48,7 +49,6 @@ try:
     from test_openmdao_integration import OpenMdaoIntegrationTests
 except:
    pass
-
 
 # example unit tests
 from test_paraboloid import TestParaboloid
