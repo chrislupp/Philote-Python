@@ -1,4 +1,4 @@
-![Philote](https://github.com/chrislupp/Philote-MDO/blob/main/doc/graphics/logos/philote-python.svg?raw=true)
+![Philote](doc/graphics/philote-python.svg)
 
 # Philote-Python
 
