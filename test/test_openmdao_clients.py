@@ -29,7 +29,7 @@
 # control over the information you may find at these locations.
 import unittest
 from unittest.mock import patch, Mock
-from philote_mdo.openmdao import RemoteExplicitComponent
+from philote_mdo.openmdao import RemoteExplicitComponent, RemoteImplicitComponent
 import philote_mdo.generated.data_pb2 as data
 
 
@@ -102,6 +102,101 @@ class TestOpenMdaoClients(unittest.TestCase):
         # Assert that the necessary methods were called
         comp._client.run_compute_partials.assert_called_once_with({'x': 1})
         self.assertEqual(partials[("y", "x")], 42.0)
+
+    def test_implicit_apply_nonlinear(self):
+        """
+        Tests the apply_nonlinear function for the OpenMDAO implicit component.
+        """
+        # Mock gRPC channel
+        channel_mock = Mock()
+
+        # Create an instance of RemoteExplicitComponent
+        comp = RemoteImplicitComponent(channel=channel_mock)
+
+        # Mock client and set the _var_meta attribute
+        comp._client = Mock()
+        comp._client._var_meta = [
+            data.VariableMetaData(name="x", type=data.kInput),
+            data.VariableMetaData(name="y", type=data.kOutput),
+        ]
+
+        # Mock inputs and outputs dictionaries
+        inputs = {'x': 1}
+        outputs = {'y': 2}
+        residuals = {'y': None}
+
+        # Configure the Mock object to support iteration
+        comp._client.run_compute_residuals.return_value = {'y': 42}
+
+        # Call the compute method
+        comp.apply_nonlinear(inputs, outputs, residuals)
+
+        # Assert that the necessary methods were called
+        comp._client.run_compute_residuals.assert_called_once_with({'x': 1}, {'y': 2})
+        self.assertEqual(residuals["y"], 42.0)
+
+    def test_implicit_solve_nonlinear(self):
+        """
+        Tests the solve_nonlinear function for the OpenMDAO implicit component.
+        """
+        # Mock gRPC channel
+        channel_mock = Mock()
+
+        # Create an instance of RemoteExplicitComponent
+        comp = RemoteImplicitComponent(channel=channel_mock)
+
+        # Mock client and set the _var_meta attribute
+        comp._client = Mock()
+        comp._client._var_meta = [
+            data.VariableMetaData(name="x", type=data.kInput),
+            data.VariableMetaData(name="y", type=data.kOutput),
+        ]
+
+        # Mock inputs and outputs dictionaries
+        inputs = {'x': 1}
+        outputs = {'y': None}
+
+        # Configure the Mock object to support iteration
+        comp._client.run_solve_residuals.return_value = {'y': 42}
+
+        # Call the compute method
+        comp.solve_nonlinear(inputs, outputs)
+
+        # Assert that the necessary methods were called
+        comp._client.run_solve_residuals.assert_called_once_with({'x': 1})
+        self.assertEqual(outputs["y"], 42.0)
+
+    def test_implicit_apply_linear(self):
+        """
+        Tests the apply_linear function for the OpenMDAO implicit component.
+        """
+        # Mock gRPC channel
+        channel_mock = Mock()
+
+        # Create an instance of RemoteExplicitComponent
+        comp = RemoteImplicitComponent(channel=channel_mock)
+
+        # Mock client and set the _var_meta attribute
+        comp._client = Mock()
+        comp._client._var_meta = [
+            data.VariableMetaData(name="x", type=data.kInput),
+            data.VariableMetaData(name="y", type=data.kOutput),
+        ]
+
+        # Mock inputs and outputs dictionaries
+        inputs = {'x': 1}
+        outputs = {'y': 2}
+        partials = {('y', 'x'): None}
+
+        # Configure the Mock object to support iteration
+        comp._client.run_residual_gradients.return_value = {('y', 'x'): 42}
+
+        # Call the compute method
+        comp.linearize(inputs, outputs, partials)
+
+        # Assert that the necessary methods were called
+        comp._client.run_residual_gradients.assert_called_once_with({'x': 1}, {'y': 2})
+        self.assertEqual(partials[('y', 'x')], 42.0)
 
 
 if __name__ == "__main__":
