@@ -1,6 +1,6 @@
 ![Philote](doc/graphics/philote-python.svg)
 
-[![Unit Tests](https://github.com/chrislupp/Philote-Python/actions/workflows/tests.yaml/badge.svg)](https://github.com/chrislupp/Philote-Python/actions/workflows/tests.yaml)
+[![Unit and Regression Tests](https://github.com/chrislupp/Philote-Python/actions/workflows/tests.yaml/badge.svg)](https://github.com/chrislupp/Philote-Python/actions/workflows/tests.yaml)
 # Philote-Python
 
 Python library for using and creating Philote analysis servers.
