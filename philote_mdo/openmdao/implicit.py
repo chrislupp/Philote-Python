@@ -46,15 +46,19 @@ class RemoteImplicitComponent(om.ImplicitComponent):
         self._client = pm.ImplicitClient(channel=self.options["channel"])
         client_setup(self)
 
-    def apply_nonlinear(self, inputs, residuals):
-        local_inputs = create_local_inputs(inputs, self._client._var_meta)
-        res = self._client.run_compute_residuals(local_inputs)
+    def apply_nonlinear(self, inputs, outputs, residuals):
+        local_inputs = create_local_inputs(inputs, self._client._var_meta, type=data.kInput)
+        local_outputs = create_local_inputs(outputs, self._client._var_meta, type=data.kOutput)
+        res = self._client.run_compute_residuals(local_inputs, local_outputs)
         assign_global_outputs(res, residuals)
 
     def solve_nonlinear(self, inputs, outputs):
         local_inputs = create_local_inputs(inputs, self._client._var_meta)
-        out = self._client.run_solve_nonlinear(local_inputs)
+        out = self._client.run_solve_residuals(local_inputs)
         assign_global_outputs(out, outputs)
 
-    def linearize(self, inputs, outputs, jacobian):
-        pass
+    def linearize(self, inputs, outputs, partials):
+        local_inputs = create_local_inputs(inputs, self._client._var_meta, type=data.kInput)
+        local_outputs = create_local_inputs(outputs, self._client._var_meta, type=data.kOutput)
+        jac = self._client.run_residual_gradients(local_inputs, local_outputs)
+        assign_global_outputs(jac, partials)

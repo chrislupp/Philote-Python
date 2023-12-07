@@ -29,11 +29,9 @@
 # control over the information you may find at these locations.
 import unittest
 from unittest.mock import Mock, patch
-
 import numpy as np
-
 from google.protobuf.empty_pb2 import Empty
-
+from google.protobuf.struct_pb2 import Struct
 from philote_mdo.general import DisciplineClient
 import philote_mdo.generated.data_pb2 as data
 import philote_mdo.utils as utils
@@ -87,8 +85,26 @@ class TestDisciplineClient(unittest.TestCase):
         self.assertTrue(mock_stub.SetStreamOptions.called)
         mock_stub.SetStreamOptions.assert_called_with(expected_options)
 
-    # def test_set_options(self):
-    #     pass
+    def test_send_options(self):
+        # mock gRPC stub and channel
+        mock_stub = Mock()
+        mock_channel = Mock()
+        mock_channel.stub.return_value = mock_stub
+
+        # create an instance of YourClass with the mocked channel
+        client = DisciplineClient(channel=mock_channel)
+        client._disc_stub = mock_stub
+
+        # mock options dictionary
+        options = {'key1': 'value1', 'key2': 42}
+
+        # call the send_options method
+        client.send_options(options)
+
+        # assert that SetOptions was called with the expected ProtoBuf structure
+        expected_proto_options = data.DisciplineOptions()
+        expected_proto_options.options.update(options)
+        mock_stub.SetOptions.assert_called_once_with(expected_proto_options)
 
     @patch("philote_mdo.generated.disciplines_pb2_grpc.DisciplineServiceStub")
     def test_run_setup(self, mock_discipline_stub):

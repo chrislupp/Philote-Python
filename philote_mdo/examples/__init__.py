@@ -30,3 +30,8 @@
 from .paraboloid import Paraboloid
 from .quadratic import QuadradicImplicit
 from .rosenbrock import Rosenbrock
+try:
+    import openmdao.api
+    from .sellar import SellarMDA
+except:
+    pass

@@ -29,3 +29,5 @@
 # control over the information you may find at these locations.
 from .explicit import RemoteExplicitComponent
 from .implicit import RemoteImplicitComponent
+
+from .group import OpenMdaoSubProblem

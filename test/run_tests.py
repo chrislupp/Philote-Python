@@ -30,6 +30,7 @@
 import unittest
 
 # general unit tests
+from test_utils import TestUtils
 from test_discipline import TestDiscipline
 
 from test_discipline_server import TestDisciplineServer
@@ -40,12 +41,22 @@ from test_discipline_client import TestDisciplineClient
 from test_explicit_client import TestExplicitClient
 from test_implicit_client import TestImplicitClient
 
+# openmdao unit tests
+use_openmdao = True
+try:
+    from test_openmdao_utils import TestOpenMdaoUtils
+    from test_openmdao_group import TestOpenMdaoGroup
+    from test_openmdao_integration import OpenMdaoIntegrationTests
+except:
+   pass
+
 # example unit tests
 from test_paraboloid import TestParaboloid
 from test_quadratic import TestQuadradicImplicit
 
 # integrations tests
 from test_integration import IntegrationTests
+
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)

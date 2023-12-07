@@ -87,7 +87,7 @@ class Discipline:
         """
         self._partials_meta += [data.PartialsMetaData(name=func, subname=var)]
 
-    def initialize(self):
+    def initialize(self, options):
         pass
 
     def setup(self):

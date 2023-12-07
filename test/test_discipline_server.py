@@ -86,8 +86,28 @@ class TestDisciplineServer(unittest.TestCase):
         # check that the streaming options were set properly
         self.assertEqual(server._stream_opts.num_double, 2)
 
-    # def test_set_options(self):
-    #     pass
+    def test_set_options(self):
+        # Create an instance of YourClass
+        server = DisciplineServer()
+        # server._discipline = Discipline()
+
+        # Mock the request and context parameters
+        request_mock = Mock()
+        context_mock = Mock()
+
+        # Set some mock options in the request
+        request_mock.options = {'key1': 'value1', 'key2': 42}
+
+        # Create a mock for the _discipline attribute
+        discipline_mock = Mock()
+        server._discipline = discipline_mock
+
+        # Call the SetOptions function with the mock parameters
+        server.SetOptions(request_mock, context_mock)
+
+        # Assert that the discipline's initialize method was called with the expected options
+        server._discipline.initialize.assert_called_once_with({'key1': 'value1', 'key2': 42})
+
 
     def test_setup(self):
         """

@@ -31,10 +31,7 @@ from concurrent import futures
 import unittest
 import grpc
 import numpy as np
-import openmdao.api as om
-from openmdao.utils.assert_utils import assert_check_partials
 import philote_mdo.general as pmdo
-import philote_mdo.openmdao as pmom
 from philote_mdo.examples import Paraboloid, QuadradicImplicit
 
 
@@ -113,102 +110,6 @@ class IntegrationTests(unittest.TestCase):
 
         # stop the server
         server.stop(0)
-
-    def test_openmdao_paraboloid_compute(self):
-        """
-        Tests the OpenMDAO compute function using the Paraboloid.
-        """
-        # server code
-        server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
-
-        discipline = pmdo.ExplicitServer(discipline=Paraboloid())
-        discipline.attach_to_server(server)
-
-        server.add_insecure_port("[::]:50051")
-        server.start()
-
-        # client code
-        client = pmdo.ExplicitClient(channel=grpc.insecure_channel("localhost:50051"))
-
-        # transfer the stream options to the server
-        client.send_stream_options()
-
-        # run setup
-        client.run_setup()
-        client.get_variable_definitions()
-        client.get_partials_definitions()
-
-        # client code
-        prob = om.Problem()
-        model = prob.model
-
-        model.add_subsystem(
-            "Paraboloid",
-            pmom.RemoteExplicitComponent(
-                channel=grpc.insecure_channel("localhost:50051")
-            ),
-            promotes=["*"],
-        )
-
-        prob.setup()
-
-        prob["x"] = 1.0
-        prob["y"] = 2.0
-        prob.run_model()
-
-        self.assertEqual(prob["f_xy"][0], 39.0)
-
-        # stop the server
-        server.stop(0)
-
-    # def test_openmdao_paraboloid_compute_partials(self):
-    #     """
-    #     Tests the OpenMDAO compute_partials function using the Paraboloid.
-    #     """
-    #     # server code
-    #     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
-
-    #     discipline = pmdo.ExplicitServer(discipline=Paraboloid())
-    #     discipline.attach_to_server(server)
-
-    #     server.add_insecure_port("[::]:50051")
-    #     server.start()
-
-    #     # client code
-    #     client = pmdo.ExplicitClient(channel=grpc.insecure_channel("localhost:50051"))
-
-    #     # transfer the stream options to the server
-    #     client.send_stream_options()
-
-    #     # run setup
-    #     client.run_setup()
-    #     client.get_variable_definitions()
-    #     client.get_partials_definitions()
-
-    #     # client code
-    #     prob = om.Problem()
-    #     model = prob.model
-
-    #     model.add_subsystem(
-    #         "Paraboloid",
-    #         pmom.RemoteExplicitComponent(
-    #             channel=grpc.insecure_channel("localhost:50051")
-    #         ),
-    #         promotes=["*"],
-    #     )
-
-    #     prob.setup()
-
-    #     prob["x"] = 1.0
-    #     prob["y"] = 2.0
-    #     prob.run_model()
-
-    #     data = prob.check_partials(out_stream=None)
-
-    #     assert_check_partials(data, atol=1.0e-6, rtol=1.0e-6)
-
-    #     # stop the server
-    #     server.stop(0)
 
     def test_quadratic_compute_residuals(self):
         """
