@@ -47,6 +47,13 @@ or
 
 for a development install.
 
+### Potential Issues
+
+Some users have reported that grpcio-tools does not install the protoc
+executable required to generate the stubs. If you run into this issue, you
+will have to manually install the protoc executable (make sure to match the
+version of gRPC that you have installed) and make it discoverable on your PATH.
+
 
 ## License
 
