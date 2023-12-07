@@ -1,0 +1,746 @@
+
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+    <title>Quick Start &#8212; Philote-Python</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=5b4479735964841361fd" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=5b4479735964841361fd" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" href="../_static/styles/sphinx-book-theme.css?digest=14f4ca6b54d191a8c7657f6c759bf11a5fb86285" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/design-style.4045f2051d55cab465a707391d5b2007.min.css" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=5b4479735964841361fd" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd" />
+  <script src="../_static/vendor/fontawesome/6.1.2/js/all.min.js?digest=5b4479735964841361fd"></script>
+
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/clipboard.min.js"></script>
+    <script src="../_static/copybutton.js"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?digest=5a5c038af52cf7bc1a1ec88eea08e6366ee68824"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../_static/togglebutton.js"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../_static/design-tabs.js"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"
+const thebe_selector = ".thebe,.cell"
+const thebe_selector_input = "pre"
+const thebe_selector_output = ".output, .cell_output"
+</script>
+    <script async="async" src="../_static/sphinx-thebe.js"></script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'tutorials/quickstart';</script>
+    <link rel="shortcut icon" href="../_static/favicon.ico"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Working with Explicit Disciplines" href="explicit_disciplines.html" />
+    <link rel="prev" title="Philote-Python" href="../intro.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>
+    Back to top
+  </button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+    </nav>
+  
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+
+<a class="navbar-brand logo" href="../intro.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/philote-python.svg" class="logo__image only-light" alt="Philote-Python - Home"/>
+    <script>document.write(`<img src="../_static/philote-python.svg" class="logo__image only-dark" alt="Philote-Python - Home"/>`);</script>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="../intro.html">
+                    Philote-Python
+                </a>
+            </li>
+        </ul>
+        <ul class="current nav bd-sidenav">
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Quick Start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="explicit_disciplines.html">Working with Explicit Disciplines</a></li>
+<li class="toctree-l1"><a class="reference internal" href="openmdao.html">Calling Philote Disciplines from OpenMDAO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="csdl.html">Calling Philote Disciplines from CSDL</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><label class="sidebar-toggle primary-toggle btn btn-sm" for="__primary" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</label></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/chrislupp/Philote-Python" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/chrislupp/Philote-Python/issues/new?title=Issue%20on%20page%20%2Ftutorials/quickstart.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/tutorials/quickstart.md" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.md</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<label class="sidebar-toggle secondary-toggle btn btn-sm" for="__secondary"title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</label>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Quick Start</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#disciplines">Disciplines</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#standing-up-an-analysis-server">Standing Up an Analysis Server</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#calling-the-discipline-using-a-client">Calling the Discipline Using a Client</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#potential-pitfalls">Potential Pitfalls</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article" role="main">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="quick-start">
+<h1>Quick Start<a class="headerlink" href="#quick-start" title="Permalink to this heading">#</a></h1>
+<p>Client/server interactions might seem difficult when starting out, but the
+purpose of this library is to help out and abstract away the difficult bits.
+This quick start guide is intended to familiarize you with the basic operating
+principles of the Philote MDO standard and get you started using this Python
+implementation.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This guide attempts to be as user friendly as possible. However, it is likely
+that some basic understanding of Multidisciplinary Design Analysis and
+Optimization may be necessary (e.g., what is a discipline, etc.).</p>
+</div>
+<section id="disciplines">
+<h2>Disciplines<a class="headerlink" href="#disciplines" title="Permalink to this heading">#</a></h2>
+<p>Before we take a closer look at clients and servers, we need a discipline that
+we will attach to a server and call from the client. Philote-Python implements
+disciplines in a similar way to OpenMDAO. We create a class, inheriting from a
+base class and then specialize some methods to run the calculations we want.</p>
+<p>To illustrate this, let us take a look at a simple paraboloid problem (the same
+problem as in the OpenMDAO documentation):</p>
+<div class="amsmath math notranslate nohighlight" id="equation-c31c562d-85e1-4562-9507-9cb19e5d5490">
+<span class="eqno">(1)<a class="headerlink" href="#equation-c31c562d-85e1-4562-9507-9cb19e5d5490" title="Permalink to this equation">#</a></span>\[\begin{align}
+f(x,y) &amp;= (x-3)^2 + x y + (y+4)^2 - 3
+\end{align}\]</div>
+<p>To create a discipline that executes this equation, we create a class and
+inherit from the ExplicitDiscipline class Philote-Python provides. First, let us
+look at the setup member function:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">philote.general</span> <span class="k">as</span> <span class="nn">pm</span>
+
+<span class="k">class</span> <span class="nc">Paraboloid</span><span class="p">(</span><span class="n">pmdo</span><span class="o">.</span><span class="n">ExplicitDiscipline</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_input</span><span class="p">(</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,),</span> <span class="n">units</span><span class="o">=</span><span class="s2">&quot;m&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_input</span><span class="p">(</span><span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,),</span> <span class="n">units</span><span class="o">=</span><span class="s2">&quot;m&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_output</span><span class="p">(</span><span class="s2">&quot;f_xy&quot;</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,),</span> <span class="n">units</span><span class="o">=</span><span class="s2">&quot;m**2&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The <strong>setup</strong> function exists to define the inputs and outputs of a discipline
+(this purpose is borrowed from the OpenMDAO workflow, which operates the same
+way). The <strong>add_input</strong> and <strong>add_output</strong> member functions are provided by the
+<strong>ExplicitDiscipline</strong> to define both inputs and outputs. Here, two inputs (<em>x</em>
+and <em>y</em>) are defined, each with the shape of 1 (scalar) and with a unit of
+meters (no physical meaning, purely for demonstration). Furthermore, a scalar
+output (<em>f_xy</em>) was defined with the units of square meters.</p>
+<p>How to declare and implement gradients is discussed in
+<a class="reference internal" href="explicit_disciplines.html#tutorials-explicit"><span class="std std-ref">Working with Explicit Disciplines</span></a>, so for the time being, we will skip over member
+functions required to define gradients (or implement them).</p>
+<p>To implement the paraboloid function, the <strong>compute</strong> member function must be
+defined:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span>    <span class="k">def</span> <span class="nf">compute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inputs</span><span class="p">,</span> <span class="n">outputs</span><span class="p">):</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">inputs</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">]</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">inputs</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">]</span>
+
+        <span class="n">outputs</span><span class="p">[</span><span class="s2">&quot;f_xy&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="mf">3.0</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">x</span> <span class="o">*</span> <span class="n">y</span> <span class="o">+</span> <span class="p">(</span><span class="n">y</span> <span class="o">+</span> <span class="mf">4.0</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">-</span> <span class="mf">3.0</span>
+</pre></div>
+</div>
+<p>The <em>inputs</em> and <em>outputs</em> variables for this function are later passed in by
+the server as dictionaries with the variable names as the keys.</p>
+<p>The discipline now contains the minimum implementation to support a function
+evaluation. However, the discipline must first be attached to a server to run.</p>
+</section>
+<section id="standing-up-an-analysis-server">
+<h2>Standing Up an Analysis Server<a class="headerlink" href="#standing-up-an-analysis-server" title="Permalink to this heading">#</a></h2>
+<p>The discipline created in the previous section serves as the implementation for
+the analysis server we will stand up in this section. Philote-Python attempts to
+abstract away most complexities of using gRPC, so that discipline developers can
+focus on their respective fields, rather than client-server communication.
+Because of this, a server class is provided, to which analysis disciplines can
+be attached.</p>
+<p>First, a gRPC channel needs to be generated:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">concurrent</span> <span class="kn">import</span> <span class="n">futures</span>
+<span class="kn">import</span> <span class="nn">grpc</span>
+<span class="c1"># ...</span>
+
+<span class="n">server</span> <span class="o">=</span> <span class="n">grpc</span><span class="o">.</span><span class="n">server</span><span class="p">(</span><span class="n">futures</span><span class="o">.</span><span class="n">ThreadPoolExecutor</span><span class="p">(</span><span class="n">max_workers</span><span class="o">=</span><span class="mi">10</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>Next, the <strong>Paraboloid</strong> discipline is attached to the server:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">philote_mdo.general</span> <span class="k">as</span> <span class="nn">pmdo</span>
+<span class="kn">from</span> <span class="nn">philote_mdo.examples</span> <span class="kn">import</span> <span class="n">Paraboloid</span>
+<span class="c1"># ...</span>
+
+<span class="n">discipline</span> <span class="o">=</span> <span class="n">pmdo</span><span class="o">.</span><span class="n">ExplicitServer</span><span class="p">(</span><span class="n">discipline</span><span class="o">=</span><span class="n">Paraboloid</span><span class="p">())</span>
+<span class="n">discipline</span><span class="o">.</span><span class="n">attach_to_server</span><span class="p">(</span><span class="n">server</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Finally, the port of the server is defined (opening a port is necessary for
+network communication) and the server is started:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">server</span><span class="o">.</span><span class="n">add_insecure_port</span><span class="p">(</span><span class="s2">&quot;[::]:50051&quot;</span><span class="p">)</span>
+<span class="n">server</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Server started. Listening on port 50051.&quot;</span><span class="p">)</span>
+<span class="n">server</span><span class="o">.</span><span class="n">wait_for_termination</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>In this example, the server waits for a termination signal. Using <em>Ctrl-C</em> will
+kill the server (on Unix and Unix-like systems) when it is no longer needed.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>This example uses an insecure port. Production environment environments should
+generally always use encrypted network traffic to minimize security
+vulnerabilities and third parties snooping on data exchanged. The code presented
+here is a tutorial and not intended for production use.</p>
+</div>
+<p>The above code snippets were taken slightly out of order for didactical
+purposes. For completeness, here is the full example server
+(paraboloid_explicit.py):</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">concurrent</span> <span class="kn">import</span> <span class="n">futures</span>
+<span class="kn">import</span> <span class="nn">grpc</span>
+<span class="kn">import</span> <span class="nn">philote_mdo.general</span> <span class="k">as</span> <span class="nn">pmdo</span>
+<span class="kn">from</span> <span class="nn">philote_mdo.examples</span> <span class="kn">import</span> <span class="n">Paraboloid</span>
+
+
+<span class="n">server</span> <span class="o">=</span> <span class="n">grpc</span><span class="o">.</span><span class="n">server</span><span class="p">(</span><span class="n">futures</span><span class="o">.</span><span class="n">ThreadPoolExecutor</span><span class="p">(</span><span class="n">max_workers</span><span class="o">=</span><span class="mi">10</span><span class="p">))</span>
+
+<span class="n">discipline</span> <span class="o">=</span> <span class="n">pmdo</span><span class="o">.</span><span class="n">ExplicitServer</span><span class="p">(</span><span class="n">discipline</span><span class="o">=</span><span class="n">Paraboloid</span><span class="p">())</span>
+<span class="n">discipline</span><span class="o">.</span><span class="n">attach_to_server</span><span class="p">(</span><span class="n">server</span><span class="p">)</span>
+
+<span class="n">server</span><span class="o">.</span><span class="n">add_insecure_port</span><span class="p">(</span><span class="s2">&quot;[::]:50051&quot;</span><span class="p">)</span>
+<span class="n">server</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Server started. Listening on port 50051.&quot;</span><span class="p">)</span>
+<span class="n">server</span><span class="o">.</span><span class="n">wait_for_termination</span><span class="p">()</span>
+</pre></div>
+</div>
+</section>
+<section id="calling-the-discipline-using-a-client">
+<h2>Calling the Discipline Using a Client<a class="headerlink" href="#calling-the-discipline-using-a-client" title="Permalink to this heading">#</a></h2>
+<p>Now that a server is running, it can be querried using a client. Philote-Python
+offers a number of clients for this purpose, ranging from the general
+implementation to OpenMDAO and CSDL components. However, under the hood, the
+OpenMDAO and CSDL components use the general client implementation.</p>
+<p>This example will use the general explicit client implementation. Despite it
+being fully functional and able to run in scientific workflows, it probably is
+not a realistic MDO workflow. <a class="reference internal" href="openmdao.html#tutorials-openmdao"><span class="std std-ref">Calling Philote Disciplines from OpenMDAO</span></a> and
+<a class="reference internal" href="csdl.html#tutorials-csdl"><span class="std std-ref">Calling Philote Disciplines from CSDL</span></a> demonstrate calling Philote disciplines from the OpenMDAO
+and CSDL MDO frameworks.</p>
+<p>First, the explicit client must be imported and initialized using a gRPC
+channel.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">grpc</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">philote_mdo.general</span> <span class="kn">import</span> <span class="n">ExplicitClient</span>
+
+
+<span class="n">client</span> <span class="o">=</span> <span class="n">ExplicitClient</span><span class="p">(</span><span class="n">channel</span><span class="o">=</span><span class="n">grpc</span><span class="o">.</span><span class="n">insecure_channel</span><span class="p">(</span><span class="s2">&quot;localhost:50051&quot;</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>The same disclaimer as above applies here. It is not recommended using an
+insecure channel for production work. Generally, all production work should be
+encrypted.</p>
+</div>
+<p>Now the client should be connected to the analysis server. While it may be
+tempting to just call the function evaluation at this point, hold your horses.
+There are a few necessary steps that are mandatory to ensure proper behavior.
+The first is to sync the stream options between the client and server (details
+of what happens here can be found in <strong>Setting up the Connection</strong>).</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># ...</span>
+
+<span class="c1"># transfer the stream options to the server</span>
+<span class="n">client</span><span class="o">.</span><span class="n">send_stream_options</span><span class="p">()</span>
+
+<span class="c1"># ...</span>
+</pre></div>
+</div>
+<p>Next, the setup function must be run, after which the variable and partials meta
+data must be retrieved from the server:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># ...</span>
+
+<span class="c1"># run setup</span>
+<span class="n">client</span><span class="o">.</span><span class="n">run_setup</span><span class="p">()</span>
+<span class="n">client</span><span class="o">.</span><span class="n">get_variable_definitions</span><span class="p">()</span>
+<span class="n">client</span><span class="o">.</span><span class="n">get_partials_definitions</span><span class="p">()</span>
+
+<span class="c1"># ...</span>
+</pre></div>
+</div>
+<p>Now, the client is ready to call the function evaluation. An input dictionary is
+defined using the variable name as the key and numpy arrays (size=1) and passed
+to the <strong>run_compute</strong> function.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># ...</span>
+
+<span class="c1"># define some inputs</span>
+<span class="n">inputs</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.0</span><span class="p">]),</span> <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">2.0</span><span class="p">])}</span>
+<span class="n">outputs</span> <span class="o">=</span> <span class="p">{}</span>
+
+<span class="c1"># run a function evaluation</span>
+<span class="n">outputs</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">run_compute</span><span class="p">(</span><span class="n">inputs</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">outputs</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The script should now have printed out the outputs dictionary. Congratulations,
+you have run your first client-server analysis using Philote/Philote-Python!</p>
+<p>The full client script (paraboloid_client.py) is:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">grpc</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">philote_mdo.general</span> <span class="kn">import</span> <span class="n">ExplicitClient</span>
+
+
+<span class="n">client</span> <span class="o">=</span> <span class="n">ExplicitClient</span><span class="p">(</span><span class="n">channel</span><span class="o">=</span><span class="n">grpc</span><span class="o">.</span><span class="n">insecure_channel</span><span class="p">(</span><span class="s2">&quot;localhost:50051&quot;</span><span class="p">))</span>
+
+<span class="c1"># transfer the stream options to the server</span>
+<span class="n">client</span><span class="o">.</span><span class="n">send_stream_options</span><span class="p">()</span>
+
+<span class="c1"># run setup</span>
+<span class="n">client</span><span class="o">.</span><span class="n">run_setup</span><span class="p">()</span>
+<span class="n">client</span><span class="o">.</span><span class="n">get_variable_definitions</span><span class="p">()</span>
+<span class="n">client</span><span class="o">.</span><span class="n">get_partials_definitions</span><span class="p">()</span>
+
+<span class="c1"># define some inputs</span>
+<span class="n">inputs</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.0</span><span class="p">]),</span> <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">2.0</span><span class="p">])}</span>
+<span class="n">outputs</span> <span class="o">=</span> <span class="p">{}</span>
+
+<span class="c1"># run a function evaluation</span>
+<span class="n">outputs</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">run_compute</span><span class="p">(</span><span class="n">inputs</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">outputs</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="potential-pitfalls">
+<h2>Potential Pitfalls<a class="headerlink" href="#potential-pitfalls" title="Permalink to this heading">#</a></h2>
+<p>Keep in mind that Philote requires network communication. For the tutorials it
+is probably best to run both the server and client on the same machine. However,
+it is possible to call a remote analysis discipline that is separate of the
+client. This requires opening the appropriate port (in this case, <em>50051</em>) and
+managing permissions. Many of these issues can be avoided by running the
+examples on the same machine.</p>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./tutorials"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="../intro.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Philote-Python</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="explicit_disciplines.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Working with Explicit Disciplines</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#disciplines">Disciplines</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#standing-up-an-analysis-server">Standing Up an Analysis Server</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#calling-the-discipline-using-a-client">Calling the Discipline Using a Client</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#potential-pitfalls">Potential Pitfalls</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Christopher A. Lupp
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2022-2023.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+<div class="extra_footer">
+  This work has been cleared for public release, distribution unlimited, case number: AFRL-2023-5713. The views expressed are those of the authors and do not reflect the official guidance or position of the United States Government, the Department of Defense or of the United States Air Force. Statement from DoD: The Appearance of external hyperlinks does not constitute endorsement by the United States Department of Defense (DoD) of the linked websites, of the information, products, or services contained therein. The DoD does not exercise any editorial, security, or other control over the information you may find at these locations.
+</div>
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=5b4479735964841361fd"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>
