@@ -5,6 +5,10 @@
 
 Python library for using and creating Philote analysis servers.
 
+Documentation can be found at:
+
+https://chrislupp.github.io/Philote-Python/intro.html
+
 
 ## Requirements
 
