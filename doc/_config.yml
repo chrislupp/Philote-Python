@@ -3,7 +3,7 @@
 
 title: Philote-Python
 author: Christopher A. Lupp
-logo: graphics/philote_logo.svg
+logo: graphics/philote-python.svg
 copyright: 2022-2023
 
 # Force re-execution of notebooks on each build.
