@@ -1,3 +1,5 @@
+# Philote-Python
+#
 # Copyright 2022-2023 Christopher A. Lupp
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -11,71 +13,46 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+#
+#
+# This work has been cleared for public release, distribution unlimited, case
+# number: AFRL-2023-5713.
+#
+# The views expressed are those of the authors and do not reflect the
+# official guidance or position of the United States Government, the
+# Department of Defense or of the United States Air Force.
+#
+# Statement from DoD: The Appearance of external hyperlinks does not
+# constitute endorsement by the United States Department of Defense (DoD) of
+# the linked websites, of the information, products, or services contained
+# therein. The DoD does not exercise any editorial, security, or other
+# control over the information you may find at these locations.
+import numpy as np
 import openmdao.api as om
-import philote_mdo as pm
+import philote_mdo.general as pm
+import philote_mdo.generated.data_pb2 as data
+from .utils import client_setup, create_local_inputs, assign_global_outputs
 
 
-class RemoteExplicitComponent(om.ExplicitComponent, pm.ExplicitClient):
+class RemoteExplicitComponent(om.ExplicitComponent):
     """
-    An OpenMDAO component that acts as a client to an explicit analysis server.
+    OpenMDAO component that acts as a client to an explicit analysis server.
     """
 
     def initialize(self):
-        # host
-        self.options.declare('host', default='localhost')
+        # gRPC channel
+        self.options.declare("channel")
 
     def setup(self):
-        # assign the host
-        self._host = self.options['host']
+        self._client = pm.ExplicitClient(channel=self.options["channel"])
+        client_setup(self)
 
-        # create the connection to the server
-        self.__connect_host()
+    def compute(self, inputs, outputs):
+        local_inputs = create_local_inputs(inputs, self._client._var_meta)
+        out = self._client.run_compute(local_inputs)
+        assign_global_outputs(out, outputs)
 
-        # set up the remote server
-        self._remote_setup()
-
-        # define inputs
-        for input in self._vars:
-            self.add_input(input['name'], shape=input['shape'],
-                           units=input['units'])
-
-        # define discrete inputs
-        for dinput in self._vars:
-            self.add_discrete_input(dinput['name'], shape=dinput['shape'],
-                                    units=dinput['units'])
-
-        # define outputs
-        for out in self._funcs:
-            self.add_output(input['name'], shape=input['shape'],
-                            units=input['units'])
-
-        # define discrete outputs
-        for dout in self._funcs:
-            self.add_discrete_output(input['name'], shape=input['shape'],
-                                     units=input['units'])
-
-    def setup_partials(self):
-        # setup the partials on the server
-        self._setup_remote_partials()
-
-    def compute(self, inputs, discrete_inputs, outputs, discrete_outputs):
-        # call the remote compute method
-        out, discrete_out = self._remote_compute(inputs, discrete_inputs,
-                                                 discrete_outputs)
-
-        # assign the values to the openmdao dict type
-        for key, val in out.items():
-            outputs[key] = val
-
-        # assign the values to the openmdao dict type
-        for key, val in discrete_out.items():
-            discrete_outputs[key] = val
-
-    def compute_partials(self, inputs, discrete_inputs, partials):
-        # call the remote analysis to get the partials
-        jac = self._remote_compute_partials(inputs, discrete_inputs)
-
-        # assign the values to the openmdao partials type
-        for key, val in jac.items():
-            partials[key] = val
+    def compute_partials(self, inputs, partials):
+        local_inputs = create_local_inputs(inputs, self._client._var_meta)
+        jac = self._client.run_compute_partials(local_inputs)
+        assign_global_outputs(jac, partials)
