@@ -56,17 +56,6 @@ class OpenMdaoIntegrationTests(unittest.TestCase):
         server.start()
 
         # client code
-        client = pmdo.ExplicitClient(channel=grpc.insecure_channel("localhost:50051"))
-
-        # transfer the stream options to the server
-        client.send_stream_options()
-
-        # run setup
-        client.run_setup()
-        client.get_variable_definitions()
-        client.get_partials_definitions()
-
-        # client code
         prob = om.Problem()
         model = prob.model
 
@@ -187,6 +176,42 @@ class OpenMdaoIntegrationTests(unittest.TestCase):
         # stop the server
         server.stop(0)
 
+    def test_implicit_quadratic(self):
+        """
+        Tests the OpenMDAO compute function using the implicit quadratic component.
+        """
+        # server code
+        server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
+
+        discipline = pmdo.ImplicitServer(discipline=QuadradicImplicit())
+        discipline.attach_to_server(server)
+
+        server.add_insecure_port("[::]:50051")
+        server.start()
+
+        # client code
+        prob = om.Problem()
+        model = prob.model
+
+        model.add_subsystem(
+            "ImplicitQuadratic",
+            pmom.RemoteImplicitComponent(
+                channel=grpc.insecure_channel("localhost:50051")
+            ),
+            promotes=["*"],
+        )
+
+        prob.setup()
+
+        prob["a"] = 1.0
+        prob["b"] = 2.0
+        prob["c"] = -2.0
+        prob.run_model()
+
+        self.assertAlmostEqual(prob["x"][0], 0.73205081, places=8)
+
+        # stop the server
+        server.stop(0)
 
     def test_sellar_compute(self):
         """
@@ -214,17 +239,6 @@ class OpenMdaoIntegrationTests(unittest.TestCase):
 
         server.add_insecure_port("[::]:50051")
         server.start()
-
-        # client code
-        client = pmdo.ExplicitClient(channel=grpc.insecure_channel("localhost:50051"))
-
-        # transfer the stream options to the server
-        client.send_stream_options()
-
-        # run setup
-        client.run_setup()
-        client.get_variable_definitions()
-        client.get_partials_definitions()
 
         # client code
         prob = om.Problem()
@@ -293,17 +307,6 @@ class OpenMdaoIntegrationTests(unittest.TestCase):
         server.start()
 
         # client code
-        client = pmdo.ExplicitClient(channel=grpc.insecure_channel("localhost:50051"))
-
-        # transfer the stream options to the server
-        client.send_stream_options()
-
-        # run setup
-        client.run_setup()
-        client.get_variable_definitions()
-        client.get_partials_definitions()
-
-        # client code
         prob = om.Problem()
         model = prob.model
 
@@ -348,6 +351,8 @@ class OpenMdaoIntegrationTests(unittest.TestCase):
 
         # stop the server
         server.stop(0)
+
+
 
 
 if __name__ == "__main__":
