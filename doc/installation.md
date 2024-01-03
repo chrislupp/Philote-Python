@@ -21,7 +21,7 @@ installed automatically during the installation process:
 
 ## Compiling Definitions and Installation
 
-The Philote MDO Python bindings require a two step installation process. First,
+The Philote MDO Python library requires a two step installation process. First,
 make sure that `grpcio-tools` and `protoletariat` are installed. If not, they
 can be installed using pip. Note, that the first step of the installation
 process will not complete without these tools. Unlike the other dependencies,
