@@ -14,7 +14,13 @@ parts:
   - file: tutorials/explicit_disciplines
   - file: tutorials/implicit_disciplines
   - file: tutorials/units
+
+- caption: Working with OpenMDAO
+  chapters:
   - file: tutorials/openmdao
+
+- caption: Working with CSDL
+  chapters:
   - file: tutorials/csdl
 
 - caption: API Reference

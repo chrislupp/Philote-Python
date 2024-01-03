@@ -21,8 +21,8 @@ To create a discipline that executes this equation, we create a class and
 inherit from the ExplicitDiscipline class Philote-Python provides. Member
 functions of the inherited class are overloaded to implement the desired
 functionality. The most common function that will need to be overloaded are
-setup, setup_partials, compute, and in the case of a discipline that offers
-derivatives, compute_partials.
+**setup**, **setup_partials**, **compute**, and in the case of a discipline that offers
+derivatives, **compute_partials**.
 
 ## Setup Functions
 
@@ -88,11 +88,12 @@ To implement the paraboloid function, the **compute** member function must be
 defined:
 
 :::{code-block} python
-    def compute(self, inputs, outputs):
+    def compute_partials(self, inputs, partials):
         x = inputs["x"]
         y = inputs["y"]
 
-        outputs["f_xy"] = (x - 3.0) ** 2 + x * y + (y + 4.0) ** 2 - 3.0
+        partials["f_xy", "x"] = 2.0 * x - 6.0 + y
+        partials["f_xy", "y"] = 2.0 * y + 8.0 + x
 :::
 
 The *inputs* and *outputs* variables for this function are later passed in by
