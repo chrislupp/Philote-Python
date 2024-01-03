@@ -8,4 +8,5 @@ chapters:
 - file: tutorials/explicit_disciplines
 - file: tutorials/openmdao
 - file: tutorials/csdl
+- file: api
 
