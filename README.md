@@ -16,7 +16,7 @@ The installation process requires the following tools to be installed:
 - importlib.resources
 
 Additionally, the following dependencies are required by Philote MDO and will be
-installed automatically during the installation process (if not process):
+installed automatically during the installation process:
 
 - numpy
 - grpcio

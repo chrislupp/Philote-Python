@@ -1,3 +1,4 @@
+(tutorials:quick_start)=
 # Quick Start
 
 Client/server interactions might seem difficult when starting out, but the

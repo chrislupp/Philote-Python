@@ -3,10 +3,21 @@
 
 format: jb-book
 root: intro
-chapters:
-- file: tutorials/quickstart
-- file: tutorials/explicit_disciplines
-- file: tutorials/openmdao
-- file: tutorials/csdl
-- file: api
+parts:
+- caption: Getting Started
+  chapters:
+    - file: installation
+    - file: tutorials/quickstart
+
+- caption: Tutorials
+  chapters:
+  - file: tutorials/explicit_disciplines
+  - file: tutorials/implicit_disciplines
+  - file: tutorials/units
+  - file: tutorials/openmdao
+  - file: tutorials/csdl
+
+- caption: API Reference
+  chapters:
+  - file: api/explicit
 
