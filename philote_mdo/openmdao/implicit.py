@@ -1,6 +1,6 @@
 # Philote-Python
 #
-# Copyright 2022-2023 Christopher A. Lupp
+# Copyright 2022-2024 Christopher A. Lupp
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -47,8 +47,12 @@ class RemoteImplicitComponent(om.ImplicitComponent):
         client_setup(self)
 
     def apply_nonlinear(self, inputs, outputs, residuals):
-        local_inputs = create_local_inputs(inputs, self._client._var_meta, type=data.kInput)
-        local_outputs = create_local_inputs(outputs, self._client._var_meta, type=data.kOutput)
+        local_inputs = create_local_inputs(
+            inputs, self._client._var_meta, type=data.kInput
+        )
+        local_outputs = create_local_inputs(
+            outputs, self._client._var_meta, type=data.kOutput
+        )
         res = self._client.run_compute_residuals(local_inputs, local_outputs)
         assign_global_outputs(res, residuals)
 
@@ -58,7 +62,11 @@ class RemoteImplicitComponent(om.ImplicitComponent):
         assign_global_outputs(out, outputs)
 
     def linearize(self, inputs, outputs, partials):
-        local_inputs = create_local_inputs(inputs, self._client._var_meta, type=data.kInput)
-        local_outputs = create_local_inputs(outputs, self._client._var_meta, type=data.kOutput)
+        local_inputs = create_local_inputs(
+            inputs, self._client._var_meta, type=data.kInput
+        )
+        local_outputs = create_local_inputs(
+            outputs, self._client._var_meta, type=data.kOutput
+        )
         jac = self._client.run_residual_gradients(local_inputs, local_outputs)
         assign_global_outputs(jac, partials)
