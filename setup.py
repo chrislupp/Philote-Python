@@ -1,6 +1,6 @@
 # Philote-Python
 #
-# Copyright 2022-2023 Christopher A. Lupp
+# Copyright 2022-2024 Christopher A. Lupp
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -32,7 +32,7 @@ from setuptools import setup, Command, find_packages
 import importlib.resources as resources
 
 __name__ = "philote-mdo"
-__version__ = "0.3.0"
+__version__ = "0.4.0"
 
 
 class CompileProto(Command):

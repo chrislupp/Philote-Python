@@ -1,3 +1,4 @@
+(tutorials:quick_start)=
 # Quick Start
 
 Client/server interactions might seem difficult when starting out, but the
@@ -9,7 +10,7 @@ implementation.
 :::{note}
 This guide attempts to be as user friendly as possible. However, it is likely
 that some basic understanding of Multidisciplinary Design Analysis and
-Optimization may be necessary (e.g., what is a discipline, etc.).
+Optimization may be necessary (e.g., what a discipline is, etc.).
 :::
 
 
@@ -28,55 +29,50 @@ f(x,y) &= (x-3)^2 + x y + (y+4)^2 - 3
 \end{align}
 
 To create a discipline that executes this equation, we create a class and
-inherit from the ExplicitDiscipline class Philote-Python provides. First, let us
-look at the setup member function:
+inherit from the ExplicitDiscipline class Philote-Python provides:
 
 :::{code-block} python
-import philote.general as pm
-
 class Paraboloid(pmdo.ExplicitDiscipline):
+    """
+    Basic two-dimensional paraboloid example (explicit) discipline.
+    """
 
     def setup(self):
         self.add_input("x", shape=(1,), units="m")
         self.add_input("y", shape=(1,), units="m")
 
         self.add_output("f_xy", shape=(1,), units="m**2")
-:::
 
-The **setup** function exists to define the inputs and outputs of a discipline
-(this purpose is borrowed from the OpenMDAO workflow, which operates the same
-way). The **add_input** and **add_output** member functions are provided by the
-**ExplicitDiscipline** to define both inputs and outputs. Here, two inputs (*x*
-and *y*) are defined, each with the shape of 1 (scalar) and with a unit of
-meters (no physical meaning, purely for demonstration). Furthermore, a scalar
-output (*f_xy*) was defined with the units of square meters.
+    def setup_partials(self):
+        self.declare_partials("f_xy", "x")
+        self.declare_partials("f_xy", "y")
 
-How to declare and implement gradients is discussed in
-{ref}`tutorials:explicit`, so for the time being, we will skip over member
-functions required to define gradients (or implement them).
-
-To implement the paraboloid function, the **compute** member function must be
-defined:
-
-:::{code-block} python
     def compute(self, inputs, outputs):
         x = inputs["x"]
         y = inputs["y"]
 
         outputs["f_xy"] = (x - 3.0) ** 2 + x * y + (y + 4.0) ** 2 - 3.0
+
+    def compute_partials(self, inputs, partials):
+        x = inputs["x"]
+        y = inputs["y"]
+
+        partials["f_xy", "x"] = 2.0 * x - 6.0 + y
+        partials["f_xy", "y"] = 2.0 * y + 8.0 + x
 :::
 
-The *inputs* and *outputs* variables for this function are later passed in by
-the server as dictionaries with the variable names as the keys.
+How to declare and implement this (explicit) discipline is discussed in
+{ref}`tutorials:explicit`. For the time being, we will skip over the
+discipline member functions or what the do in detail.
 
-The discipline now contains the minimum implementation to support a function
-evaluation. However, the discipline must first be attached to a server to run.
+Now, the discipline must first be attached to a server to run.
+
 
 ## Standing Up an Analysis Server
 
 The discipline created in the previous section serves as the implementation for
 the analysis server we will stand up in this section. Philote-Python attempts to
-abstract away most complexities of using gRPC, so that discipline developers can
+abstract away most aspects of using gRPC, so that discipline developers can
 focus on their respective fields, rather than client-server communication.
 Because of this, a server class is provided, to which analysis disciplines can
 be attached.
@@ -116,7 +112,7 @@ In this example, the server waits for a termination signal. Using *Ctrl-C* will
 kill the server (on Unix and Unix-like systems) when it is no longer needed.
 
 :::{warning}
-This example uses an insecure port. Production environment environments should
+This example uses an insecure port. Production environments should
 generally always use encrypted network traffic to minimize security
 vulnerabilities and third parties snooping on data exchanged. The code presented
 here is a tutorial and not intended for production use.

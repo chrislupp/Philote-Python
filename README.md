@@ -1,6 +1,7 @@
 ![Philote](doc/graphics/philote-python.svg)
 
 [![Unit and Regression Tests](https://github.com/chrislupp/Philote-Python/actions/workflows/tests.yaml/badge.svg)](https://github.com/chrislupp/Philote-Python/actions/workflows/tests.yaml)
+[![Deploy Documentation](https://github.com/chrislupp/Philote-Python/actions/workflows/documentation.yaml/badge.svg)](https://github.com/chrislupp/Philote-Python/actions/workflows/documentation.yaml)
 # Philote-Python
 
 Python library for using and creating Philote analysis servers.
@@ -19,7 +20,7 @@ The installation process requires the following tools to be installed:
 - importlib.resources
 
 Additionally, the following dependencies are required by Philote MDO and will be
-installed automatically during the installation process (if not process):
+installed automatically during the installation process:
 
 - numpy
 - grpcio
@@ -27,7 +28,7 @@ installed automatically during the installation process (if not process):
 
 ## Installation
 
-The Philote MDO Python bindings require a two step installation process. First,
+The Philote MDO Python library requires a two step installation process. First,
 make sure that `grpcio-tools` and `protoletariat` are installed. If not, they
 can be installed using pip. Note, that the first step of the installation
 process will not complete without these tools. Unlike the other dependencies,
@@ -59,7 +60,7 @@ version of gRPC that you have installed) and make it discoverable on your PATH.
 
 This package is licensed under the Apache 2 license:
 
-   Copyright 2022-2023 Christopher A. Lupp
+   Copyright 2022-2024 Christopher A. Lupp
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.

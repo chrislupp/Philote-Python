@@ -1,6 +1,6 @@
 # Philote-Python
 #
-# Copyright 2022-2023 Christopher A. Lupp
+# Copyright 2022-2024 Christopher A. Lupp
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -36,6 +36,7 @@ import philote_mdo.general as pmdo
 import philote_mdo.openmdao as pmom
 from philote_mdo.examples import Paraboloid, QuadradicImplicit, SellarMDA
 from philote_mdo.openmdao import OpenMdaoSubProblem
+
 
 class OpenMdaoIntegrationTests(unittest.TestCase):
     """
@@ -146,8 +147,8 @@ class OpenMdaoIntegrationTests(unittest.TestCase):
         # client code
         prob = om.Problem()
         prob.driver = om.ScipyOptimizeDriver()
-        prob.driver.options['optimizer'] = 'SLSQP'
-        prob.driver.options['disp'] = False
+        prob.driver.options["optimizer"] = "SLSQP"
+        prob.driver.options["disp"] = False
         model = prob.model
 
         model.add_subsystem(
@@ -163,8 +164,8 @@ class OpenMdaoIntegrationTests(unittest.TestCase):
         model.add_objective("f_xy")
 
         prob.setup()
-        prob.set_val('x', 50.0)
-        prob.set_val('y', 50.0)
+        prob.set_val("x", 50.0)
+        prob.set_val("y", 50.0)
 
         prob.run_driver()
 
@@ -255,7 +256,7 @@ class OpenMdaoIntegrationTests(unittest.TestCase):
         prob.setup()
 
         prob["x"] = np.array([2.0])
-        prob["z"] = np.array([-1., -1.])
+        prob["z"] = np.array([-1.0, -1.0])
 
         prob.run_model()
 
@@ -321,7 +322,7 @@ class OpenMdaoIntegrationTests(unittest.TestCase):
         prob.setup()
 
         prob["x"] = np.array([2.0])
-        prob["z"] = np.array([-1., -1.])
+        prob["z"] = np.array([-1.0, -1.0])
 
         prob.run_model()
 
@@ -351,8 +352,6 @@ class OpenMdaoIntegrationTests(unittest.TestCase):
 
         # stop the server
         server.stop(0)
-
-
 
 
 if __name__ == "__main__":

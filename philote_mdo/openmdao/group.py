@@ -1,6 +1,6 @@
 # Philote-Python
 #
-# Copyright 2022-2023 Christopher A. Lupp
+# Copyright 2022-2024 Christopher A. Lupp
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -68,7 +68,7 @@ class OpenMdaoSubProblem(pm.ExplicitDiscipline):
         self._input_map[local_var] = {
             "sub_prob_name": subprob_var,
             "shape": shape,
-            "units": units
+            "units": units,
         }
 
     def add_mapped_output(self, local_var, subprob_var, shape=(1,), units=""):
@@ -78,7 +78,7 @@ class OpenMdaoSubProblem(pm.ExplicitDiscipline):
         self._output_map[local_var] = {
             "sub_prob_name": subprob_var,
             "shape": shape,
-            "units": units
+            "units": units,
         }
 
     def clear_mapped_variables(self):
@@ -103,10 +103,10 @@ class OpenMdaoSubProblem(pm.ExplicitDiscipline):
         -------
             None
         """
-        self._partials_map[(local_func, local_var)] =\
-            (self._output_map[local_func]["sub_prob_name"],
-             self._input_map[local_var]["sub_prob_name"]
-             )
+        self._partials_map[(local_func, local_var)] = (
+            self._output_map[local_func]["sub_prob_name"],
+            self._input_map[local_var]["sub_prob_name"],
+        )
 
     def initialize(self):
         pass
