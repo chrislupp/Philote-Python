@@ -102,8 +102,7 @@ the server as dictionaries with the variable names as the keys.
 
 ## Summary
 
-In this section we covered the basics of creating an explicit discipline 
-
+In this section we covered the basics of creating an explicit discipline.
 The entire code for the paraboloid discipline is listed here for completeness:
 
 :::{code-block} python
