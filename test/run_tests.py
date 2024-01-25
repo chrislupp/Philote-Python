@@ -1,6 +1,6 @@
 # Philote-Python
 #
-# Copyright 2022-2023 Christopher A. Lupp
+# Copyright 2022-2024 Christopher A. Lupp
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -48,7 +48,7 @@ try:
     from test_openmdao_group import TestOpenMdaoGroup
     from test_openmdao_integration import OpenMdaoIntegrationTests
 except:
-   pass
+    pass
 
 # example unit tests
 from test_paraboloid import TestParaboloid

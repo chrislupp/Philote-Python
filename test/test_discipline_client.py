@@ -1,6 +1,6 @@
 # Philote-Python
 #
-# Copyright 2022-2023 Christopher A. Lupp
+# Copyright 2022-2024 Christopher A. Lupp
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -96,7 +96,7 @@ class TestDisciplineClient(unittest.TestCase):
         client._disc_stub = mock_stub
 
         # mock options dictionary
-        options = {'key1': 'value1', 'key2': 42}
+        options = {"key1": "value1", "key2": 42}
 
         # call the send_options method
         client.send_options(options)

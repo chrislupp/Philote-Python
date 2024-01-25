@@ -4,7 +4,7 @@
 title: Philote-Python
 author: Christopher A. Lupp
 logo: graphics/philote-python.svg
-copyright: 2022-2023
+copyright: 2022-2024
 
 # Force re-execution of notebooks on each build.
 # See https://jupyterbook.org/content/execute.html
@@ -53,3 +53,7 @@ html:
 sphinx:
   extra_extensions:
   - 'sphinx.ext.autodoc'
+  - 'sphinx.ext.napoleon'
+  - 'sphinx.ext.viewcode'
+  config:
+      add_module_names: False

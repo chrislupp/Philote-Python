@@ -1,6 +1,6 @@
 # Philote-Python
 #
-# Copyright 2022-2023 Christopher A. Lupp
+# Copyright 2022-2024 Christopher A. Lupp
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -58,16 +58,13 @@ class TestOpenMdaoGroup(unittest.TestCase):
 
         disc.setup()
 
-        inputs = {
-            "x": np.array([2.0]),
-            "z": np.array([-1., -1.])
-        }
+        inputs = {"x": np.array([2.0]), "z": np.array([-1.0, -1.0])}
         outputs = {
             "y1": np.array([0.0]),
             "y2": np.array([0.0]),
             "obj": np.array([0.0]),
             "con1": np.array([0.0]),
-            "con2": np.array([0.0])
+            "con2": np.array([0.0]),
         }
 
         disc.compute(inputs, outputs)
@@ -109,10 +106,7 @@ class TestOpenMdaoGroup(unittest.TestCase):
 
         disc.setup()
 
-        inputs = {
-            "x": np.array([2.0]),
-            "z": np.array([-1., -1.])
-        }
+        inputs = {"x": np.array([2.0]), "z": np.array([-1.0, -1.0])}
         partials = {
             ("y1", "x"): np.array([0.0]),
             ("y1", "z"): np.zeros(2),
@@ -123,7 +117,7 @@ class TestOpenMdaoGroup(unittest.TestCase):
             ("con1", "x"): np.array([0.0]),
             ("con1", "z"): np.zeros(2),
             ("con2", "x"): np.array([0.0]),
-            ("con2", "z"): np.zeros(2)
+            ("con2", "z"): np.zeros(2),
         }
 
         disc.compute_partials(inputs, partials)
@@ -147,6 +141,7 @@ class TestOpenMdaoGroup(unittest.TestCase):
         self.assertAlmostEqual(partials[("con2", "x")][0, 0], 0.32195231245910344, 5)
         self.assertAlmostEqual(partials[("con2", "z")][0, 0], 0.2914151146554633, 5)
         self.assertAlmostEqual(partials[("con2", "z")][0, 1], 1.2574391012932133, 5)
+
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)

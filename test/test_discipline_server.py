@@ -1,6 +1,6 @@
 # Philote-Python
 #
-# Copyright 2022-2023 Christopher A. Lupp
+# Copyright 2022-2024 Christopher A. Lupp
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -96,7 +96,7 @@ class TestDisciplineServer(unittest.TestCase):
         context_mock = Mock()
 
         # Set some mock options in the request
-        request_mock.options = {'key1': 'value1', 'key2': 42}
+        request_mock.options = {"key1": "value1", "key2": 42}
 
         # Create a mock for the _discipline attribute
         discipline_mock = Mock()
@@ -106,8 +106,9 @@ class TestDisciplineServer(unittest.TestCase):
         server.SetOptions(request_mock, context_mock)
 
         # Assert that the discipline's initialize method was called with the expected options
-        server._discipline.initialize.assert_called_once_with({'key1': 'value1', 'key2': 42})
-
+        server._discipline.initialize.assert_called_once_with(
+            {"key1": "value1", "key2": 42}
+        )
 
     def test_setup(self):
         """

@@ -1,6 +1,6 @@
 # Philote-Python
 #
-# Copyright 2022-2023 Christopher A. Lupp
+# Copyright 2022-2024 Christopher A. Lupp
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -29,7 +29,11 @@
 # control over the information you may find at these locations.
 import unittest
 from unittest.mock import patch
-from philote_mdo.openmdao.utils import client_setup, create_local_inputs, assign_global_outputs
+from philote_mdo.openmdao.utils import (
+    client_setup,
+    create_local_inputs,
+    assign_global_outputs,
+)
 import philote_mdo.generated.data_pb2 as data
 
 
@@ -38,8 +42,8 @@ class TestOpenMdaoUtils(unittest.TestCase):
     Unit tests for the OpenMDAO utilities.
     """
 
-    @patch('philote_mdo.general.DisciplineClient')
-    @patch('philote_mdo.openmdao.RemoteExplicitComponent', autospec=True)
+    @patch("philote_mdo.general.DisciplineClient")
+    @patch("philote_mdo.openmdao.RemoteExplicitComponent", autospec=True)
     def test_client_setup(self, mock_component_class, mock_discipline_client):
         """
         Tests the client setup utility function.
@@ -49,7 +53,11 @@ class TestOpenMdaoUtils(unittest.TestCase):
         comp._client = mock_discipline_client
 
         # Mock variable and partial metadata
-        mock_var_metadata = [data.VariableMetaData(name="x", shape=[2, 2], units="m", type=data.VariableType.kInput)]
+        mock_var_metadata = [
+            data.VariableMetaData(
+                name="x", shape=[2, 2], units="m", type=data.VariableType.kInput
+            )
+        ]
         mock_partial_metadata = [data.PartialsMetaData(name="x", subname="y")]
 
         # configure the mock client to return the mock metadata
@@ -77,10 +85,12 @@ class TestOpenMdaoUtils(unittest.TestCase):
         Tests the function for creating local inputs.
         """
         # mock input data and variable metadata
-        inputs = {'x': 1, 'y': 2, 'z': 3}
+        inputs = {"x": 1, "y": 2, "z": 3}
         var_meta = [
             data.VariableMetaData(name="x", type=data.VariableType.kInput),
-            data.VariableMetaData(name="y", type=data.VariableType.kOutput),  # should be ignored
+            data.VariableMetaData(
+                name="y", type=data.VariableType.kOutput
+            ),  # should be ignored
             data.VariableMetaData(name="z", type=data.VariableType.kInput),
         ]
 
@@ -88,22 +98,21 @@ class TestOpenMdaoUtils(unittest.TestCase):
         result = create_local_inputs(inputs, var_meta)
 
         # assert that the local inputs dictionary contains only the expected variables
-        self.assertEqual(result, {'x': 1, 'z': 3})
+        self.assertEqual(result, {"x": 1, "z": 3})
 
     def test_assign_global_outputs(self):
         """
         Tests the function for assigning global outputs.
         """
         # mock output data and OpenMDAO outputs dictionary
-        out = {'x': 1, 'y': 2, 'z': 3}
-        outputs = {'x': None, 'y': None, 'z': None}
+        out = {"x": 1, "y": 2, "z": 3}
+        outputs = {"x": None, "y": None, "z": None}
 
         # call the assign_global_outputs function
         assign_global_outputs(out, outputs)
 
         # assert that the OpenMDAO outputs dictionary has been updated
-        self.assertEqual(outputs, {'x': 1, 'y': 2, 'z': 3})
-
+        self.assertEqual(outputs, {"x": 1, "y": 2, "z": 3})
 
 
 if __name__ == "__main__":

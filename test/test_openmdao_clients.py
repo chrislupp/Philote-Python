@@ -1,6 +1,6 @@
 # Philote-Python
 #
-# Copyright 2022-2023 Christopher A. Lupp
+# Copyright 2022-2024 Christopher A. Lupp
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -38,7 +38,7 @@ class TestOpenMdaoClients(unittest.TestCase):
     Unit tests for the OpenMDAO clients/components.
     """
 
-    @patch('philote_mdo.openmdao.utils.assign_global_outputs')
+    @patch("philote_mdo.openmdao.utils.assign_global_outputs")
     def test_explicit_compute(self, mock_assign_global_outputs):
         """
         Tests the compute function for the OpenMDAO explicit component.
@@ -57,21 +57,20 @@ class TestOpenMdaoClients(unittest.TestCase):
         ]
 
         # Mock inputs and outputs dictionaries
-        inputs = {'x': 1}
-        outputs = {'y': None}
+        inputs = {"x": 1}
+        outputs = {"y": None}
 
         # Configure the Mock object to support iteration
-        comp._client.run_compute.return_value = {'y': 42}
+        comp._client.run_compute.return_value = {"y": 42}
 
         # Call the compute method
         comp.compute(inputs, outputs)
 
         # Assert that the necessary methods were called
-        comp._client.run_compute.assert_called_once_with({'x': 1})
+        comp._client.run_compute.assert_called_once_with({"x": 1})
         self.assertEqual(outputs["y"], 42.0)
 
-
-    @patch('philote_mdo.openmdao.utils.assign_global_outputs')
+    @patch("philote_mdo.openmdao.utils.assign_global_outputs")
     def test_explicit_compute_partials(self, mock_assign_global_outputs):
         """
         Tests the compute_partials function for the OpenMDAO explicit component.
@@ -90,17 +89,17 @@ class TestOpenMdaoClients(unittest.TestCase):
         ]
 
         # Mock inputs and partials dictionaries
-        inputs = {'x': 1}
-        partials = {'y': None}
+        inputs = {"x": 1}
+        partials = {"y": None}
 
         # Configure the Mock object to support iteration
-        comp._client.run_compute_partials.return_value = {('y', 'x'): 42}
+        comp._client.run_compute_partials.return_value = {("y", "x"): 42}
 
         # Call the compute_partials method
         comp.compute_partials(inputs, partials)
 
         # Assert that the necessary methods were called
-        comp._client.run_compute_partials.assert_called_once_with({'x': 1})
+        comp._client.run_compute_partials.assert_called_once_with({"x": 1})
         self.assertEqual(partials[("y", "x")], 42.0)
 
     def test_implicit_apply_nonlinear(self):
@@ -121,18 +120,18 @@ class TestOpenMdaoClients(unittest.TestCase):
         ]
 
         # Mock inputs and outputs dictionaries
-        inputs = {'x': 1}
-        outputs = {'y': 2}
-        residuals = {'y': None}
+        inputs = {"x": 1}
+        outputs = {"y": 2}
+        residuals = {"y": None}
 
         # Configure the Mock object to support iteration
-        comp._client.run_compute_residuals.return_value = {'y': 42}
+        comp._client.run_compute_residuals.return_value = {"y": 42}
 
         # Call the compute method
         comp.apply_nonlinear(inputs, outputs, residuals)
 
         # Assert that the necessary methods were called
-        comp._client.run_compute_residuals.assert_called_once_with({'x': 1}, {'y': 2})
+        comp._client.run_compute_residuals.assert_called_once_with({"x": 1}, {"y": 2})
         self.assertEqual(residuals["y"], 42.0)
 
     def test_implicit_solve_nonlinear(self):
@@ -153,17 +152,17 @@ class TestOpenMdaoClients(unittest.TestCase):
         ]
 
         # Mock inputs and outputs dictionaries
-        inputs = {'x': 1}
-        outputs = {'y': None}
+        inputs = {"x": 1}
+        outputs = {"y": None}
 
         # Configure the Mock object to support iteration
-        comp._client.run_solve_residuals.return_value = {'y': 42}
+        comp._client.run_solve_residuals.return_value = {"y": 42}
 
         # Call the compute method
         comp.solve_nonlinear(inputs, outputs)
 
         # Assert that the necessary methods were called
-        comp._client.run_solve_residuals.assert_called_once_with({'x': 1})
+        comp._client.run_solve_residuals.assert_called_once_with({"x": 1})
         self.assertEqual(outputs["y"], 42.0)
 
     def test_implicit_apply_linear(self):
@@ -184,19 +183,19 @@ class TestOpenMdaoClients(unittest.TestCase):
         ]
 
         # Mock inputs and outputs dictionaries
-        inputs = {'x': 1}
-        outputs = {'y': 2}
-        partials = {('y', 'x'): None}
+        inputs = {"x": 1}
+        outputs = {"y": 2}
+        partials = {("y", "x"): None}
 
         # Configure the Mock object to support iteration
-        comp._client.run_residual_gradients.return_value = {('y', 'x'): 42}
+        comp._client.run_residual_gradients.return_value = {("y", "x"): 42}
 
         # Call the compute method
         comp.linearize(inputs, outputs, partials)
 
         # Assert that the necessary methods were called
-        comp._client.run_residual_gradients.assert_called_once_with({'x': 1}, {'y': 2})
-        self.assertEqual(partials[('y', 'x')], 42.0)
+        comp._client.run_residual_gradients.assert_called_once_with({"x": 1}, {"y": 2})
+        self.assertEqual(partials[("y", "x")], 42.0)
 
 
 if __name__ == "__main__":

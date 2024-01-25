@@ -1,6 +1,6 @@
 # Philote-Python
 #
-# Copyright 2022-2023 Christopher A. Lupp
+# Copyright 2022-2024 Christopher A. Lupp
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -30,6 +30,7 @@
 from .paraboloid import Paraboloid
 from .quadratic import QuadradicImplicit
 from .rosenbrock import Rosenbrock
+
 try:
     import openmdao.api
     from .sellar import SellarMDA
