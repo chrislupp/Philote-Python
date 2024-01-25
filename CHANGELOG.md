@@ -1,5 +1,10 @@
 # Change Log
 
+## Version 0.4.0
+
+This version only expands the package documentation.
+
+
 ## Version 0.3.0
 
 This release is one of the biggest changes to the code to date. It contains a
