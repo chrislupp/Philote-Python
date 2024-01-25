@@ -19,15 +19,15 @@
   </script>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../_static/styles/theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
-<link href="../_static/styles/bootstrap.css?digest=5b4479735964841361fd" rel="stylesheet" />
-<link href="../_static/styles/pydata-sphinx-theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
+  <link href="../_static/styles/theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
 
   
-  <link href="../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=5b4479735964841361fd" rel="stylesheet" />
-  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+  <link href="../_static/vendor/fontawesome/6.5.1/css/all.min.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.1/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.1/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.1/webfonts/fa-regular-400.woff2" />
 
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" href="../_static/styles/sphinx-book-theme.css?digest=14f4ca6b54d191a8c7657f6c759bf11a5fb86285" type="text/css" />
@@ -38,9 +38,9 @@
     <link rel="stylesheet" type="text/css" href="../_static/design-style.4045f2051d55cab465a707391d5b2007.min.css" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=5b4479735964841361fd" />
-<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd" />
-  <script src="../_static/vendor/fontawesome/6.1.2/js/all.min.js?digest=5b4479735964841361fd"></script>
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
+  <script src="../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
 
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
@@ -68,8 +68,8 @@ const thebe_selector_output = ".output, .cell_output"
     <link rel="shortcut icon" href="../_static/favicon.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Working with Explicit Disciplines" href="explicit_disciplines.html" />
-    <link rel="prev" title="Philote-Python" href="../intro.html" />
+    <link rel="next" title="Creating Explicit Disciplines" href="explicit_disciplines.html" />
+    <link rel="prev" title="Installation" href="../installation.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -79,10 +79,9 @@ const thebe_selector_output = ".output, .cell_output"
 
   
   
-  <a class="skip-link" href="#main-content">Skip to main content</a>
+  <a id="pst-skip-link" class="skip-link" href="#main-content">Skip to main content</a>
   
   <div id="pst-scroll-pixel-helper"></div>
-
   
   <button type="button" class="btn rounded-pill" id="pst-back-to-top">
     <i class="fa-solid fa-arrow-up"></i>
@@ -123,11 +122,14 @@ const thebe_selector_output = ".output, .cell_output"
 </form></div>
   </div>
   
-    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
-    </nav>
+    <header class="bd-header navbar navbar-expand-lg bd-navbar">
+    </header>
   
+
   <div class="bd-container">
     <div class="bd-container__inner bd-page-width">
+      
+      
       
       <div class="bd-sidebar-primary bd-sidebar">
         
@@ -171,10 +173,23 @@ const thebe_selector_output = ".output, .cell_output"
                 </a>
             </li>
         </ul>
-        <ul class="current nav bd-sidenav">
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
 <li class="toctree-l1 current active"><a class="current reference internal" href="#">Quick Start</a></li>
-<li class="toctree-l1"><a class="reference internal" href="explicit_disciplines.html">Working with Explicit Disciplines</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Tutorials</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="explicit_disciplines.html">Creating Explicit Disciplines</a></li>
+<li class="toctree-l1"><a class="reference internal" href="implicit_disciplines.html">Creating Implicit Disciplines</a></li>
+<li class="toctree-l1"><a class="reference internal" href="units.html">Unit Definitions</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Working with OpenMDAO</span></p>
+<ul class="nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="openmdao.html">Calling Philote Disciplines from OpenMDAO</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Working with CSDL</span></p>
+<ul class="nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="csdl.html">Calling Philote Disciplines from CSDL</a></li>
 </ul>
 
@@ -384,10 +399,10 @@ document.write(`
               
                 
 <div id="searchbox"></div>
-                <article class="bd-article" role="main">
+                <article class="bd-article">
                   
   <section class="tex2jax_ignore mathjax_ignore" id="quick-start">
-<h1>Quick Start<a class="headerlink" href="#quick-start" title="Permalink to this heading">#</a></h1>
+<span id="tutorials-quick-start"></span><h1>Quick Start<a class="headerlink" href="#quick-start" title="Permalink to this heading">#</a></h1>
 <p>Client/server interactions might seem difficult when starting out, but the
 purpose of this library is to help out and abstract away the difficult bits.
 This quick start guide is intended to familiarize you with the basic operating
@@ -397,7 +412,7 @@ implementation.</p>
 <p class="admonition-title">Note</p>
 <p>This guide attempts to be as user friendly as possible. However, it is likely
 that some basic understanding of Multidisciplinary Design Analysis and
-Optimization may be necessary (e.g., what is a discipline, etc.).</p>
+Optimization may be necessary (e.g., what a discipline is, etc.).</p>
 </div>
 <section id="disciplines">
 <h2>Disciplines<a class="headerlink" href="#disciplines" title="Permalink to this heading">#</a></h2>
@@ -407,53 +422,51 @@ disciplines in a similar way to OpenMDAO. We create a class, inheriting from a
 base class and then specialize some methods to run the calculations we want.</p>
 <p>To illustrate this, let us take a look at a simple paraboloid problem (the same
 problem as in the OpenMDAO documentation):</p>
-<div class="amsmath math notranslate nohighlight" id="equation-1d861b2f-89f0-4257-a7e4-389e5bcf455a">
-<span class="eqno">(1)<a class="headerlink" href="#equation-1d861b2f-89f0-4257-a7e4-389e5bcf455a" title="Permalink to this equation">#</a></span>\[\begin{align}
+<div class="amsmath math notranslate nohighlight" id="equation-d153bdb5-6a3d-4ed9-9d93-98caa0359c0a">
+<span class="eqno">(1)<a class="headerlink" href="#equation-d153bdb5-6a3d-4ed9-9d93-98caa0359c0a" title="Permalink to this equation">#</a></span>\[\begin{align}
 f(x,y) &amp;= (x-3)^2 + x y + (y+4)^2 - 3
 \end{align}\]</div>
 <p>To create a discipline that executes this equation, we create a class and
-inherit from the ExplicitDiscipline class Philote-Python provides. First, let us
-look at the setup member function:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">philote.general</span> <span class="k">as</span> <span class="nn">pm</span>
-
-<span class="k">class</span> <span class="nc">Paraboloid</span><span class="p">(</span><span class="n">pmdo</span><span class="o">.</span><span class="n">ExplicitDiscipline</span><span class="p">):</span>
+inherit from the ExplicitDiscipline class Philote-Python provides:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Paraboloid</span><span class="p">(</span><span class="n">pmdo</span><span class="o">.</span><span class="n">ExplicitDiscipline</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Basic two-dimensional paraboloid example (explicit) discipline.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">add_input</span><span class="p">(</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,),</span> <span class="n">units</span><span class="o">=</span><span class="s2">&quot;m&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">add_input</span><span class="p">(</span><span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,),</span> <span class="n">units</span><span class="o">=</span><span class="s2">&quot;m&quot;</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">add_output</span><span class="p">(</span><span class="s2">&quot;f_xy&quot;</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,),</span> <span class="n">units</span><span class="o">=</span><span class="s2">&quot;m**2&quot;</span><span class="p">)</span>
-</pre></div>
-</div>
-<p>The <strong>setup</strong> function exists to define the inputs and outputs of a discipline
-(this purpose is borrowed from the OpenMDAO workflow, which operates the same
-way). The <strong>add_input</strong> and <strong>add_output</strong> member functions are provided by the
-<strong>ExplicitDiscipline</strong> to define both inputs and outputs. Here, two inputs (<em>x</em>
-and <em>y</em>) are defined, each with the shape of 1 (scalar) and with a unit of
-meters (no physical meaning, purely for demonstration). Furthermore, a scalar
-output (<em>f_xy</em>) was defined with the units of square meters.</p>
-<p>How to declare and implement gradients is discussed in
-<a class="reference internal" href="explicit_disciplines.html#tutorials-explicit"><span class="std std-ref">Working with Explicit Disciplines</span></a>, so for the time being, we will skip over member
-functions required to define gradients (or implement them).</p>
-<p>To implement the paraboloid function, the <strong>compute</strong> member function must be
-defined:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span>    <span class="k">def</span> <span class="nf">compute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inputs</span><span class="p">,</span> <span class="n">outputs</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="nf">setup_partials</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">declare_partials</span><span class="p">(</span><span class="s2">&quot;f_xy&quot;</span><span class="p">,</span> <span class="s2">&quot;x&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">declare_partials</span><span class="p">(</span><span class="s2">&quot;f_xy&quot;</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">compute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inputs</span><span class="p">,</span> <span class="n">outputs</span><span class="p">):</span>
         <span class="n">x</span> <span class="o">=</span> <span class="n">inputs</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">]</span>
         <span class="n">y</span> <span class="o">=</span> <span class="n">inputs</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">]</span>
 
         <span class="n">outputs</span><span class="p">[</span><span class="s2">&quot;f_xy&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="mf">3.0</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">x</span> <span class="o">*</span> <span class="n">y</span> <span class="o">+</span> <span class="p">(</span><span class="n">y</span> <span class="o">+</span> <span class="mf">4.0</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">-</span> <span class="mf">3.0</span>
+
+    <span class="k">def</span> <span class="nf">compute_partials</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inputs</span><span class="p">,</span> <span class="n">partials</span><span class="p">):</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">inputs</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">]</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">inputs</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">]</span>
+
+        <span class="n">partials</span><span class="p">[</span><span class="s2">&quot;f_xy&quot;</span><span class="p">,</span> <span class="s2">&quot;x&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">x</span> <span class="o">-</span> <span class="mf">6.0</span> <span class="o">+</span> <span class="n">y</span>
+        <span class="n">partials</span><span class="p">[</span><span class="s2">&quot;f_xy&quot;</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">y</span> <span class="o">+</span> <span class="mf">8.0</span> <span class="o">+</span> <span class="n">x</span>
 </pre></div>
 </div>
-<p>The <em>inputs</em> and <em>outputs</em> variables for this function are later passed in by
-the server as dictionaries with the variable names as the keys.</p>
-<p>The discipline now contains the minimum implementation to support a function
-evaluation. However, the discipline must first be attached to a server to run.</p>
+<p>How to declare and implement this (explicit) discipline is discussed in
+<a class="reference internal" href="explicit_disciplines.html#tutorials-explicit"><span class="std std-ref">Creating Explicit Disciplines</span></a>. For the time being, we will skip over the
+discipline member functions or what the do in detail.</p>
+<p>Now, the discipline must first be attached to a server to run.</p>
 </section>
 <section id="standing-up-an-analysis-server">
 <h2>Standing Up an Analysis Server<a class="headerlink" href="#standing-up-an-analysis-server" title="Permalink to this heading">#</a></h2>
 <p>The discipline created in the previous section serves as the implementation for
 the analysis server we will stand up in this section. Philote-Python attempts to
-abstract away most complexities of using gRPC, so that discipline developers can
+abstract away most aspects of using gRPC, so that discipline developers can
 focus on their respective fields, rather than client-server communication.
 Because of this, a server class is provided, to which analysis disciplines can
 be attached.</p>
@@ -486,7 +499,7 @@ network communication) and the server is started:</p>
 kill the server (on Unix and Unix-like systems) when it is no longer needed.</p>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
-<p>This example uses an insecure port. Production environment environments should
+<p>This example uses an insecure port. Production environments should
 generally always use encrypted network traffic to minimize security
 vulnerabilities and third parties snooping on data exchanged. The code presented
 here is a tutorial and not intended for production use.</p>
@@ -650,12 +663,12 @@ examples on the same machine.</p>
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="../intro.html"
+       href="../installation.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">Philote-Python</p>
+        <p class="prev-next-title">Installation</p>
       </div>
     </a>
     <a class="right-next"
@@ -663,7 +676,7 @@ examples on the same machine.</p>
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Working with Explicit Disciplines</p>
+        <p class="prev-next-title">Creating Explicit Disciplines</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -675,6 +688,7 @@ examples on the same machine.</p>
             
               
                 <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
 
   <div class="sidebar-secondary-item">
   <div class="page-toc tocsection onthispage">
@@ -710,7 +724,7 @@ By Christopher A. Lupp
 
   <p class="copyright">
     
-      © Copyright 2022-2023.
+      © Copyright 2022-2024.
       <br/>
     
   </p>
@@ -737,8 +751,8 @@ By Christopher A. Lupp
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script src="../_static/scripts/bootstrap.js?digest=5b4479735964841361fd"></script>
-<script src="../_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd"></script>
+  <script src="../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae"></script>
 
   <footer class="bd-footer">
   </footer>
