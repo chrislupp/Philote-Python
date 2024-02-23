@@ -33,14 +33,16 @@ installed automatically during the installation process:
 Older versions of this library featured a two-step build process. This has since
 been simplified. To install the package run pip:
 
-    pip install -e .
+    pip install <path/to/Philote-Python>
 
-If you want to install the package without editable mode, you will need to run the
-two-step process previously described. First, run:
+or
 
-    python utils/compile_proto.py
+    pip install -e <path/to/Philote-Python>
 
-followed by:
+for an editable install. Note, that <path/to/Philote-Python> is the path to the
+repository root directory (the one containing pyproject.toml). Often, people
+install packages when located in that directory, making the corresponding
+command:
 
     pip install .
 
