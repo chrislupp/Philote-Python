@@ -33,13 +33,17 @@ installed automatically during the installation process:
 Older versions of this library featured a two-step build process. This has since
 been simplified. To install the package run pip:
 
-    pip install .
-
-or
-
     pip install -e .
 
-for a development install.
+If you want to install the package without editable mode, you will need to run the
+two-step process previously described. First, run:
+
+    python utils/compile_proto.py
+
+followed by:
+
+    pip install .
+
 
 ### Potential Issues
 
