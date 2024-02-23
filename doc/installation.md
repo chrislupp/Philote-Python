@@ -21,22 +21,16 @@ installed automatically during the installation process:
 
 ## Compiling Definitions and Installation
 
-The Philote MDO Python library requires a two step installation process. First,
-make sure that `grpcio-tools` and `protoletariat` are installed. If not, they
-can be installed using pip. Note, that the first step of the installation
-process will not complete without these tools. Unlike the other dependencies,
-pip will not automatically install them during the package build. The first step
-is to compile the protobuf/gRPC files into python files. This is done by running
-(from the repository directory):
-
-    python setup.py compile_proto
-
-Once this step completes successfully, the package can be installed using pip:
-
-    pip install .
-
-or
+Older versions of this library featured a two-step build process. This has since
+been simplified. To install the package run pip:
 
     pip install -e .
 
-for a development install.
+If you want to install the package without editable mode, you will need to run the
+two-step process previously described. First, run:
+
+    python utils/compile_proto.py
+
+followed by:
+
+    pip install .
