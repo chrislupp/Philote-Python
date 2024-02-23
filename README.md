@@ -13,7 +13,8 @@ https://chrislupp.github.io/Philote-Python
 
 ## Requirements
 
-The installation process requires the following tools to be installed:
+The installation/build process requires the following tools to be installed
+(they will be installed if not present):
 
 - grpcio-tools
 - protoletariat
@@ -23,22 +24,14 @@ Additionally, the following dependencies are required by Philote MDO and will be
 installed automatically during the installation process:
 
 - numpy
+- scipy
 - grpcio
 
 
 ## Installation
 
-The Philote MDO Python library requires a two step installation process. First,
-make sure that `grpcio-tools` and `protoletariat` are installed. If not, they
-can be installed using pip. Note, that the first step of the installation
-process will not complete without these tools. Unlike the other dependencies,
-pip will not automatically install them during the package build. The first step
-is to compile the protobuf/gRPC files into python files. This is done by running
-(from the repository directory):
-
-    python setup.py compile_proto
-
-Once this step completes successfully, the package can be installed using pip:
+Older versions of this library featured a two-step build process. This has since
+been simplified. To install the package run pip:
 
     pip install .
 
@@ -60,19 +53,20 @@ version of gRPC that you have installed) and make it discoverable on your PATH.
 
 This package is licensed under the Apache 2 license:
 
-   Copyright 2022-2024 Christopher A. Lupp
 
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
-
-       http://www.apache.org/licenses/LICENSE-2.0
-
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
+>   Copyright 2022-2024 Christopher A. Lupp
+>   
+>   Licensed under the Apache License, Version 2.0 (the "License");
+>   you may not use this file except in compliance with the License.
+>   You may obtain a copy of the License at
+>   
+>       http://www.apache.org/licenses/LICENSE-2.0
+>   
+>   Unless required by applicable law or agreed to in writing, software
+>   distributed under the License is distributed on an "AS IS" BASIS,
+>   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+>   See the License for the specific language governing permissions and
+>   limitations under the License.
 
 
 
