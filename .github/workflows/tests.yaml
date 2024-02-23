@@ -37,7 +37,6 @@ jobs:
         sudo apt install -y protobuf-compiler
     - name: Install Package
       run: |
-        python setup.py compile_proto
         pip install .
     - name: Lint with flake8
       run: |
