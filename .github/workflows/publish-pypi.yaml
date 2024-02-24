@@ -21,7 +21,7 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install build poetry
+        pip install build poetry grpcio-tools protoletariat
     - name: Build package
       run: poetry build
     - name: Publish package
