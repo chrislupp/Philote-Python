@@ -1,6 +1,7 @@
 ![Philote](doc/graphics/philote-python.svg)
 
 [![Unit and Regression Tests](https://github.com/chrislupp/Philote-Python/actions/workflows/tests.yaml/badge.svg)](https://github.com/chrislupp/Philote-Python/actions/workflows/tests.yaml)
+[![Coverage Status](https://coveralls.io/repos/github/chrislupp/Philote-Python/badge.svg?branch=main)](https://coveralls.io/github/chrislupp/Philote-Python?branch=main)
 [![Deploy Documentation](https://github.com/chrislupp/Philote-Python/actions/workflows/documentation.yaml/badge.svg)](https://github.com/chrislupp/Philote-Python/actions/workflows/documentation.yaml)
 # Philote-Python
 
@@ -33,14 +34,16 @@ installed automatically during the installation process:
 Older versions of this library featured a two-step build process. This has since
 been simplified. To install the package run pip:
 
-    pip install -e .
+    pip install <path/to/Philote-Python>
 
-If you want to install the package without editable mode, you will need to run the
-two-step process previously described. First, run:
+or
 
-    python utils/compile_proto.py
+    pip install -e <path/to/Philote-Python>
 
-followed by:
+for an editable install. Note, that <path/to/Philote-Python> is the path to the
+repository root directory (the one containing pyproject.toml). Often, people
+install packages when located in that directory, making the corresponding
+command:
 
     pip install .
 
