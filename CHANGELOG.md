@@ -1,5 +1,17 @@
 # Change Log
 
+## Version 0.5.0
+
+- [feature] Transitioned away from setuptools and setup.py to a pyproject.toml
+  and poetry-based package.
+- [feature] gRPC and protobuf stubs are now automatically compiled when
+  running an editable install (pip install -e).
+
+## Version 0.4.0
+
+- [doc] General documentation updates.
+
+
 ## Version 0.3.0
 
 This release is one of the biggest changes to the code to date. It contains a
