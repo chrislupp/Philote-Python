@@ -45,7 +45,7 @@ class TestRosenbrock(unittest.TestCase):
         Tests the setup function of the Rosenbrock discipline.
         """
         disc = Rosenbrock()
-        disc.initialize()
+        disc.initialize({"dimension": 2})
         disc.setup()
 
         self.assertEqual(disc._var_meta[0].name, "x")
