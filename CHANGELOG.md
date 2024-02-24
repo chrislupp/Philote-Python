@@ -4,8 +4,11 @@
 
 - [feature] Transitioned away from setuptools and setup.py to a pyproject.toml
   and poetry-based package.
-- [feature] gRPC and protobuf stubs are now automatically compiled when
-  running an editable install (pip install -e).
+- [feature] gRPC and protobuf stubs are now automatically compiled during
+   installation.
+- [feature] Added test coverage report generation that is uploaded to
+  coveralls.
+- [feature] Added action to upload to PyPI when a release is published. 
 
 ## Version 0.4.0
 
