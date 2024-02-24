@@ -48,7 +48,7 @@ jobs:
       run: |
         python -m coverage run --omit=philote_mdo/generated -m unittest discover -v -s philote_mdo/tests -p 'test_*.py'
 
-#    - name: Coveralls
-#      uses: coverallsapp/github-action@v2
-#      with:
-#        github-token: ${{ github.token }}
+    - name: Coveralls
+      uses: coverallsapp/github-action@v2
+      with:
+        github-token: ${{ github.token }}
