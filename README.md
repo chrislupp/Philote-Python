@@ -1,6 +1,7 @@
 ![Philote](doc/graphics/philote-python.svg)
 
 [![Unit and Regression Tests](https://github.com/chrislupp/Philote-Python/actions/workflows/tests.yaml/badge.svg)](https://github.com/chrislupp/Philote-Python/actions/workflows/tests.yaml)
+[![Coverage Status](https://coveralls.io/repos/github/chrislupp/Philote-Python/badge.svg?branch=main)](https://coveralls.io/github/chrislupp/Philote-Python?branch=main)
 [![Deploy Documentation](https://github.com/chrislupp/Philote-Python/actions/workflows/documentation.yaml/badge.svg)](https://github.com/chrislupp/Philote-Python/actions/workflows/documentation.yaml)
 # Philote-Python
 
