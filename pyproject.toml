@@ -1,9 +1,9 @@
 [tool.poetry]
 name = "philote-mdo"
-version = "0.5.0"
+version = "0.5.1"
 description = "Python bindings that implement the Philote-MDO standard."
 license = "Apache-2.0"
-authors = ["Christopher Lupp <christopherlupp@gmail.com>"]
+authors = ["Christopher Lupp"]
 readme = "README.md"
 homepage = "https://chrislupp.github.io/Philote-Python/"
 repository = "https://github.com/chrislupp/Philote-Python"
