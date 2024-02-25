@@ -62,7 +62,7 @@ def openmdao_client_setup(comp):
     #     comp.declare_partials(partial.name, partial.subname)
 
 
-def create_local_inputs(inputs, var_meta, type=data.kInput):
+def create_local_inputs(comp_name, inputs, var_meta, type=data.kInput):
     """
     Creates a Philote-Python local inputs dictionary from OpenMDAO inputs.
 
@@ -74,7 +74,7 @@ def create_local_inputs(inputs, var_meta, type=data.kInput):
     local = {}
     for var in var_meta:
         if var.type == type:
-            local[var.name] = inputs[var.name]
+            local[var.name] = inputs["{}.{}".format(comp_name, var.name)]
 
     return local
 

@@ -70,7 +70,10 @@ class TestOpenMdaoUtils(unittest.TestCase):
 
     def test_create_local_inputs(self):
         # Define sample inputs and var_meta
-        inputs = {'var1': 10, 'var2': 20, 'var3': 30}
+        inputs = {'parent.var1': 10, 'parent.var2': 20, 'parent.var3': 30}
+
+        # case 1: 3 inputs
+        # ----------------
 
         # create variable metadata
         var1 = Mock()
@@ -88,7 +91,7 @@ class TestOpenMdaoUtils(unittest.TestCase):
         var_meta = [var1, var2, var3]
 
         # Call the function
-        local_inputs = create_local_inputs(inputs, var_meta)
+        local_inputs = create_local_inputs("parent", inputs, var_meta)
 
         # Assert that only relative variable names are included in local_inputs
         self.assertIn('var1', local_inputs)
@@ -97,6 +100,9 @@ class TestOpenMdaoUtils(unittest.TestCase):
         self.assertEqual(local_inputs['var1'], 10)
         self.assertEqual(local_inputs['var2'], 20)
         self.assertEqual(local_inputs['var3'], 30)
+
+        # case 2: 2 inputs, 1 output
+        # --------------------------
 
     # def test_create_local_outputs(self):
     #     pass
