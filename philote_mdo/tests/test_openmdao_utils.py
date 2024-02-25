@@ -32,7 +32,7 @@ from unittest.mock import Mock
 import numpy as np
 
 from philote_mdo.generated.data_pb2 import kInput, kOutput
-from philote_mdo.openmdao.utils import openmdao_client_setup, create_local_inputs
+from philote_mdo.openmdao.utils import openmdao_client_setup, create_local_inputs, assign_global_outputs
 
 
 class TestOpenMdaoUtils(unittest.TestCase):
@@ -69,7 +69,7 @@ class TestOpenMdaoUtils(unittest.TestCase):
             getattr(self.comp, call[0]).assert_called_once_with(*call[1], **call[2])
 
     def test_create_local_inputs(self):
-        # Define sample inputs and var_meta
+        # define sample inputs and var_meta
         inputs = {'parent.var1': 10, 'parent.var2': 20, 'parent.var3': 30}
 
         # case 1: 3 inputs
@@ -90,10 +90,10 @@ class TestOpenMdaoUtils(unittest.TestCase):
 
         var_meta = [var1, var2, var3]
 
-        # Call the function
+        # call the function
         local_inputs1 = create_local_inputs("parent", inputs, var_meta)
 
-        # Assert that only relative variable names are included in local_inputs
+        # assert that only relative variable names are included in local_inputs
         self.assertIn('var1', local_inputs1)
         self.assertIn('var2', local_inputs1)
         self.assertIn('var3', local_inputs1)
@@ -107,7 +107,7 @@ class TestOpenMdaoUtils(unittest.TestCase):
 
         local_inputs2 = create_local_inputs("parent", inputs, var_meta)
 
-        # Assert that only relative variable names are included in local_inputs
+        # assert that only relative variable names are included in local_inputs
         self.assertIn('var1', local_inputs2)
         self.assertNotIn('var2', local_inputs2)
         self.assertIn('var3', local_inputs2)
@@ -120,17 +120,26 @@ class TestOpenMdaoUtils(unittest.TestCase):
 
         local_inputs3 = create_local_inputs("parent", inputs, var_meta, kOutput)
 
-        # Assert that only relative variable names are included in local_inputs
+        # assert that only relative variable names are included in local_inputs
         self.assertNotIn('var1', local_inputs3)
         self.assertIn('var2', local_inputs3)
         self.assertIn('var3', local_inputs3)
         self.assertEqual(local_inputs3['var2'], 20)
         self.assertEqual(local_inputs3['var3'], 30)
 
+    def test_create_local_outputs(self):
+        # Define sample out and outputs dictionaries
+        out = {'output1': 10, 'output2': 20}
+        outputs = {'output1': None, 'output2': None, 'output3': None}
 
+        # call the function
+        assign_global_outputs(out, outputs)
 
-    # def test_create_local_outputs(self):
-    #     pass
+        # assert that the values in outputs are updated correctly
+        self.assertEqual(outputs['output1'], 10)
+        self.assertEqual(outputs['output2'], 20)
+        # ensure that other keys in outputs are unchanged
+        self.assertEqual(outputs['output3'], None)
 
 
 if __name__ == "__main__":
