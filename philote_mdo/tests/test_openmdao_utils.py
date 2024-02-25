@@ -91,18 +91,43 @@ class TestOpenMdaoUtils(unittest.TestCase):
         var_meta = [var1, var2, var3]
 
         # Call the function
-        local_inputs = create_local_inputs("parent", inputs, var_meta)
+        local_inputs1 = create_local_inputs("parent", inputs, var_meta)
 
         # Assert that only relative variable names are included in local_inputs
-        self.assertIn('var1', local_inputs)
-        self.assertIn('var2', local_inputs)
-        self.assertIn('var3', local_inputs)
-        self.assertEqual(local_inputs['var1'], 10)
-        self.assertEqual(local_inputs['var2'], 20)
-        self.assertEqual(local_inputs['var3'], 30)
+        self.assertIn('var1', local_inputs1)
+        self.assertIn('var2', local_inputs1)
+        self.assertIn('var3', local_inputs1)
+        self.assertEqual(local_inputs1['var1'], 10)
+        self.assertEqual(local_inputs1['var2'], 20)
+        self.assertEqual(local_inputs1['var3'], 30)
 
         # case 2: 2 inputs, 1 output
         # --------------------------
+        var2.type = kOutput
+
+        local_inputs2 = create_local_inputs("parent", inputs, var_meta)
+
+        # Assert that only relative variable names are included in local_inputs
+        self.assertIn('var1', local_inputs2)
+        self.assertNotIn('var2', local_inputs2)
+        self.assertIn('var3', local_inputs2)
+        self.assertEqual(local_inputs2['var1'], 10)
+        self.assertEqual(local_inputs2['var3'], 30)
+
+        # case 2: 1 input, 2 outputs
+        # --------------------------
+        var3.type = kOutput
+
+        local_inputs3 = create_local_inputs("parent", inputs, var_meta, kOutput)
+
+        # Assert that only relative variable names are included in local_inputs
+        self.assertNotIn('var1', local_inputs3)
+        self.assertIn('var2', local_inputs3)
+        self.assertIn('var3', local_inputs3)
+        self.assertEqual(local_inputs3['var2'], 20)
+        self.assertEqual(local_inputs3['var3'], 30)
+
+
 
     # def test_create_local_outputs(self):
     #     pass
