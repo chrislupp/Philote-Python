@@ -71,7 +71,6 @@ def create_local_inputs(inputs, var_meta, type=data.kInput):
     remote client is unaware of any of the parent systems, so the relative
     name of all variables is required.
     """
-
     local = {}
     for var in var_meta:
         if var.type == type:

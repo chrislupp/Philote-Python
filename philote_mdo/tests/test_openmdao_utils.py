@@ -31,8 +31,8 @@ import unittest
 from unittest.mock import Mock
 import numpy as np
 
-import philote_mdo.generated.data_pb2
-from philote_mdo.openmdao.utils import openmdao_client_setup
+from philote_mdo.generated.data_pb2 import kInput, kOutput
+from philote_mdo.openmdao.utils import openmdao_client_setup, create_local_inputs
 
 
 class TestOpenMdaoUtils(unittest.TestCase):
@@ -45,13 +45,13 @@ class TestOpenMdaoUtils(unittest.TestCase):
         var1 = Mock()
         var1.name = "var1"
         var1.units = "m"
-        var1.type = philote_mdo.generated.data_pb2.kInput
+        var1.type = kInput
         var1.shape = [2]
 
         var2 = Mock()
         var2.name = "var2"
         var2.units = None
-        var2.type = philote_mdo.generated.data_pb2.kOutput
+        var2.type = kOutput
         var2.shape = [1]
 
         self.comp._client._var_meta = [var1, var2]
@@ -67,6 +67,39 @@ class TestOpenMdaoUtils(unittest.TestCase):
         ]
         for call in expected_calls:
             getattr(self.comp, call[0]).assert_called_once_with(*call[1], **call[2])
+
+    def test_create_local_inputs(self):
+        # Define sample inputs and var_meta
+        inputs = {'var1': 10, 'var2': 20, 'var3': 30}
+
+        # create variable metadata
+        var1 = Mock()
+        var1.name = "var1"
+        var1.type = kInput
+
+        var2 = Mock()
+        var2.name = "var2"
+        var2.type = kInput
+
+        var3 = Mock()
+        var3.name = "var3"
+        var3.type = kInput
+
+        var_meta = [var1, var2, var3]
+
+        # Call the function
+        local_inputs = create_local_inputs(inputs, var_meta)
+
+        # Assert that only relative variable names are included in local_inputs
+        self.assertIn('var1', local_inputs)
+        self.assertIn('var2', local_inputs)
+        self.assertIn('var3', local_inputs)
+        self.assertEqual(local_inputs['var1'], 10)
+        self.assertEqual(local_inputs['var2'], 20)
+        self.assertEqual(local_inputs['var3'], 30)
+
+    # def test_create_local_outputs(self):
+    #     pass
 
 
 if __name__ == "__main__":
