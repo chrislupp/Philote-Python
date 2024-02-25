@@ -30,7 +30,7 @@
 import philote_mdo.generated.data_pb2 as data
 
 
-def client_setup(comp):
+def openmdao_client_setup(comp):
     """
     Sets up the OpenMDAO component with all required inputs and outputs.
 
@@ -41,7 +41,7 @@ def client_setup(comp):
     comp._client.run_setup()
     comp._client.get_variable_definitions()
 
-    # define inputs and outputs based on the discipline meta data
+    # define inputs and outputs based on the discipline metadata
     for var in comp._client._var_meta:
         if not var.units:
             units = None
@@ -55,11 +55,11 @@ def client_setup(comp):
             comp.add_output(var.name, shape=tuple(var.shape), units=units)
 
     # set up the remote discipline and get the variable definitions
-    comp._client.get_partials_definitions()
+    # comp._client.get_partials_definitions()
 
     # declare partials based on the discipline meta data
-    for partial in comp._client._partials_meta:
-        comp.declare_partials(partial.name, partial.subname)
+    # for partial in comp._client._partials_meta:
+    #     comp.declare_partials(partial.name, partial.subname)
 
 
 def create_local_inputs(inputs, var_meta, type=data.kInput):
