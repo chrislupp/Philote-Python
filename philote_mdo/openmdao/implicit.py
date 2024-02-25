@@ -30,7 +30,7 @@
 import openmdao.api as om
 import philote_mdo.general as pm
 import philote_mdo.generated.data_pb2 as data
-from .utils import client_setup, create_local_inputs, assign_global_outputs
+from .utils import openmdao_client_setup, create_local_inputs, assign_global_outputs
 
 
 class RemoteImplicitComponent(om.ImplicitComponent):

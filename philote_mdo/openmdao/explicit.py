@@ -30,8 +30,7 @@
 import numpy as np
 import openmdao.api as om
 import philote_mdo.general as pm
-import philote_mdo.generated.data_pb2 as data
-from .utils import openmdao_client_setup, create_local_inputs, assign_global_outputs
+from philote_mdo.openmdao.utils import openmdao_client_setup, create_local_inputs, assign_global_outputs
 
 
 class RemoteExplicitComponent(om.ExplicitComponent):
@@ -47,6 +46,7 @@ class RemoteExplicitComponent(om.ExplicitComponent):
         if not channel:
             raise ValueError('No channel provided, the Philote client will not'
                              'be able to connect.')
+
         # generic Philote client
         # The setting of OpenMDAO options requires the list of available
         # Philote discipline options to be known during initialize. That
@@ -57,7 +57,7 @@ class RemoteExplicitComponent(om.ExplicitComponent):
         # call the init function of the explicit component
         super().__init__()
 
-        # send the option values to the server
+        # assign and send the option values to the server
         # this must be done here and not in initialize, as the values of the
         # OpenMDAO options are only set after intialize has been called in the
         # init function. That is why the parent init function must be called
@@ -72,6 +72,7 @@ class RemoteExplicitComponent(om.ExplicitComponent):
         # get the available options from the philote discipline
 
         # add the OpenMDAO component options
+        pass
 
     def setup(self):
         """
@@ -80,7 +81,7 @@ class RemoteExplicitComponent(om.ExplicitComponent):
         openmdao_client_setup(self)
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-        """"
+        """
         Compute the function evaluation.
         """
         local_inputs = create_local_inputs(inputs, self._client._var_meta)
