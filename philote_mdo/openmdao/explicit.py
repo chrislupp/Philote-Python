@@ -84,7 +84,7 @@ class RemoteExplicitComponent(om.ExplicitComponent):
         """
         Compute the function evaluation.
         """
-        local_inputs = create_local_inputs(inputs, self._client._var_meta)
+        local_inputs = create_local_inputs(self.name, inputs, self._client._var_meta)
         out = self._client.run_compute(local_inputs)
         assign_global_outputs(out, outputs)
 
@@ -92,6 +92,6 @@ class RemoteExplicitComponent(om.ExplicitComponent):
         """"
         Compute the gradient evaluation.
         """
-        local_inputs = create_local_inputs(inputs, self._client._var_meta)
+        local_inputs = create_local_inputs(self.name, inputs, self._client._var_meta)
         jac = self._client.run_compute_partials(local_inputs)
         assign_global_outputs(jac, partials)

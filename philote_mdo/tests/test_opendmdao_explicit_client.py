@@ -63,55 +63,56 @@ class TestOpenMdaoExplicitClient(unittest.TestCase):
     #     component.setup()
 
 
-    # def test_compute_function(self):
-    #
-    #     self.comp = Mock()
-    #     var1 = Mock()
-    #     var1.name = "input1"
-    #     var1.units = "m"
-    #     var1.type = kInput
-    #     var1.shape = [1]
-    #
-    #     var2 = Mock()
-    #     var2.name = "input2"
-    #     var2.units = None
-    #     var2.type = kInput
-    #     var2.shape = [1]
-    #
-    #     var3 = Mock()
-    #     var3.name = "output1"
-    #     var3.units = None
-    #     var3.type = kOutput
-    #     var3.shape = [1]
-    #
-    #     var4 = Mock()
-    #     var4.name = "output2"
-    #     var4.units = None
-    #     var4.type = kOutput
-    #     var4.shape = [1]
-    #
-    #     self.comp._client._var_meta = [var1, var2, var3, var4]
-    #
-    #     # Mocking necessary objects
-    #     inputs = {'input1': 10, 'input2': 20}
-    #     outputs = {'output1': None, 'output2': None}
-    #     discrete_inputs = None
-    #     discrete_outputs = None
-    #
-    #     # Mocking the client and its methods
-    #     client_mock = MagicMock()
-    #     client_mock._var_meta = {'input1': kInput, 'input2': kInput}
-    #     client_mock.run_compute.return_value = {'output1': 30, 'output2': 40}
-    #
-    #     # Creating instance of the class to be tested
-    #     mock_channel = Mock()
-    #     instance = RemoteExplicitComponent(channel=mock_channel)
-    #     instance._client = client_mock
-    #
-    #     # Calling the function to be tested
-    #     instance.compute(inputs, outputs, discrete_inputs, discrete_outputs)
-    #
-    #     # Asserting that the method calls are made correctly
-    #     client_mock.run_compute.assert_called_once_with({'input1': 10, 'input2': 20})
-    #     self.assertEqual(outputs['output1'], 30)
-    #     self.assertEqual(outputs['output2'], 40)
+    def test_compute_function(self):
+        """
+        Tests the compute function of the OpenMDAO explicit client.
+        """
+        var1 = Mock()
+        var1.name = "input1"
+        var1.units = "m"
+        var1.type = kInput
+        var1.shape = [1]
+
+        var2 = Mock()
+        var2.name = "input2"
+        var2.units = None
+        var2.type = kInput
+        var2.shape = [1]
+
+        var3 = Mock()
+        var3.name = "output1"
+        var3.units = None
+        var3.type = kOutput
+        var3.shape = [1]
+
+        var4 = Mock()
+        var4.name = "output2"
+        var4.units = None
+        var4.type = kOutput
+        var4.shape = [1]
+
+        # Mocking necessary objects
+        inputs = {'test.input1': 10, 'test.input2': 20}
+        outputs = {'output1': None, 'output2': None}
+        discrete_inputs = None
+        discrete_outputs = None
+
+        # Mocking the client and its methods
+        client_mock = MagicMock()
+        client_mock._var_meta = [var1, var2, var3, var4]
+        client_mock.run_compute.return_value = {'output1': 30, 'output2': 40}
+
+        # Creating instance of the class to be tested
+        mock_channel = Mock()
+        instance = RemoteExplicitComponent(channel=mock_channel)
+        instance._client = client_mock
+        # mock the component name
+        instance.name = 'test'
+
+        # Calling the function to be tested
+        instance.compute(inputs, outputs, discrete_inputs, discrete_outputs)
+
+        # Asserting that the method calls are made correctly
+        client_mock.run_compute.assert_called_once_with({'input1': 10, 'input2': 20})
+        self.assertEqual(outputs['output1'], 30)
+        self.assertEqual(outputs['output2'], 40)
