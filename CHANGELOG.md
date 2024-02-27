@@ -1,5 +1,10 @@
 # Change Log
 
+## Version 0.5.3
+
+- [fix] Added missing function arguments to explicit discipline.
+
+
 ## Version 0.5.2
 
 - [fix] Lowered the dependency versions (they were far too stringent and new)

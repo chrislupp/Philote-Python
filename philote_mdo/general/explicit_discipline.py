@@ -38,8 +38,8 @@ class ExplicitDiscipline(pmdo.Discipline):
     def __init__(self):
         super().__init__()
 
-    def compute(self):
+    def compute(self, inputs, outputs):
         raise NotImplementedError("compute not implemented")
 
-    def compute_partials(self):
+    def compute_partials(self, inputs, partials):
         raise NotImplementedError("compute_partials not implemented")
