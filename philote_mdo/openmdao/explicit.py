@@ -30,7 +30,7 @@
 import numpy as np
 import openmdao.api as om
 import philote_mdo.general as pm
-from philote_mdo.openmdao.utils import openmdao_client_setup, create_local_inputs, assign_global_outputs
+import philote_mdo.openmdao.utils as utils
 
 
 class RemoteExplicitComponent(om.ExplicitComponent):
@@ -78,23 +78,23 @@ class RemoteExplicitComponent(om.ExplicitComponent):
         """
         Set up the OpenMDAO component.
         """
-        openmdao_client_setup(self)
+        utils.openmdao_client_setup(self)
 
     def setup_partials(self):
-        pass
+        utils.openmdao_client_setup_partials(self)
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         """
         Compute the function evaluation.
         """
-        local_inputs = create_local_inputs(self.name, inputs, self._client._var_meta)
+        local_inputs = utils.create_local_inputs(self.name, inputs, self._client._var_meta)
         out = self._client.run_compute(local_inputs)
-        assign_global_outputs(out, outputs)
+        utils.assign_global_outputs(out, outputs)
 
     def compute_partials(self, inputs, partials, discrete_inputs=None, discrete_outputs=None):
         """
         Compute the gradient evaluation.
         """
-        local_inputs = create_local_inputs(self.name, inputs, self._client._var_meta)
+        local_inputs = utils.create_local_inputs(self.name, inputs, self._client._var_meta)
         jac = self._client.run_compute_partials(local_inputs)
-        assign_global_outputs(jac, partials)
+        utils.assign_global_outputs(jac, partials)

@@ -37,6 +37,7 @@ from philote_mdo.openmdao import RemoteExplicitComponent
 def mock_openmdao_client_setup(arg):
     pass
 
+
 class TestOpenMdaoExplicitClient(unittest.TestCase):
     """
     Unit tests for the OpenMDAO explicit component/client.
@@ -61,7 +62,6 @@ class TestOpenMdaoExplicitClient(unittest.TestCase):
     #     mock_openmdao_client_setup.return_value = None
     #
     #     component.setup()
-
 
     def test_compute_function(self):
         """
