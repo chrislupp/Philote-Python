@@ -116,3 +116,57 @@ class TestOpenMdaoExplicitClient(unittest.TestCase):
         client_mock.run_compute.assert_called_once_with({'input1': 10, 'input2': 20})
         self.assertEqual(outputs['output1'], 30)
         self.assertEqual(outputs['output2'], 40)
+
+    def test_compute_partials_function(self):
+        # Mocking necessary objects
+        inputs = {'test.input1': 10, 'test.input2': 20}
+        partials = {'output1': {'input1': None, 'input2': None},
+                    'output2': {'input1': None, 'input2': None}}
+        discrete_inputs = None
+        discrete_outputs = None
+
+        var1 = Mock()
+        var1.name = "input1"
+        var1.units = "m"
+        var1.type = kInput
+        var1.shape = [1]
+
+        var2 = Mock()
+        var2.name = "input2"
+        var2.units = None
+        var2.type = kInput
+        var2.shape = [1]
+
+        var3 = Mock()
+        var3.name = "output1"
+        var3.units = None
+        var3.type = kOutput
+        var3.shape = [1]
+
+        var4 = Mock()
+        var4.name = "output2"
+        var4.units = None
+        var4.type = kOutput
+        var4.shape = [1]
+
+        # Mocking the client and its methods
+        client_mock = MagicMock()
+        client_mock._var_meta = [var1, var2, var3, var4]
+        client_mock.run_compute_partials.return_value = {'output1': {'input1': 1, 'input2': 2},
+                                                         'output2': {'input1': 3, 'input2': 4}}
+
+        # Creating instance of the class to be tested
+        instance = RemoteExplicitComponent(channel=Mock())
+        instance._client = client_mock
+        # mock the component name
+        instance.name = 'test'
+
+        # Calling the function to be tested
+        instance.compute_partials(inputs, partials, discrete_inputs, discrete_outputs)
+
+        # Asserting that the method calls are made correctly
+        client_mock.run_compute_partials.assert_called_once_with({'input1': 10, 'input2': 20})
+        self.assertEqual(partials['output1']['input1'], 1)
+        self.assertEqual(partials['output1']['input2'], 2)
+        self.assertEqual(partials['output2']['input1'], 3)
+        self.assertEqual(partials['output2']['input2'], 4)
