@@ -49,19 +49,69 @@ class TestOpenMdaoExplicitClient(unittest.TestCase):
     #     """
     #     pass
 
-    # @patch("philote_mdo.openmdao.utils.openmdao_client_setup")
-    # def test_setup(self, mock_openmdao_client_setup):
-    #     """
-    #     Tests the initialize function of the OpenMDAO Explicit Client.
-    #     """
-    #     mock_openmdao_client_setup.side_effect = mock_openmdao_client_setup
-    #     mock_channel = Mock()
-    #     component = RemoteExplicitComponent(channel=mock_channel)
-    #     # component._client = Mock()
-    #
-    #     mock_openmdao_client_setup.return_value = None
-    #
-    #     component.setup()
+    @patch('philote_mdo.openmdao.utils.openmdao_client_setup')
+    def test_setup(self, mock_openmdao_client_setup):
+        """
+        Tests the setup function of the OpenMDAO Explicit Client.
+        """
+        var1 = Mock()
+        var1.name = "input1"
+        var1.units = "m"
+        var1.type = kInput
+        var1.shape = [1]
+
+        var2 = Mock()
+        var2.name = "input2"
+        var2.units = None
+        var2.type = kInput
+        var2.shape = [1]
+
+        var3 = Mock()
+        var3.name = "output1"
+        var3.units = None
+        var3.type = kOutput
+        var3.shape = [1]
+
+        var4 = Mock()
+        var4.name = "output2"
+        var4.units = None
+        var4.type = kOutput
+        var4.shape = [1]
+
+        mock_channel = Mock()
+        component = RemoteExplicitComponent(channel=mock_channel)
+        component._client = Mock()
+        component._client._var_meta = [var1, var2, var3, var4]
+
+        # call the function
+        component.setup()
+
+        # check that the setup utility function was called
+        mock_openmdao_client_setup.assert_called_once_with(component)
+
+    @patch('philote_mdo.openmdao.utils.openmdao_client_setup_partials')
+    def test_setup_partials(self, mock_openmdao_client_setup_partials):
+        """
+        Tests the setup partials function of the OpenMDAO Explicit Client.
+        """
+        par1 = Mock()
+        par1.name = "partial1"
+        par1.subname = "subpartial1"
+
+        par2 = Mock()
+        par2.name = "partial2"
+        par2.subname = "subpartial2"
+
+        mock_channel = Mock()
+        component = RemoteExplicitComponent(channel=mock_channel)
+        component._client = Mock()
+        component._client._partials_meta = [par1, par2]
+
+        # call the function
+        component.setup_partials()
+
+        # check that the setup utility function was called
+        mock_openmdao_client_setup_partials.assert_called_once_with(component)
 
     def test_compute_function(self):
         """
