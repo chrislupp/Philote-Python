@@ -1,6 +1,19 @@
 # Change Log
 
-## Version 0.5.0
+## Version 0.5.3
+
+- [fix] Added missing function arguments to explicit discipline.
+
+
+## Version 0.5.2
+
+- [fix] Lowered the dependency versions (they were far too stringent and new)
+- [fix] Change PyPI deployment to source only. It is not practical to distribute
+  a platform-specific wheel. The wheel must be platform-specific, because gRPC
+  has C underpinnings.
+
+
+## Version 0.5.1
 
 - [feature] Transitioned away from setuptools and setup.py to a pyproject.toml
   and poetry-based package.
@@ -9,6 +22,12 @@
 - [feature] Added test coverage report generation that is uploaded to
   coveralls.
 - [feature] Added action to upload to PyPI when a release is published. 
+
+
+## Version 0.5.0
+
+- yanked due to source distribution issues. All features present in 0.5.1
+
 
 ## Version 0.4.0
 
