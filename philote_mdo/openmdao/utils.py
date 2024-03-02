@@ -34,8 +34,8 @@ def openmdao_client_setup(comp):
     """
     Sets up the OpenMDAO component with all required inputs and outputs.
 
-    This function will call the required RPCs to obtain the variables and
-    partials from the remote discipline server.
+    This function will call the required RPCs to obtain the variables
+    from the remote discipline server.
     """
     # set up the remote discipline and get the variable definitions
     comp._client.run_setup()
@@ -54,13 +54,19 @@ def openmdao_client_setup(comp):
         if var.type == data.kOutput:
             comp.add_output(var.name, shape=tuple(var.shape), units=units)
 
+def openmdao_client_setup_partials(comp):
+    """
+    Sets up the partials for the OpenMDAO component.
+
+    This function will call the required RPCs to obtain the partials
+    from the remote discipline server.
+    """
     # set up the remote discipline and get the variable definitions
-    # comp._client.get_partials_definitions()
+    comp._client.get_partials_definitions()
 
     # declare partials based on the discipline meta data
-    # for partial in comp._client._partials_meta:
-    #     comp.declare_partials(partial.name, partial.subname)
-
+    for partial in comp._client._partials_meta:
+        comp.declare_partials(partial.name, partial.subname)
 
 def create_local_inputs(comp_name, inputs, var_meta, type=data.kInput):
     """
@@ -77,7 +83,6 @@ def create_local_inputs(comp_name, inputs, var_meta, type=data.kInput):
             local[var.name] = inputs["{}.{}".format(comp_name, var.name)]
 
     return local
-
 
 def assign_global_outputs(out, outputs):
     """

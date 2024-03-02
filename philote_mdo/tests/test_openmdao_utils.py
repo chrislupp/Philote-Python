@@ -28,11 +28,12 @@
 # therein. The DoD does not exercise any editorial, security, or other
 # control over the information you may find at these locations.
 import unittest
-from unittest.mock import Mock
+from unittest.mock import Mock, MagicMock
 import numpy as np
 
 from philote_mdo.generated.data_pb2 import kInput, kOutput
-from philote_mdo.openmdao.utils import openmdao_client_setup, create_local_inputs, assign_global_outputs
+from philote_mdo.openmdao.utils import openmdao_client_setup, \
+    openmdao_client_setup_partials, create_local_inputs, assign_global_outputs
 
 
 class TestOpenMdaoUtils(unittest.TestCase):
@@ -41,7 +42,7 @@ class TestOpenMdaoUtils(unittest.TestCase):
     """
 
     def test_openmdao_client_setup(self):
-        self.comp = Mock()
+        comp = Mock()
         var1 = Mock()
         var1.name = "var1"
         var1.units = "m"
@@ -54,19 +55,43 @@ class TestOpenMdaoUtils(unittest.TestCase):
         var2.type = kOutput
         var2.shape = [1]
 
-        self.comp._client._var_meta = [var1, var2]
+        comp._client._var_meta = [var1, var2]
 
-        openmdao_client_setup(self.comp)
+        openmdao_client_setup(comp)
 
-        self.comp._client.run_setup.assert_called_once()
-        self.comp._client.get_variable_definitions.assert_called_once()
+        comp._client.run_setup.assert_called_once()
+        comp._client.get_variable_definitions.assert_called_once()
 
         expected_calls = [
             ("add_input", ("var1",), {"shape": (2,), "units": "m"}),
             ("add_output", ("var2",), {"shape": (1,), "units": None})
         ]
         for call in expected_calls:
-            getattr(self.comp, call[0]).assert_called_once_with(*call[1], **call[2])
+            getattr(comp, call[0]).assert_called_once_with(*call[1], **call[2])
+
+    def test_openmdao_client_setup_partials(self):
+        # mocking the component and its necessary attributes/methods
+        comp_mock = MagicMock()
+
+        par1 = Mock()
+        par1.name = "partial1"
+        par1.subname = "subpartial1"
+
+        par2 = Mock()
+        par2.name = "partial2"
+        par2.subname = "subpartial2"
+
+        comp_mock._client.get_partials_definitions.return_value = None
+        comp_mock._client._partials_meta = [par1, par2]
+
+        # call the function
+        openmdao_client_setup_partials(comp_mock)
+
+        # assert that the necessary methods are called and that
+        # declare_partials is called for each partial
+        comp_mock._client.get_partials_definitions.assert_called_once()
+        comp_mock.declare_partials.assert_any_call('partial1', 'subpartial1')
+        comp_mock.declare_partials.assert_any_call('partial2', 'subpartial2')
 
     def test_create_local_inputs(self):
         # define sample inputs and var_meta

@@ -80,6 +80,9 @@ class RemoteExplicitComponent(om.ExplicitComponent):
         """
         openmdao_client_setup(self)
 
+    def setup_partials(self):
+        pass
+
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         """
         Compute the function evaluation.
@@ -89,7 +92,7 @@ class RemoteExplicitComponent(om.ExplicitComponent):
         assign_global_outputs(out, outputs)
 
     def compute_partials(self, inputs, partials, discrete_inputs=None, discrete_outputs=None):
-        """"
+        """
         Compute the gradient evaluation.
         """
         local_inputs = create_local_inputs(self.name, inputs, self._client._var_meta)
