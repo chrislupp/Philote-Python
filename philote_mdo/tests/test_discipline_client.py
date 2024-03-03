@@ -34,6 +34,7 @@ from google.protobuf.empty_pb2 import Empty
 from google.protobuf.struct_pb2 import Struct
 from philote_mdo.general import DisciplineClient
 import philote_mdo.generated.data_pb2 as data
+import philote_mdo.generated.disciplines_pb2_grpc as disc
 import philote_mdo.utils as utils
 
 
@@ -41,6 +42,24 @@ class TestDisciplineClient(unittest.TestCase):
     """
     Unit tests for the discipline client.
     """
+
+    def test_init(self):
+        # Create a mock grpc channel
+        mock_channel = Mock()
+
+        # Create an instance of YourClass with the mock channel
+        instance = DisciplineClient(mock_channel)
+
+        # Assert that the attributes are initialized correctly
+        self.assertTrue(instance.verbose)
+        self.assertEqual(instance.grpc_options, [])
+        self.assertFalse(instance._is_continuous)
+        self.assertFalse(instance._is_differentiable)
+        self.assertFalse(instance._provides_gradients)
+        self.assertIsInstance(instance._disc_stub, disc.DisciplineServiceStub)
+        self.assertEqual(instance._stream_options.num_double, 1000)
+        self.assertEqual(instance._var_meta, [])
+        self.assertEqual(instance._partials_meta, [])
 
     @patch("philote_mdo.generated.disciplines_pb2_grpc.DisciplineServiceStub")
     def test_get_discipline_info(self, mock_discipline_stub):
