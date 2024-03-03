@@ -95,7 +95,7 @@ class TestOpenMdaoUtils(unittest.TestCase):
 
     def test_create_local_inputs(self):
         # define sample inputs and var_meta
-        inputs = {'parent.var1': 10, 'parent.var2': 20, 'parent.var3': 30}
+        inputs = {'var1': 10, 'var2': 20, 'var3': 30}
 
         # case 1: 3 inputs
         # ----------------
@@ -116,7 +116,7 @@ class TestOpenMdaoUtils(unittest.TestCase):
         var_meta = [var1, var2, var3]
 
         # call the function
-        local_inputs1 = create_local_inputs("parent", inputs, var_meta)
+        local_inputs1 = create_local_inputs(inputs, var_meta)
 
         # assert that only relative variable names are included in local_inputs
         self.assertIn('var1', local_inputs1)
@@ -130,7 +130,7 @@ class TestOpenMdaoUtils(unittest.TestCase):
         # --------------------------
         var2.type = kOutput
 
-        local_inputs2 = create_local_inputs("parent", inputs, var_meta)
+        local_inputs2 = create_local_inputs(inputs, var_meta)
 
         # assert that only relative variable names are included in local_inputs
         self.assertIn('var1', local_inputs2)
@@ -143,7 +143,7 @@ class TestOpenMdaoUtils(unittest.TestCase):
         # --------------------------
         var3.type = kOutput
 
-        local_inputs3 = create_local_inputs("parent", inputs, var_meta, kOutput)
+        local_inputs3 = create_local_inputs(inputs, var_meta, kOutput)
 
         # assert that only relative variable names are included in local_inputs
         self.assertNotIn('var1', local_inputs3)

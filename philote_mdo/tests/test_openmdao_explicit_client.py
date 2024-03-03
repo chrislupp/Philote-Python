@@ -142,7 +142,7 @@ class TestOpenMdaoExplicitClient(unittest.TestCase):
         var4.shape = [1]
 
         # Mocking necessary objects
-        inputs = {'test.input1': 10, 'test.input2': 20}
+        inputs = {'input1': 10, 'input2': 20}
         outputs = {'output1': None, 'output2': None}
         discrete_inputs = None
         discrete_outputs = None
@@ -169,7 +169,7 @@ class TestOpenMdaoExplicitClient(unittest.TestCase):
 
     def test_compute_partials_function(self):
         # Mocking necessary objects
-        inputs = {'test.input1': 10, 'test.input2': 20}
+        inputs = {'input1': 10, 'input2': 20}
         partials = {'output1': {'input1': None, 'input2': None},
                     'output2': {'input1': None, 'input2': None}}
         discrete_inputs = None
