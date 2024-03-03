@@ -39,6 +39,18 @@ class TestDiscipline(unittest.TestCase):
     Unit tests for the discipline base class.
     """
 
+    def test_init(self):
+        disc = Discipline()
+
+        # assert that the attributes are initialized correctly
+        self.assertFalse(disc._is_continuous)
+        self.assertFalse(disc._is_differentiable)
+        self.assertFalse(disc._provides_gradients)
+        self.assertEqual(disc._var_meta, [])
+        self.assertEqual(disc._partials_meta, [])
+        self.assertFalse(disc._is_implicit)
+        self.assertEqual(disc.options_list, {})
+
     def test_add_option(self):
         """
         Tests the add input member function.
@@ -103,6 +115,45 @@ class TestDiscipline(unittest.TestCase):
         self.assertEqual(disc._partials_meta[0].name, "f")
         self.assertEqual(disc._partials_meta[0].subname, "x")
 
+    def test_initialize(self):
+        disc = Discipline()
+
+        disc.initialize()
+
+        # check that the function completed without raising exceptions
+        self.assertTrue(True)
+
+    def test_set_options(self):
+        disc = Discipline()
+        opts = Mock()
+        disc.set_options(opts)
+
+        # check that the function completed without raising exceptions
+        self.assertTrue(True)
+
+    def test_setup(self):
+        disc = Discipline()
+
+        disc.setup()
+
+        # check that the function completed without raising exceptions
+        self.assertTrue(True)
+
+    def test_setup_partials(self):
+        disc = Discipline()
+
+        disc.setup_partials()
+
+        # check that the function completed without raising exceptions
+        self.assertTrue(True)
+    def test_configure(self):
+        disc = Discipline()
+
+        disc.configure()
+
+        # check that the function completed without raising exceptions
+        self.assertTrue(True)
+
     def test_clear_data(self):
         disc = Discipline()
 
@@ -116,7 +167,7 @@ class TestDiscipline(unittest.TestCase):
         # clear the data
         disc._clear_data()
 
-        # check that the meta data has been deleted
+        # check that the metadata has been deleted
         self.assertEqual(len(disc._var_meta), 0)
         self.assertEqual(len(disc._partials_meta), 0)
 
