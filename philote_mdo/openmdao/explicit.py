@@ -31,6 +31,7 @@ import numpy as np
 import openmdao.api as om
 import philote_mdo.general as pm
 import philote_mdo.openmdao.utils as utils
+import philote_mdo.generated.data_pb2 as data
 
 
 class RemoteExplicitComponent(om.ExplicitComponent):
@@ -62,16 +63,26 @@ class RemoteExplicitComponent(om.ExplicitComponent):
         # OpenMDAO options are only set after intialize has been called in the
         # init function. That is why the parent init function must be called
         # before sending the options values to the philote server.
-        # self._client.send_options()
+        # self._client.send_options(options)
 
     def initialize(self):
         """
         Define the OpenMDAO component options.
         """
         # get the available options from the philote discipline
+        self._client.get_available_options()
 
-        # add the OpenMDAO component options
-        pass
+        # add to the OpenMDAO component options
+        for name, type_str in self._client.options_list.items():
+            type = None
+            if type_str == 'bool':
+                type = bool
+            elif type_str == 'int':
+                type = int
+            elif type_str == 'float':
+                type = float
+
+            self.options.declare(name, type=type)
 
     def setup(self):
         """

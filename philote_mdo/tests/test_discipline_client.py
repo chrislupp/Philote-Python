@@ -113,16 +113,16 @@ class TestDisciplineClient(unittest.TestCase):
 
         instance = DisciplineClient(channel=mock_channel)
 
-        # Mock the _disc_stub.GetAvailableOptions method
+        # mock the _disc_stub.GetAvailableOptions method
         mock_options = MagicMock()
         mock_options.options = ['option1', 'option2']
         mock_options.type = ['type1', 'type2']
         instance._disc_stub.GetAvailableOptions.return_value = mock_options
 
-        # Call the get_available_options method
+        # call the get_available_options method
         instance.get_available_options()
 
-        # Assert that options_list is populated correctly
+        # assert that options_list is populated correctly
         expected_options_list = {'option1': 'type1', 'option2': 'type2'}
         self.assertEqual(instance.options_list, expected_options_list)
 
