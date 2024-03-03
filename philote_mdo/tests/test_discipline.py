@@ -39,6 +39,21 @@ class TestDiscipline(unittest.TestCase):
     Unit tests for the discipline base class.
     """
 
+    def test_add_option(self):
+        """
+        Tests the add input member function.
+        """
+        disc = Discipline()
+
+        disc.add_option("a", "int")
+        disc.add_option("b", "bool")
+        disc.add_option("c", "float")
+
+        # check option entries
+        self.assertEqual(disc.options_list["a"], "int")
+        self.assertEqual(disc.options_list["b"], "bool")
+        self.assertEqual(disc.options_list["c"], "float")
+
     def test_add_input(self):
         """
         Tests the add input member function.
