@@ -53,7 +53,7 @@ class Discipline:
         # dictionary of available discipline options (with types)
         self.options_list = {}
 
-        # create the available options
+        # create the available options and run any other initialization
         self.initialize()
 
     def add_option(self, name, type):
@@ -66,7 +66,7 @@ class Discipline:
             the name of the option being added
         type : string
             the data type of the option. acceptable types are 'bool', 'int',
-            'double'
+            'float'
         """
         self.options_list[name] = type
 
