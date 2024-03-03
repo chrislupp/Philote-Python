@@ -50,6 +50,26 @@ class Discipline:
         # flag that indicates the discipline is implicit
         self._is_implicit = False
 
+        # dictionary of available discipline options (with types)
+        self.options_list = {}
+
+        # create the available options
+        self.initialize()
+
+    def add_option(self, name, type):
+        """
+        Adds an option definition to the discipline.
+
+        Parameters
+        ----------
+        name : string
+            the name of the option being added
+        type : string
+            the data type of the option.
+            Acceptable types are 'bool', 'int', 'double'
+        """
+        self.options_list[name] = type
+
     def add_input(self, name, shape=(1,), units=""):
         """
         Define a continuous input.
@@ -87,7 +107,21 @@ class Discipline:
         """
         self._partials_meta += [data.PartialsMetaData(name=func, subname=var)]
 
-    def initialize(self, options):
+    def initialize(self):
+        """
+        Sets up the available options.
+
+        This function is called when the server is first started. It does not
+        set options, but instead defines what option names (and types) are
+        available. The set_options function is used to actually set the option
+        values instead.
+        """
+        pass
+
+    def set_options(self, options):
+        """
+        Sets the option values for the discipline.
+        """
         pass
 
     def setup(self):

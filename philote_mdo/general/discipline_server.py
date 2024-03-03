@@ -80,12 +80,18 @@ class DisciplineServer(disc.DisciplineService):
         self._stream_opts = request
         return Empty()
 
+    def GetStreamOptions(self, request, context):
+        """
+        RPC that gets the names and types of all available discipline options.
+        """
+        pass
+
     def SetOptions(self, request, context):
         """
         RPC that sets the discipline options.
         """
         options = request.options
-        self._discipline.initialize(options)
+        self._discipline.set_options(options)
 
     def Setup(self, request, context):
         """

@@ -55,7 +55,7 @@ class RemoteExplicitComponent(om.ExplicitComponent):
         self._client = pm.ExplicitClient(channel=channel)
 
         # call the init function of the explicit component
-        super().__init__()
+        super().__init__(num_par_fd=1, **kwargs)
 
         # assign and send the option values to the server
         # this must be done here and not in initialize, as the values of the
@@ -64,15 +64,14 @@ class RemoteExplicitComponent(om.ExplicitComponent):
         # before sending the options values to the philote server.
         # self._client.send_options()
 
+    def initialize(self):
+        """
+        Define the OpenMDAO component options.
+        """
+        # get the available options from the philote discipline
 
-    # def initialize(self):
-    #     """
-    #     Define the OpenMDAO component options.
-    #     """
-    #     # get the available options from the philote discipline
-    #
-    #     # add the OpenMDAO component options
-    #     pass
+        # add the OpenMDAO component options
+        pass
 
     def setup(self):
         """

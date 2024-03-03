@@ -106,7 +106,7 @@ class TestDisciplineServer(unittest.TestCase):
         server.SetOptions(request_mock, context_mock)
 
         # Assert that the discipline's initialize method was called with the expected options
-        server._discipline.initialize.assert_called_once_with(
+        server._discipline.set_options.assert_called_once_with(
             {"key1": "value1", "key2": 42}
         )
 
