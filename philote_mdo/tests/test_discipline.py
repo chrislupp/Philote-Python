@@ -103,6 +103,22 @@ class TestDiscipline(unittest.TestCase):
         self.assertEqual(disc._partials_meta[0].name, "f")
         self.assertEqual(disc._partials_meta[0].subname, "x")
 
+    def test_clear_data(self):
+        disc = Discipline()
+
+        disc.add_input("test", shape=(2, 2), units="m**2")
+        disc.declare_partials("f", "x")
+
+        # check if the variable meta data contains one entry
+        self.assertEqual(len(disc._var_meta), 1)
+        self.assertEqual(len(disc._partials_meta), 1)
+
+        # clear the data
+        disc._clear_data()
+
+        # check that the meta data has been deleted
+        self.assertEqual(len(disc._var_meta), 0)
+        self.assertEqual(len(disc._partials_meta), 0)
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)
