@@ -62,6 +62,9 @@ class DisciplineClient:
         self._var_meta = []
         self._partials_meta = []
 
+        # list of available options
+        self.options_list = {}
+
     def get_discipline_info(self):
         """
         Gets the discipline properties from the analysis server.
@@ -76,6 +79,17 @@ class DisciplineClient:
         Transmits the stream options for the remote analysis to the server.
         """
         self._disc_stub.SetStreamOptions(self._stream_options)
+
+    def get_available_options(self):
+        """
+        Gets the available options for the analysis discipline.
+        """
+        opts = self._disc_stub.GetAvailableOptions()
+
+        self.options_list = {}
+
+        for name, type in zip(opts.options, opts.type):
+            self.options_list[name] = type
 
     def send_options(self, options):
         """

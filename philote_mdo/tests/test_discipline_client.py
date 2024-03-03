@@ -28,7 +28,7 @@
 # therein. The DoD does not exercise any editorial, security, or other
 # control over the information you may find at these locations.
 import unittest
-from unittest.mock import Mock, patch
+from unittest.mock import Mock, MagicMock, patch
 import numpy as np
 from google.protobuf.empty_pb2 import Empty
 from google.protobuf.struct_pb2 import Struct
@@ -60,6 +60,8 @@ class TestDisciplineClient(unittest.TestCase):
         self.assertEqual(instance._stream_options.num_double, 1000)
         self.assertEqual(instance._var_meta, [])
         self.assertEqual(instance._partials_meta, [])
+        self.assertEqual(instance.options_list, {})
+
 
     @patch("philote_mdo.generated.disciplines_pb2_grpc.DisciplineServiceStub")
     def test_get_discipline_info(self, mock_discipline_stub):
@@ -103,6 +105,26 @@ class TestDisciplineClient(unittest.TestCase):
         )
         self.assertTrue(mock_stub.SetStreamOptions.called)
         mock_stub.SetStreamOptions.assert_called_with(expected_options)
+
+    @patch("philote_mdo.generated.disciplines_pb2_grpc.DisciplineServiceStub")
+    def test_get_available_options(self, mock_discipline_stub):
+        mock_channel = Mock()
+        mock_stub = mock_discipline_stub.return_value
+
+        instance = DisciplineClient(channel=mock_channel)
+
+        # Mock the _disc_stub.GetAvailableOptions method
+        mock_options = MagicMock()
+        mock_options.options = ['option1', 'option2']
+        mock_options.type = ['type1', 'type2']
+        instance._disc_stub.GetAvailableOptions.return_value = mock_options
+
+        # Call the get_available_options method
+        instance.get_available_options()
+
+        # Assert that options_list is populated correctly
+        expected_options_list = {'option1': 'type1', 'option2': 'type2'}
+        self.assertEqual(instance.options_list, expected_options_list)
 
     def test_send_options(self):
         # mock gRPC stub and channel
