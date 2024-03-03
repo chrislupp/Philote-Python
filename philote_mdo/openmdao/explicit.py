@@ -65,14 +65,14 @@ class RemoteExplicitComponent(om.ExplicitComponent):
         # self._client.send_options()
 
 
-    def initialize(self):
-        """
-        Define the OpenMDAO component options.
-        """
-        # get the available options from the philote discipline
-
-        # add the OpenMDAO component options
-        pass
+    # def initialize(self):
+    #     """
+    #     Define the OpenMDAO component options.
+    #     """
+    #     # get the available options from the philote discipline
+    #
+    #     # add the OpenMDAO component options
+    #     pass
 
     def setup(self):
         """
