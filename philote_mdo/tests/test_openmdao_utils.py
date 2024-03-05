@@ -32,8 +32,7 @@ from unittest.mock import Mock, MagicMock
 import numpy as np
 
 from philote_mdo.generated.data_pb2 import kInput, kOutput
-from philote_mdo.openmdao.utils import openmdao_client_setup, \
-    openmdao_client_setup_partials, create_local_inputs, assign_global_outputs
+import philote_mdo.openmdao.utils as utils
 
 
 class TestOpenMdaoUtils(unittest.TestCase):
@@ -57,7 +56,7 @@ class TestOpenMdaoUtils(unittest.TestCase):
 
         comp._client._var_meta = [var1, var2]
 
-        openmdao_client_setup(comp)
+        utils.client_setup(comp)
 
         comp._client.run_setup.assert_called_once()
         comp._client.get_variable_definitions.assert_called_once()
@@ -85,7 +84,7 @@ class TestOpenMdaoUtils(unittest.TestCase):
         comp_mock._client._partials_meta = [par1, par2]
 
         # call the function
-        openmdao_client_setup_partials(comp_mock)
+        utils.client_setup_partials(comp_mock)
 
         # assert that the necessary methods are called and that
         # declare_partials is called for each partial
@@ -116,7 +115,7 @@ class TestOpenMdaoUtils(unittest.TestCase):
         var_meta = [var1, var2, var3]
 
         # call the function
-        local_inputs1 = create_local_inputs(inputs, var_meta)
+        local_inputs1 = utils.create_local_inputs(inputs, var_meta)
 
         # assert that only relative variable names are included in local_inputs
         self.assertIn('var1', local_inputs1)
@@ -130,7 +129,7 @@ class TestOpenMdaoUtils(unittest.TestCase):
         # --------------------------
         var2.type = kOutput
 
-        local_inputs2 = create_local_inputs(inputs, var_meta)
+        local_inputs2 = utils.create_local_inputs(inputs, var_meta)
 
         # assert that only relative variable names are included in local_inputs
         self.assertIn('var1', local_inputs2)
@@ -143,7 +142,7 @@ class TestOpenMdaoUtils(unittest.TestCase):
         # --------------------------
         var3.type = kOutput
 
-        local_inputs3 = create_local_inputs(inputs, var_meta, kOutput)
+        local_inputs3 = utils.create_local_inputs(inputs, var_meta, kOutput)
 
         # assert that only relative variable names are included in local_inputs
         self.assertNotIn('var1', local_inputs3)
@@ -158,7 +157,7 @@ class TestOpenMdaoUtils(unittest.TestCase):
         outputs = {'output1': None, 'output2': None, 'output3': None}
 
         # call the function
-        assign_global_outputs(out, outputs)
+        utils.assign_global_outputs(out, outputs)
 
         # assert that the values in outputs are updated correctly
         self.assertEqual(outputs['output1'], 10)

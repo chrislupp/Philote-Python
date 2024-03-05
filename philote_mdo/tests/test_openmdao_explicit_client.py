@@ -30,12 +30,12 @@
 import unittest
 from unittest.mock import Mock, MagicMock, patch
 import numpy as np
-from philote_mdo.generated.data_pb2 import kInput, kOutput
+import philote_mdo.generated.data_pb2 as data
 from philote_mdo.openmdao import RemoteExplicitComponent
 
 
-def mock_openmdao_client_setup(arg):
-    pass
+def mock_get_options(arg):
+    return data.OptionsList(options=[], type=[])
 
 
 class TestOpenMdaoExplicitClient(unittest.TestCase):
@@ -49,7 +49,7 @@ class TestOpenMdaoExplicitClient(unittest.TestCase):
     #     """
     #     pass
 
-    @patch('philote_mdo.openmdao.utils.openmdao_client_setup')
+    @patch('philote_mdo.openmdao.utils.client_setup')
     def test_setup(self, mock_openmdao_client_setup):
         """
         Tests the setup function of the OpenMDAO Explicit Client.
@@ -57,25 +57,25 @@ class TestOpenMdaoExplicitClient(unittest.TestCase):
         var1 = Mock()
         var1.name = "input1"
         var1.units = "m"
-        var1.type = kInput
+        var1.type = data.kInput
         var1.shape = [1]
 
         var2 = Mock()
         var2.name = "input2"
         var2.units = None
-        var2.type = kInput
+        var2.type = data.kInput
         var2.shape = [1]
 
         var3 = Mock()
         var3.name = "output1"
         var3.units = None
-        var3.type = kOutput
+        var3.type = data.kOutput
         var3.shape = [1]
 
         var4 = Mock()
         var4.name = "output2"
         var4.units = None
-        var4.type = kOutput
+        var4.type = data.kOutput
         var4.shape = [1]
 
         mock_channel = Mock()
@@ -89,7 +89,7 @@ class TestOpenMdaoExplicitClient(unittest.TestCase):
         # check that the setup utility function was called
         mock_openmdao_client_setup.assert_called_once_with(component)
 
-    @patch('philote_mdo.openmdao.utils.openmdao_client_setup_partials')
+    @patch('philote_mdo.openmdao.utils.client_setup_partials')
     def test_setup_partials(self, mock_openmdao_client_setup_partials):
         """
         Tests the setup partials function of the OpenMDAO Explicit Client.
@@ -120,25 +120,25 @@ class TestOpenMdaoExplicitClient(unittest.TestCase):
         var1 = Mock()
         var1.name = "input1"
         var1.units = "m"
-        var1.type = kInput
+        var1.type = data.kInput
         var1.shape = [1]
 
         var2 = Mock()
         var2.name = "input2"
         var2.units = None
-        var2.type = kInput
+        var2.type = data.kInput
         var2.shape = [1]
 
         var3 = Mock()
         var3.name = "output1"
         var3.units = None
-        var3.type = kOutput
+        var3.type = data.kOutput
         var3.shape = [1]
 
         var4 = Mock()
         var4.name = "output2"
         var4.units = None
-        var4.type = kOutput
+        var4.type = data.kOutput
         var4.shape = [1]
 
         # Mocking necessary objects
@@ -178,25 +178,25 @@ class TestOpenMdaoExplicitClient(unittest.TestCase):
         var1 = Mock()
         var1.name = "input1"
         var1.units = "m"
-        var1.type = kInput
+        var1.type = data.kInput
         var1.shape = [1]
 
         var2 = Mock()
         var2.name = "input2"
         var2.units = None
-        var2.type = kInput
+        var2.type = data.kInput
         var2.shape = [1]
 
         var3 = Mock()
         var3.name = "output1"
         var3.units = None
-        var3.type = kOutput
+        var3.type = data.kOutput
         var3.shape = [1]
 
         var4 = Mock()
         var4.name = "output2"
         var4.units = None
-        var4.type = kOutput
+        var4.type = data.kOutput
         var4.shape = [1]
 
         # Mocking the client and its methods
@@ -220,3 +220,7 @@ class TestOpenMdaoExplicitClient(unittest.TestCase):
         self.assertEqual(partials['output1']['input2'], 2)
         self.assertEqual(partials['output2']['input1'], 3)
         self.assertEqual(partials['output2']['input2'], 4)
+
+
+if __name__ == "__main__":
+    unittest.main(verbosity=2)
