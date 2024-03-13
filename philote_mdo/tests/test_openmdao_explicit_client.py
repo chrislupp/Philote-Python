@@ -33,20 +33,20 @@ import philote_mdo.generated.data_pb2 as data
 from philote_mdo.openmdao import RemoteExplicitComponent
 
 
-
+@patch('openmdao.api.ExplicitComponent.__init__')
 class TestOpenMdaoExplicitClient(unittest.TestCase):
     """
     Unit tests for the OpenMDAO explicit component/client.
     """
 
     @patch('philote_mdo.general.ExplicitClient')
-    def test_constructor(self, mock_explicit_client):
+    def test_constructor(self, mock_explicit_client, mock_explicit_component):
         """
         Tests the initialize function of the OpenMDAO Explicit Client.
         """
         mock_channel = Mock()
         num_par_fd = 1
-        options = {'option1': 10, 'option2': 20}
+        options = {'option1': True, 'option2': 20, 'option3': 3.14}
 
         # mock the client and its behavior
         mock_client_instance = MagicMock()
@@ -63,13 +63,13 @@ class TestOpenMdaoExplicitClient(unittest.TestCase):
         mock_explicit_client.assert_called_once_with(channel=mock_channel)
 
         # Verify that super().__init__ is called with the correct arguments
-        comp.super().__init__.assert_called_once_with(num_par_fd=num_par_fd, **options)
+        mock_explicit_component.assert_called_once_with(num_par_fd=num_par_fd, **options)
 
         # Verify that send_options is called with the correct arguments
         expected_send_options_args = options.copy()
         comp._client.send_options.assert_called_once_with(expected_send_options_args)
 
-    def test_initialize(self):
+    def test_initialize(self, om_explicit_component_patch):
         mock_channel = Mock()
 
         # mock the client and its behavior
@@ -96,7 +96,7 @@ class TestOpenMdaoExplicitClient(unittest.TestCase):
         options_mock.declare.assert_any_call('option3', types=float)
 
     @patch('philote_mdo.openmdao.utils.client_setup')
-    def test_setup(self, mock_openmdao_client_setup):
+    def test_setup(self, mock_openmdao_client_setup, om_explicit_component_patch):
         """
         Tests the setup function of the OpenMDAO Explicit Client.
         """
@@ -136,7 +136,7 @@ class TestOpenMdaoExplicitClient(unittest.TestCase):
         mock_openmdao_client_setup.assert_called_once_with(component)
 
     @patch('philote_mdo.openmdao.utils.client_setup_partials')
-    def test_setup_partials(self, mock_openmdao_client_setup_partials):
+    def test_setup_partials(self, mock_openmdao_client_setup_partials, om_explicit_component_patch):
         """
         Tests the setup partials function of the OpenMDAO Explicit Client.
         """
@@ -159,7 +159,7 @@ class TestOpenMdaoExplicitClient(unittest.TestCase):
         # check that the setup utility function was called
         mock_openmdao_client_setup_partials.assert_called_once_with(component)
 
-    def test_compute_function(self):
+    def test_compute_function(self, om_explicit_component_patch):
         """
         Tests the compute function of the OpenMDAO explicit client.
         """
@@ -213,7 +213,7 @@ class TestOpenMdaoExplicitClient(unittest.TestCase):
         self.assertEqual(outputs['output1'], 30)
         self.assertEqual(outputs['output2'], 40)
 
-    def test_compute_partials_function(self):
+    def test_compute_partials_function(self, om_explicit_component_patch):
         # Mocking necessary objects
         inputs = {'input1': 10, 'input2': 20}
         partials = {'output1': {'input1': None, 'input2': None},
