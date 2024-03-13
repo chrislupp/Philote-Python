@@ -101,18 +101,14 @@ class TestDisciplineServer(unittest.TestCase):
                                            'option3': 'float'}
 
         # call the function
-        opts_generator = server.GetAvailableOptions(request_mock, context_mock)
-
-        # collect the yielded results
-        results = list(opts_generator)
+        results = server.GetAvailableOptions(request_mock, context_mock)
 
         # assert that the results are correct
         expected_options = ['option1', 'option2', 'option3']
         expected_types = [data.kBool, data.kInt, data.kDouble]
 
-        for result in results:
-            self.assertEqual(result.options, expected_options)
-            self.assertEqual(result.type, expected_types)
+        self.assertEqual(results.options, expected_options)
+        self.assertEqual(results.type, expected_types)
 
     def test_set_options(self):
         server = DisciplineServer()
