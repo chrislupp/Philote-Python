@@ -87,20 +87,18 @@ class DisciplineClient:
 
         # this try and except is needed to avoid a failed unit test due to
         # issues with mocking
-        try:
-            for name, val in zip(opts.options, opts.type):
-                type_str = None
-                if val == data.kBool:
-                    type_str = "bool"
-                if val == data.kInt:
-                    type_str = "int"
-                if val == data.kDouble:
-                    type_str = "float"
-                if val == data.kString:
-                    type_str = "str"
-                self.options_list[name] = type_str
-        except TypeError:
-            pass
+
+        for name, val in zip(opts.options, opts.type):
+            type_str = None
+            if val == data.kBool:
+                type_str = "bool"
+            if val == data.kInt:
+                type_str = "int"
+            if val == data.kDouble:
+                type_str = "float"
+            if val == data.kString:
+                type_str = "str"
+            self.options_list[name] = type_str
 
     def send_options(self, options):
         """
