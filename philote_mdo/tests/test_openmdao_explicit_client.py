@@ -205,6 +205,7 @@ class TestOpenMdaoExplicitClient(unittest.TestCase):
         client_mock.run_compute_partials.return_value = {'output1': {'input1': 1, 'input2': 2},
                                                          'output2': {'input1': 3, 'input2': 4}}
 
+
         # Creating instance of the class to be tested
         instance = RemoteExplicitComponent(channel=Mock())
         instance._client = client_mock
