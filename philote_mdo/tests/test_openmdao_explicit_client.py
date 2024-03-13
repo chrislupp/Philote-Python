@@ -43,11 +43,54 @@ class TestOpenMdaoExplicitClient(unittest.TestCase):
     Unit tests for the OpenMDAO explicit component/client.
     """
 
-    # def test_initialize(self):
-    #     """
-    #     Tests the initialize function of the OpenMDAO Explicit Client.
-    #     """
-    #     pass
+    @patch('philote_mdo.general.ExplicitClient')
+    def test_init(self, mock_explicit_client):
+        """
+        Tests the initialize function of the OpenMDAO Explicit Client.
+        """
+        # Mock the pm.ExplicitClient class
+        mock_channel = Mock()
+        num_par_fd = 1
+        options = {'option1': 10, 'option2': 20}
+
+        # Create an instance of the class
+        comp = RemoteExplicitComponent(channel=mock_channel, num_par_fd=num_par_fd, **options)
+
+        # Verify that pm.ExplicitClient is initialized with the correct channel
+        mock_explicit_client.assert_called_once_with(channel=mock_channel)
+
+        # Verify that super().__init__ is called with the correct arguments
+        comp.super().__init__.assert_called_once_with(num_par_fd=num_par_fd, **options)
+
+        # Verify that send_options is called with the correct arguments
+        expected_send_options_args = options.copy()
+        comp._client.send_options.assert_called_once_with(expected_send_options_args)
+
+    def test_initialize(self):
+        mock_channel = Mock()
+
+        # mock the client and its behavior
+        client_mock = MagicMock()
+        client_mock.options_list = {'option1': 'bool', 'option2': 'int', 'option3': 'float'}
+
+        # mock the options object
+        options_mock = MagicMock()
+
+        # create an instance of the class
+        comp = RemoteExplicitComponent(channel=mock_channel)
+        comp._client = client_mock
+        comp.options = options_mock
+
+        # call the method to be tested
+        comp.initialize()
+
+        # assert that get_available_options is called
+        client_mock.get_available_options.assert_called_once()
+
+        # assert that options.declare is called for each option
+        options_mock.declare.assert_any_call('option1', type=bool)
+        options_mock.declare.assert_any_call('option2', type=int)
+        options_mock.declare.assert_any_call('option3', type=float)
 
     @patch('philote_mdo.openmdao.utils.client_setup')
     def test_setup(self, mock_openmdao_client_setup):

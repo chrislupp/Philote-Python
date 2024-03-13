@@ -4,6 +4,8 @@
 
 ### Features
 
+- Added a mechanism for the server to provide a list of available options
+  (with associated types).
 - Created a general implementation of the explicit discipline client for
   OpenMDAO. The client creates an OpenMDAO ExplicitComponent which can
   be added to any OpenMDAO model.

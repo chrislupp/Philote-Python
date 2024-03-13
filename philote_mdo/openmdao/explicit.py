@@ -62,8 +62,10 @@ class RemoteExplicitComponent(om.ExplicitComponent):
         # OpenMDAO options are only set after intialize has been called in the
         # init function. That is why the parent init function must be called
         # before sending the options values to the philote server.
-        # for
-        # self._client.send_options(options)
+        options = {}
+        for key, val in self.options.items():
+            options[key] = val
+        self._client.send_options(options)
 
     def initialize(self):
         """

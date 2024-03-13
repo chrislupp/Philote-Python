@@ -85,6 +85,8 @@ class DisciplineClient:
         """
         opts = self._disc_stub.GetAvailableOptions(empty.Empty())
 
+        # this try and except is needed to avoid a failed unit test due to
+        # issues with mocking
         try:
             for name, val in zip(opts.options, opts.type):
                 type_str = None
