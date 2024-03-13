@@ -104,7 +104,7 @@ class DisciplineServer(disc.DisciplineService):
 
             opts.type.append(type)
 
-            yield opts
+        return opts
 
     def SetOptions(self, request, context):
         """
@@ -112,6 +112,7 @@ class DisciplineServer(disc.DisciplineService):
         """
         options = request.options
         self._discipline.set_options(options)
+        return Empty()
 
     def Setup(self, request, context):
         """
