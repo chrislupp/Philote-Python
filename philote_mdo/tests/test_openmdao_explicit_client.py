@@ -29,13 +29,9 @@
 # control over the information you may find at these locations.
 import unittest
 from unittest.mock import Mock, MagicMock, patch
-import numpy as np
 import philote_mdo.generated.data_pb2 as data
 from philote_mdo.openmdao import RemoteExplicitComponent
 
-
-def mock_get_options(arg):
-    return data.OptionsList(options=[], type=[])
 
 
 class TestOpenMdaoExplicitClient(unittest.TestCase):
@@ -44,14 +40,21 @@ class TestOpenMdaoExplicitClient(unittest.TestCase):
     """
 
     @patch('philote_mdo.general.ExplicitClient')
-    def test_init(self, mock_explicit_client):
+    def test_constructor(self, mock_explicit_client):
         """
         Tests the initialize function of the OpenMDAO Explicit Client.
         """
-        # Mock the pm.ExplicitClient class
         mock_channel = Mock()
         num_par_fd = 1
         options = {'option1': 10, 'option2': 20}
+
+        # mock the client and its behavior
+        mock_client_instance = MagicMock()
+        mock_client_instance.options_list = {'option1': 'bool', 'option2': 'int', 'option3': 'float'}
+        mock_client_instance.get_available_options.return_value = None
+
+        # set the mock client instance as the return value of pm.ExplicitClient
+        mock_explicit_client.return_value = mock_client_instance
 
         # Create an instance of the class
         comp = RemoteExplicitComponent(channel=mock_channel, num_par_fd=num_par_fd, **options)
@@ -88,9 +91,9 @@ class TestOpenMdaoExplicitClient(unittest.TestCase):
         client_mock.get_available_options.assert_called_once()
 
         # assert that options.declare is called for each option
-        options_mock.declare.assert_any_call('option1', type=bool)
-        options_mock.declare.assert_any_call('option2', type=int)
-        options_mock.declare.assert_any_call('option3', type=float)
+        options_mock.declare.assert_any_call('option1', types=bool)
+        options_mock.declare.assert_any_call('option2', types=int)
+        options_mock.declare.assert_any_call('option3', types=float)
 
     @patch('philote_mdo.openmdao.utils.client_setup')
     def test_setup(self, mock_openmdao_client_setup):
