@@ -81,6 +81,8 @@ class RemoteExplicitComponent(om.ExplicitComponent):
                 type = int
             elif type_str == 'float':
                 type = float
+            elif type_str == 'str':
+                type = str
 
             self.options.declare(name, type=type)
 

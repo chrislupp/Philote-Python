@@ -115,15 +115,15 @@ class TestDisciplineClient(unittest.TestCase):
 
         # mock the _disc_stub.GetAvailableOptions method
         mock_options = MagicMock()
-        mock_options.options = ['option1', 'option2']
-        mock_options.type = ['type1', 'type2']
+        mock_options.options = ['option1', 'option2', 'option3', 'option4']
+        mock_options.type = [data.kBool, data.kDouble, data.kString, data.kInt]
         instance._disc_stub.GetAvailableOptions.return_value = mock_options
 
         # call the get_available_options method
         instance.get_available_options()
 
         # assert that options_list is populated correctly
-        expected_options_list = {'option1': 'type1', 'option2': 'type2'}
+        expected_options_list = {'option1': 'bool', 'option2': 'float', 'option3': 'str', 'option4': 'int'}
         self.assertEqual(instance.options_list, expected_options_list)
 
     def test_send_options(self):
