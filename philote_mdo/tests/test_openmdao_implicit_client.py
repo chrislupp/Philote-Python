@@ -95,90 +95,96 @@ class TestOpenMdaoImplicitClient(unittest.TestCase):
         options_mock.declare.assert_any_call('option2', types=int)
         options_mock.declare.assert_any_call('option3', types=float)
 
-    # @patch('philote_mdo.openmdao.utils.client_setup')
-    # def test_setup(self, mock_openmdao_client_setup, om_explicit_component_patch):
-    #     """
-    #     Tests the setup function of the OpenMDAO Explicit Client.
-    #     """
-    #     var1 = Mock()
-    #     var1.name = "input1"
-    #     var1.units = "m"
-    #     var1.type = data.kInput
-    #     var1.shape = [1]
-    #
-    #     var2 = Mock()
-    #     var2.name = "input2"
-    #     var2.units = None
-    #     var2.type = data.kInput
-    #     var2.shape = [1]
-    #
-    #     var3 = Mock()
-    #     var3.name = "output1"
-    #     var3.units = None
-    #     var3.type = data.kOutput
-    #     var3.shape = [1]
-    #
-    #     var4 = Mock()
-    #     var4.name = "output2"
-    #     var4.units = None
-    #     var4.type = data.kOutput
-    #     var4.shape = [1]
-    #
-    #     mock_channel = Mock()
-    #     component = RemoteImplicitComponent(channel=mock_channel)
-    #     component._client = Mock()
-    #     component._client._var_meta = [var1, var2, var3, var4]
-    #
-    #     # call the function
-    #     component.setup()
-    #
-    #     # check that the setup utility function was called
-    #     mock_openmdao_client_setup.assert_called_once_with(component)
-    #
-    # @patch('philote_mdo.openmdao.utils.client_setup_partials')
-    # def test_setup_partials(self, mock_openmdao_client_setup_partials, om_explicit_component_patch):
-    #     """
-    #     Tests the setup partials function of the OpenMDAO Explicit Client.
-    #     """
-    #     par1 = Mock()
-    #     par1.name = "partial1"
-    #     par1.subname = "subpartial1"
-    #
-    #     par2 = Mock()
-    #     par2.name = "partial2"
-    #     par2.subname = "subpartial2"
-    #
-    #     mock_channel = Mock()
-    #     component = RemoteExplicitComponent(channel=mock_channel)
-    #     component._client = Mock()
-    #     component._client._partials_meta = [par1, par2]
-    #
-    #     # call the function
-    #     component.setup_partials()
-    #
-    #     # check that the setup utility function was called
-    #     mock_openmdao_client_setup_partials.assert_called_once_with(component)
-    #
-    # def test_compute_function(self, om_explicit_component_patch):
+    @patch('philote_mdo.openmdao.utils.client_setup')
+    def test_setup(self, mock_openmdao_client_setup, om_explicit_component_patch):
+        """
+        Tests the setup function of the OpenMDAO Explicit Client.
+        """
+        var1 = Mock()
+        var1.name = "input1"
+        var1.units = "m"
+        var1.type = data.kInput
+        var1.shape = [1]
+
+        var2 = Mock()
+        var2.name = "input2"
+        var2.units = None
+        var2.type = data.kInput
+        var2.shape = [1]
+
+        var3 = Mock()
+        var3.name = "output1"
+        var3.units = None
+        var3.type = data.kOutput
+        var3.shape = [1]
+
+        var4 = Mock()
+        var4.name = "output2"
+        var4.units = None
+        var4.type = data.kOutput
+        var4.shape = [1]
+
+        mock_channel = Mock()
+        component = RemoteImplicitComponent(channel=mock_channel)
+        component._client = Mock()
+        component._client._var_meta = [var1, var2, var3, var4]
+
+        # call the function
+        component.setup()
+
+        # check that the setup utility function was called
+        mock_openmdao_client_setup.assert_called_once_with(component)
+
+    @patch('philote_mdo.openmdao.utils.client_setup_partials')
+    def test_setup_partials(self, mock_openmdao_client_setup_partials, om_explicit_component_patch):
+        """
+        Tests the setup partials function of the OpenMDAO Explicit Client.
+        """
+        par1 = Mock()
+        par1.name = "partial1"
+        par1.subname = "subpartial1"
+
+        par2 = Mock()
+        par2.name = "partial2"
+        par2.subname = "subpartial2"
+
+        mock_channel = Mock()
+        component = RemoteImplicitComponent(channel=mock_channel)
+        component._client = Mock()
+        component._client._partials_meta = [par1, par2]
+
+        # call the function
+        component.setup_partials()
+
+        # check that the setup utility function was called
+        mock_openmdao_client_setup_partials.assert_called_once_with(component)
+
+    # def test_apply_nonlinear(self, om_explicit_component_patch):
     #     """
     #     Tests the compute function of the OpenMDAO explicit client.
     #     """
+    #     data.VariableMetaData(name="f", type=data.kOutput, shape=(3,)),
+    #     data.VariableMetaData(name="f", type=data.kResidual, shape=(3,)),
+    #     data.VariableMetaData(name="x", type=data.kInput, shape=(2, 2)),
+    #     data.VariableMetaData(name="g", type=data.kOutput, shape=(3,)),
+    #     data.VariableMetaData(name="g", type=data.kResidual, shape=(3,)),
+    #
     #     var1 = Mock()
-    #     var1.name = "input1"
+    #     var1.name = "x"
     #     var1.units = "m"
     #     var1.type = data.kInput
     #     var1.shape = [1]
     #
     #     var2 = Mock()
-    #     var2.name = "input2"
+    #     var2.name = "f"
     #     var2.units = None
-    #     var2.type = data.kInput
+    #     var2.type = data.kOutput
     #     var2.shape = [1]
     #
     #     var3 = Mock()
-    #     var3.name = "output1"
+    #     var3.name = "f"
     #     var3.units = None
-    #     var3.type = data.kOutput
+    #     var3.type = data.kResidual
     #     var3.shape = [1]
     #
     #     var4 = Mock()
@@ -200,7 +206,7 @@ class TestOpenMdaoImplicitClient(unittest.TestCase):
     #
     #     # Creating instance of the class to be tested
     #     mock_channel = Mock()
-    #     instance = RemoteExplicitComponent(channel=mock_channel)
+    #     instance = RemoteImplicitComponent(channel=mock_channel)
     #     instance._client = client_mock
     #     # mock the component name
     #     instance.name = 'test'

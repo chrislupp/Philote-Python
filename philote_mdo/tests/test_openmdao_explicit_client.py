@@ -159,7 +159,7 @@ class TestOpenMdaoExplicitClient(unittest.TestCase):
         # check that the setup utility function was called
         mock_openmdao_client_setup_partials.assert_called_once_with(component)
 
-    def test_compute_function(self, om_explicit_component_patch):
+    def test_compute(self, om_explicit_component_patch):
         """
         Tests the compute function of the OpenMDAO explicit client.
         """
@@ -213,7 +213,7 @@ class TestOpenMdaoExplicitClient(unittest.TestCase):
         self.assertEqual(outputs['output1'], 30)
         self.assertEqual(outputs['output2'], 40)
 
-    def test_compute_partials_function(self, om_explicit_component_patch):
+    def test_compute_partials(self, om_explicit_component_patch):
         # Mocking necessary objects
         inputs = {'input1': 10, 'input2': 20}
         partials = {'output1': {'input1': None, 'input2': None},
