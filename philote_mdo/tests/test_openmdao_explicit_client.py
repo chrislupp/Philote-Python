@@ -46,11 +46,11 @@ class TestOpenMdaoExplicitClient(unittest.TestCase):
         """
         mock_channel = Mock()
         num_par_fd = 1
-        options = {'option1': True, 'option2': 20, 'option3': 3.14}
+        options = {'option1': True, 'option2': 20, 'option3': 3.14, 'option4': 'test'}
 
         # mock the client and its behavior
         mock_client_instance = MagicMock()
-        mock_client_instance.options_list = {'option1': 'bool', 'option2': 'int', 'option3': 'float'}
+        mock_client_instance.options_list = {'option1': 'bool', 'option2': 'int', 'option3': 'float', 'option4': 'str'}
         mock_client_instance.get_available_options.return_value = None
 
         # set the mock client instance as the return value of pm.ExplicitClient
