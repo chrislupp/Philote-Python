@@ -39,7 +39,7 @@ class Rosenbrock(pmdo.ExplicitDiscipline):
         self.add_option('dimension', 'int')
 
     def set_options(self, options):
-        self.dimension = options["dimension"]
+        self.dimension = int(options["dimension"])
 
     def setup(self):
         self.add_input("x", shape=(self.dimension,), units="")

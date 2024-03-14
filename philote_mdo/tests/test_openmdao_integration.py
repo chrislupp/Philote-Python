@@ -31,10 +31,11 @@ from concurrent import futures
 import unittest
 import grpc
 import numpy as np
+from numpy.testing import assert_almost_equal
 import openmdao.api as om
 import philote_mdo.general as pmdo
 import philote_mdo.openmdao as pmdo_om
-from philote_mdo.examples import Paraboloid, QuadradicImplicit
+from philote_mdo.examples import Paraboloid, QuadradicImplicit, Rosenbrock
 
 
 class OpenMDAOIntegrationTests(unittest.TestCase):
@@ -109,6 +110,74 @@ class OpenMDAOIntegrationTests(unittest.TestCase):
 
         self.assertEqual(jac["Paraboloid.f_xy", "Paraboloid.x"][0], -2.0)
         self.assertEqual(jac["Paraboloid.f_xy", "Paraboloid.y"][0], 13.0)
+
+        # stop the server
+        server.stop(0)
+
+    def test_rosenbrock_compute(self):
+        """
+        Integration test for the Paraboloid compute function.
+        """
+        # server code
+        server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
+
+        discipline = pmdo.ExplicitServer(discipline=Rosenbrock())
+        discipline.attach_to_server(server)
+
+        server.add_insecure_port("[::]:50051")
+        server.start()
+
+        # client code
+        prob = om.Problem()
+        model = prob.model
+
+        comp = pmdo_om.RemoteExplicitComponent(channel=grpc.insecure_channel("localhost:50051"), dimension=2)
+        model.add_subsystem("Rosenbrock", comp)
+
+        # run setup
+        prob.setup()
+
+        # define some inputs
+        prob.set_val("Rosenbrock.x", np.zeros(2))
+
+        # run a function evaluation
+        prob.run_model()
+
+        self.assertEqual(prob.get_val("Rosenbrock.f")[0], 1.0)
+
+        # stop the server
+        server.stop(0)
+
+    def test_rosenbrock_compute_partials(self):
+        """
+        Integration test for the Paraboloid compute function.
+        """
+        # server code
+        server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
+
+        discipline = pmdo.ExplicitServer(discipline=Rosenbrock())
+        discipline.attach_to_server(server)
+
+        server.add_insecure_port("[::]:50051")
+        server.start()
+
+        # client code
+        prob = om.Problem()
+        model = prob.model
+
+        comp = pmdo_om.RemoteExplicitComponent(channel=grpc.insecure_channel("localhost:50051"), dimension=2)
+        model.add_subsystem("Rosenbrock", comp)
+
+        # setup the problem
+        prob.setup()
+
+        # define some inputs
+        prob.set_val("Rosenbrock.x", np.zeros(2))
+
+        # run a function evaluation
+        jac = prob.compute_totals("Rosenbrock.f", ["Rosenbrock.x"])
+
+        assert_almost_equal(jac["Rosenbrock.f", "Rosenbrock.x"], np.array([[-2.0, 0.0]]))
 
         # stop the server
         server.stop(0)
