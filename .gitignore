@@ -1,4 +1,5 @@
 doxer.*
+*.html
 .idea/
 examples/reports/
 **/reports/

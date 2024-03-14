@@ -50,9 +50,38 @@ class Discipline:
         # flag that indicates the discipline is implicit
         self._is_implicit = False
 
+        # dictionary of available discipline options (with types)
+        self.options_list = {}
+
+        # create the available options and run any other initialization
+        self.initialize()
+
+    def add_option(self, name, type):
+        """
+        Adds an option definition to the discipline.
+
+        Parameters
+        ----------
+        name : string
+            the name of the option being added
+        type : string
+            the data type of the option. acceptable types are 'bool', 'int',
+            'float'
+        """
+        self.options_list[name] = type
+
     def add_input(self, name, shape=(1,), units=""):
         """
         Define a continuous input.
+
+        Parameters
+        ----------
+        name : string
+            the name of the input variable
+        shape : tuple
+            the shape of the input variable
+        units : string
+            the unit definition for the input variable
         """
         meta = data.VariableMetaData()
         meta.type = data.VariableType.kInput
@@ -64,6 +93,15 @@ class Discipline:
     def add_output(self, name, shape=(1,), units=""):
         """
         Defines a continuous output.
+
+        Parameters
+        ----------
+        name : string
+            the name of the output variable
+        shape : tuple
+            the shape of the output variable
+        units : string
+            the unit definition for the output variable
         """
         out_meta = data.VariableMetaData()
         out_meta.type = data.VariableType.kOutput
@@ -87,13 +125,48 @@ class Discipline:
         """
         self._partials_meta += [data.PartialsMetaData(name=func, subname=var)]
 
-    def initialize(self, options):
+    def initialize(self):
+        """
+        Sets up the available options.
+
+        This function is called when the server is first started. It does not
+        set options, but instead defines what option names (and types) are
+        available. The set_options function is used to actually set the option
+        values instead.
+        """
+        pass
+
+    def set_options(self, options):
+        """
+        Sets the option values for the discipline.
+
+        Parameters
+        ----------
+        options : DisciplineOptions
+            options data structure (generated from the Philote MDO standard)
+            that is used to set the discipline options. This data structure
+            is received from the client and passed to this function.
+        """
         pass
 
     def setup(self):
+        """
+        Sets up the discipline inputs and outputs.
+
+        This function is called when the client invokes the Setup RPC. This
+        function should be used to define inputs and outputs of the analysis
+        discipline.
+        """
         pass
 
     def setup_partials(self):
+        """
+        Sets up the discipline partials.
+
+        This function is called when the client invokes the Setup RPC. This
+        function should be used to define partial derivatives of the analysis
+        discipline.
+        """
         pass
 
     def configure(self):
@@ -101,7 +174,7 @@ class Discipline:
 
     def _clear_data(self):
         """
-        Clears all meta data of the discipline.
+        Clears all metadata of the discipline.
 
         This function is invoked from the Setup function of the server.
         """

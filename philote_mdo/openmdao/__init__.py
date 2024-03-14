@@ -30,4 +30,4 @@
 from .explicit import RemoteExplicitComponent
 from .implicit import RemoteImplicitComponent
 
-from .group import OpenMdaoSubProblem
+# from .group import OpenMdaoSubProblem

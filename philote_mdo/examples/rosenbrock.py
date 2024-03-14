@@ -35,9 +35,11 @@ class Rosenbrock(pmdo.ExplicitDiscipline):
     """
     Explicit discipline implementation of the Rosenbrock function.
     """
+    def initialize(self):
+        self.add_option('dimension', 'int')
 
-    def initialize(self, options):
-        self.dimension = options["dimension"]
+    def set_options(self, options):
+        self.dimension = int(options["dimension"])
 
     def setup(self):
         self.add_input("x", shape=(self.dimension,), units="")

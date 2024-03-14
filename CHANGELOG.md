@@ -1,27 +1,62 @@
 # Change Log
 
+## Version 0.6.0
+
+### Features
+
+- Added a mechanism for the server to provide a list of available options
+  (with associated types).
+- Created a general implementation of the explicit discipline client for
+  OpenMDAO. The client creates an OpenMDAO ExplicitComponent which can
+  be added to any OpenMDAO model.
+
+### Bug Fixes
+
+- None
+
+
 ## Version 0.5.3
 
-- [fix] Added missing function arguments to explicit discipline.
+### Features
+
+- None
+
+### Bug Fixes
+
+- Added missing function arguments to explicit discipline.
 
 
 ## Version 0.5.2
 
-- [fix] Lowered the dependency versions (they were far too stringent and new)
-- [fix] Change PyPI deployment to source only. It is not practical to distribute
+### Features
+
+- None
+
+### Bug Fixes
+
+- Lowered the dependency versions (they were far too stringent and new)
+- Change PyPI deployment to source only. It is not practical to distribute
   a platform-specific wheel. The wheel must be platform-specific, because gRPC
   has C underpinnings.
 
 
 ## Version 0.5.1
 
-- [feature] Transitioned away from setuptools and setup.py to a pyproject.toml
+### Features
+
+- Transitioned away from setuptools and setup.py to a pyproject.toml
   and poetry-based package.
-- [feature] gRPC and protobuf stubs are now automatically compiled during
-   installation.
-- [feature] Added test coverage report generation that is uploaded to
-  coveralls.
-- [feature] Added action to upload to PyPI when a release is published. 
+- gRPC and protobuf stubs are now automatically compiled during 
+  installation.
+- Added test coverage report generation that is uploaded to coveralls.
+- Added action to upload to PyPI when a release is published.
+
+### Bug Fixes
+
+- Lowered the dependency versions (they were far too stringent and new)
+- Change PyPI deployment to source only. It is not practical to distribute
+  a platform-specific wheel. The wheel must be platform-specific, because gRPC
+  has C underpinnings.
 
 
 ## Version 0.5.0
@@ -31,7 +66,13 @@
 
 ## Version 0.4.0
 
-- [doc] General documentation updates.
+### Features
+
+- General documentation updates.
+
+### Bug Fixes
+
+- None
 
 
 ## Version 0.3.0
@@ -40,24 +81,30 @@ This release is one of the biggest changes to the code to date. It contains a
 fundamental reorganization and adds a number of features. Notably, it adds
 unit and integration testing of almost all the code.
 
-- [feature] Reorganized codebase to reduce code duplication. The clients and
-  servers now use base classes.
-- [feature] Protobuf/gRPC files are now generated at build time and not commited
+### Features
+
+- Reorganized codebase to reduce code duplication. The clients and servers now
+  use base classes.
+- Protobuf/gRPC files are now generated at build time and not committed
   to the repository. This requires grpc-tools and protoletariat to be installed.
   See the readme for details.
-- [feature] Added a change log file to the repository.
-- [feature] Updated API and logic to conform with newer Philote definition.
-- [feature] Added unit testing suite.
-- [feature] Added integration test suite (based on examples).
-- [feature] Completed implicit discipline functionality and testing.
-- [fix] Fixed unit tests for GetVariableDefinitions and GetPartialsDefinitions.
-- [fix] Added edge case handling for partials of variables that are scalar.
-- [fix] Corrected the preallocate_inputs function for the implicit case to
-  resolve variable copy issues.
-- [fix] Fixed typo in discrete input parsing.
-- [fix] Moved to setup.py, as setuptools is still in beta for pyproject.toml.
-- [doc] Added jupyter book for documentation.
-- [doc] Added a quick start guide.
+- Added a change log file to the repository.
+- Updated API and logic to conform with newer Philote definition.
+- Added unit testing suite.
+- Added integration test suite (based on examples).
+- Completed implicit discipline functionality and testing.
+- Fixed unit tests for GetVariableDefinitions and GetPartialsDefinitions.
+- Added edge case handling for partials of variables that are scalar.
+- 
+
+### Bug Fixes
+
+- Corrected the preallocate_inputs function for the implicit case to resolve
+  variable copy issues.
+- Fixed typo in discrete input parsing.
+- Moved to setup.py, as setuptools is still in beta for pyproject.toml.
+- Added jupyter book for documentation.
+- Added a quick start guide.
 
 
 ## Version 0.2.1

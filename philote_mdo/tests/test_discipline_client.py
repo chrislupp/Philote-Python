@@ -28,12 +28,13 @@
 # therein. The DoD does not exercise any editorial, security, or other
 # control over the information you may find at these locations.
 import unittest
-from unittest.mock import Mock, patch
+from unittest.mock import Mock, MagicMock, patch
 import numpy as np
 from google.protobuf.empty_pb2 import Empty
 from google.protobuf.struct_pb2 import Struct
 from philote_mdo.general import DisciplineClient
 import philote_mdo.generated.data_pb2 as data
+import philote_mdo.generated.disciplines_pb2_grpc as disc
 import philote_mdo.utils as utils
 
 
@@ -41,6 +42,26 @@ class TestDisciplineClient(unittest.TestCase):
     """
     Unit tests for the discipline client.
     """
+
+    def test_init(self):
+        # Create a mock grpc channel
+        mock_channel = Mock()
+
+        # Create an instance of YourClass with the mock channel
+        instance = DisciplineClient(mock_channel)
+
+        # Assert that the attributes are initialized correctly
+        self.assertTrue(instance.verbose)
+        self.assertEqual(instance.grpc_options, [])
+        self.assertFalse(instance._is_continuous)
+        self.assertFalse(instance._is_differentiable)
+        self.assertFalse(instance._provides_gradients)
+        self.assertIsInstance(instance._disc_stub, disc.DisciplineServiceStub)
+        self.assertEqual(instance._stream_options.num_double, 1000)
+        self.assertEqual(instance._var_meta, [])
+        self.assertEqual(instance._partials_meta, [])
+        self.assertEqual(instance.options_list, {})
+
 
     @patch("philote_mdo.generated.disciplines_pb2_grpc.DisciplineServiceStub")
     def test_get_discipline_info(self, mock_discipline_stub):
@@ -84,6 +105,26 @@ class TestDisciplineClient(unittest.TestCase):
         )
         self.assertTrue(mock_stub.SetStreamOptions.called)
         mock_stub.SetStreamOptions.assert_called_with(expected_options)
+
+    @patch("philote_mdo.generated.disciplines_pb2_grpc.DisciplineServiceStub")
+    def test_get_available_options(self, mock_discipline_stub):
+        mock_channel = Mock()
+        mock_stub = mock_discipline_stub.return_value
+
+        instance = DisciplineClient(channel=mock_channel)
+
+        # mock the _disc_stub.GetAvailableOptions method
+        mock_options = MagicMock()
+        mock_options.options = ['option1', 'option2', 'option3', 'option4']
+        mock_options.type = [data.kBool, data.kDouble, data.kString, data.kInt]
+        instance._disc_stub.GetAvailableOptions.return_value = mock_options
+
+        # call the get_available_options method
+        instance.get_available_options()
+
+        # assert that options_list is populated correctly
+        expected_options_list = {'option1': 'bool', 'option2': 'float', 'option3': 'str', 'option4': 'int'}
+        self.assertEqual(instance.options_list, expected_options_list)
 
     def test_send_options(self):
         # mock gRPC stub and channel
