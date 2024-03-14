@@ -91,13 +91,13 @@ class DisciplineServer(disc.DisciplineService):
             opts.options.append(name)
 
             # assign the correct data type
-            if val is 'bool':
+            if val == 'bool':
                 type = data.kBool
-            elif val is 'int':
+            elif val == 'int':
                 type = data.kInt
-            elif val is 'float':
+            elif val == 'float':
                 type = data.kDouble
-            elif val is 'str':
+            elif val == 'str':
                 type = data.kString
             else:
                 raise ValueError("Invalid value for discipline option '{}'".format(name))
