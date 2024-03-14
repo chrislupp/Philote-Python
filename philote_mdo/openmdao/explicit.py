@@ -95,6 +95,9 @@ class RemoteExplicitComponent(om.ExplicitComponent):
         utils.client_setup(self)
 
     def setup_partials(self):
+        """
+        Set up the partials of the OpenMDAO component.
+        """
         utils.client_setup_partials(self)
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
