@@ -80,12 +80,39 @@ class DisciplineServer(disc.DisciplineService):
         self._stream_opts = request
         return Empty()
 
+    def GetAvailableOptions(self, request, context):
+        """
+        RPC that gets the names and types of all available discipline options.
+        """
+        opts_dict = self._discipline.options_list
+        opts = data.OptionsList()
+
+        for name, val in opts_dict.items():
+            opts.options.append(name)
+
+            # assign the correct data type
+            if val == 'bool':
+                type = data.kBool
+            elif val == 'int':
+                type = data.kInt
+            elif val == 'float':
+                type = data.kDouble
+            elif val == 'str':
+                type = data.kString
+            else:
+                raise ValueError("Invalid value for discipline option '{}'".format(name))
+
+            opts.type.append(type)
+
+        return opts
+
     def SetOptions(self, request, context):
         """
         RPC that sets the discipline options.
         """
         options = request.options
-        self._discipline.initialize(options)
+        self._discipline.set_options(options)
+        return Empty()
 
     def Setup(self, request, context):
         """

@@ -86,27 +86,49 @@ class TestDisciplineServer(unittest.TestCase):
         # check that the streaming options were set properly
         self.assertEqual(server._stream_opts.num_double, 2)
 
-    def test_set_options(self):
-        # Create an instance of YourClass
+    def test_get_available_options(self):
         server = DisciplineServer()
-        # server._discipline = Discipline()
 
-        # Mock the request and context parameters
+        # mock the request and context parameters (since they are not used in this function)
+        request_mock = Mock()
+        context_mock = None
+
+        server._discipline = Discipline()
+
+        # set the mock options_list to _discipline.options_list
+        server._discipline.options_list = {'option1': 'bool',
+                                           'option2': 'int',
+                                           'option3': 'float'}
+
+        # call the function
+        results = server.GetAvailableOptions(request_mock, context_mock)
+
+        # assert that the results are correct
+        expected_options = ['option1', 'option2', 'option3']
+        expected_types = [data.kBool, data.kInt, data.kDouble]
+
+        self.assertEqual(results.options, expected_options)
+        self.assertEqual(results.type, expected_types)
+
+    def test_set_options(self):
+        server = DisciplineServer()
+
+        # mock the request and context parameters
         request_mock = Mock()
         context_mock = Mock()
 
-        # Set some mock options in the request
+        # set some mock options in the request
         request_mock.options = {"key1": "value1", "key2": 42}
 
-        # Create a mock for the _discipline attribute
+        # create a mock for the _discipline attribute
         discipline_mock = Mock()
         server._discipline = discipline_mock
 
-        # Call the SetOptions function with the mock parameters
+        # call the SetOptions function with the mock parameters
         server.SetOptions(request_mock, context_mock)
 
-        # Assert that the discipline's initialize method was called with the expected options
-        server._discipline.initialize.assert_called_once_with(
+        # assert that the discipline's initialize method was called with the expected options
+        server._discipline.set_options.assert_called_once_with(
             {"key1": "value1", "key2": 42}
         )
 

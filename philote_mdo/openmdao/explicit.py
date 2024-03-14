@@ -55,33 +55,50 @@ class RemoteExplicitComponent(om.ExplicitComponent):
         self._client = pm.ExplicitClient(channel=channel)
 
         # call the init function of the explicit component
-        super().__init__()
+        super().__init__(num_par_fd=1, **kwargs)
 
         # assign and send the option values to the server
         # this must be done here and not in initialize, as the values of the
         # OpenMDAO options are only set after intialize has been called in the
         # init function. That is why the parent init function must be called
         # before sending the options values to the philote server.
-        # self._client.send_options()
+        # options = {}
+        # for key, val in self.options.items():
+        #     options[key] = val
+        self._client.send_options(kwargs)
 
+    def initialize(self):
+        """
+        Define the OpenMDAO component options.
+        """
+        # get the available options from the philote discipline
+        self._client.get_available_options()
 
-    # def initialize(self):
-    #     """
-    #     Define the OpenMDAO component options.
-    #     """
-    #     # get the available options from the philote discipline
-    #
-    #     # add the OpenMDAO component options
-    #     pass
+        # add to the OpenMDAO component options
+        for name, type_str in self._client.options_list.items():
+            type = None
+            if type_str == 'bool':
+                type = bool
+            elif type_str == 'int':
+                type = int
+            elif type_str == 'float':
+                type = float
+            elif type_str == 'str':
+                type = str
+
+            self.options.declare(name, types=type)
 
     def setup(self):
         """
         Set up the OpenMDAO component.
         """
-        utils.openmdao_client_setup(self)
+        utils.client_setup(self)
 
     def setup_partials(self):
-        utils.openmdao_client_setup_partials(self)
+        """
+        Set up the partials of the OpenMDAO component.
+        """
+        utils.client_setup_partials(self)
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         """

@@ -28,8 +28,7 @@
 # therein. The DoD does not exercise any editorial, security, or other
 # control over the information you may find at these locations.
 import numpy as np
-from google.protobuf.empty_pb2 import Empty
-from google.protobuf.struct_pb2 import Struct
+import google.protobuf.empty_pb2 as empty
 import philote_mdo.generated.data_pb2 as data
 import philote_mdo.generated.disciplines_pb2_grpc as disc
 import philote_mdo.utils as utils
@@ -62,11 +61,14 @@ class DisciplineClient:
         self._var_meta = []
         self._partials_meta = []
 
+        # list of available options
+        self.options_list = {}
+
     def get_discipline_info(self):
         """
         Gets the discipline properties from the analysis server.
         """
-        response = self._disc_stub.GetInfo(Empty())
+        response = self._disc_stub.GetInfo(empty.Empty())
         self._is_continuous = response[0].continuous
         self._is_differentiable = response[0].differentiable
         self._provides_gradients = response[0].provides_gradients
@@ -76,6 +78,24 @@ class DisciplineClient:
         Transmits the stream options for the remote analysis to the server.
         """
         self._disc_stub.SetStreamOptions(self._stream_options)
+
+    def get_available_options(self):
+        """
+        Gets the available options for the analysis discipline.
+        """
+        opts = self._disc_stub.GetAvailableOptions(empty.Empty())
+
+        for name, val in zip(opts.options, opts.type):
+            type_str = None
+            if val == data.kBool:
+                type_str = "bool"
+            if val == data.kInt:
+                type_str = "int"
+            if val == data.kDouble:
+                type_str = "float"
+            if val == data.kString:
+                type_str = "str"
+            self.options_list[name] = type_str
 
     def send_options(self, options):
         """
@@ -98,20 +118,20 @@ class DisciplineClient:
         """
         Runs the setup function on the analysis server.
         """
-        self._disc_stub.Setup(Empty())
+        self._disc_stub.Setup(empty.Empty())
 
     def get_variable_definitions(self):
         """
         Requests the input and output metadata from the server.
         """
-        for message in self._disc_stub.GetVariableDefinitions(Empty()):
+        for message in self._disc_stub.GetVariableDefinitions(empty.Empty()):
             self._var_meta += [message]
 
     def get_partials_definitions(self):
         """
         Requests metadata information on the partials from the analysis server.
         """
-        for message in self._disc_stub.GetPartialDefinitions(Empty()):
+        for message in self._disc_stub.GetPartialDefinitions(empty.Empty()):
             if message.name not in self._partials_meta:
                 self._partials_meta += [message]
 
