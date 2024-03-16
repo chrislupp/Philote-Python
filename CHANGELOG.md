@@ -1,5 +1,17 @@
 # Change Log
 
+## Version 0.7.0
+
+### Features
+
+- Created a general implementation of the implicit discipline client for
+  OpenMDAO. The client creates an OpenMDAO ExplicitComponent which can
+  be added to any OpenMDAO model.
+
+### Bug Fixes
+
+- None
+
 ## Version 0.6.0
 
 ### Features
