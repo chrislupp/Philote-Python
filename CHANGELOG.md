@@ -11,7 +11,7 @@
 ### Bug Fixes
 
 - Added a check if OpenMDAO is installed before defining any classes that use
-  OpenMDAO types. This is a bug that has never (to my knowlege) been
+  OpenMDAO types. This is a bug that has never (to my knowledge) been
   encountered, but could force non-OpenMDAO users to install the package, even
   though they have no use for it.
 
