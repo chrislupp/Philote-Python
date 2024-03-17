@@ -99,7 +99,7 @@ class RemoteImplicitComponent(om.ImplicitComponent):
         """
         utils.client_setup_partials(self)
 
-    def apply_nonlinear(self, inputs, outputs, residuals):
+    def apply_nonlinear(self, inputs, outputs, residuals, discrete_inputs, discrete_outputs):
         """
         Compute the residual evaluation.
         """

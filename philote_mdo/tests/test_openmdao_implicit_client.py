@@ -29,6 +29,7 @@
 # control over the information you may find at these locations.
 import unittest
 from unittest.mock import Mock, MagicMock, patch
+import numpy as np
 import philote_mdo.generated.data_pb2 as data
 from philote_mdo.openmdao import RemoteImplicitComponent
 
@@ -159,65 +160,59 @@ class TestOpenMdaoImplicitClient(unittest.TestCase):
         # check that the setup utility function was called
         mock_openmdao_client_setup_partials.assert_called_once_with(component)
 
-    # def test_apply_nonlinear(self, om_explicit_component_patch):
-    #     """
-    #     Tests the compute function of the OpenMDAO explicit client.
-    #     """
-    #     data.VariableMetaData(name="f", type=data.kOutput, shape=(3,)),
-    #     data.VariableMetaData(name="f", type=data.kResidual, shape=(3,)),
-    #     data.VariableMetaData(name="x", type=data.kInput, shape=(2, 2)),
-    #     data.VariableMetaData(name="g", type=data.kOutput, shape=(3,)),
-    #     data.VariableMetaData(name="g", type=data.kResidual, shape=(3,)),
-    #
-    #     var1 = Mock()
-    #     var1.name = "x"
-    #     var1.units = "m"
-    #     var1.type = data.kInput
-    #     var1.shape = [1]
-    #
-    #     var2 = Mock()
-    #     var2.name = "f"
-    #     var2.units = None
-    #     var2.type = data.kOutput
-    #     var2.shape = [1]
-    #
-    #     var3 = Mock()
-    #     var3.name = "f"
-    #     var3.units = None
-    #     var3.type = data.kResidual
-    #     var3.shape = [1]
-    #
-    #     var4 = Mock()
-    #     var4.name = "output2"
-    #     var4.units = None
-    #     var4.type = data.kOutput
-    #     var4.shape = [1]
-    #
-    #     # Mocking necessary objects
-    #     inputs = {'input1': 10, 'input2': 20}
-    #     outputs = {'output1': None, 'output2': None}
-    #     discrete_inputs = None
-    #     discrete_outputs = None
-    #
-    #     # Mocking the client and its methods
-    #     client_mock = MagicMock()
-    #     client_mock._var_meta = [var1, var2, var3, var4]
-    #     client_mock.run_compute.return_value = {'output1': 30, 'output2': 40}
-    #
-    #     # Creating instance of the class to be tested
-    #     mock_channel = Mock()
-    #     instance = RemoteImplicitComponent(channel=mock_channel)
-    #     instance._client = client_mock
-    #     # mock the component name
-    #     instance.name = 'test'
-    #
-    #     # Calling the function to be tested
-    #     instance.compute(inputs, outputs, discrete_inputs, discrete_outputs)
-    #
-    #     # Asserting that the method calls are made correctly
-    #     client_mock.run_compute.assert_called_once_with({'input1': 10, 'input2': 20})
-    #     self.assertEqual(outputs['output1'], 30)
-    #     self.assertEqual(outputs['output2'], 40)
+    def test_apply_nonlinear(self, mock):
+        """
+        Tests the compute function of the OpenMDAO explicit client.
+        """
+        # mocking the client and its methods
+        client_mock = MagicMock()
+        client_mock._var_meta = [
+            data.VariableMetaData(name="f", type=data.kOutput, shape=(3,)),
+            data.VariableMetaData(name="f", type=data.kResidual, shape=(3,)),
+            data.VariableMetaData(name="x", type=data.kInput, shape=(2, 2)),
+            data.VariableMetaData(name="g", type=data.kOutput, shape=(3,)),
+            data.VariableMetaData(name="g", type=data.kResidual, shape=(3,)),
+        ]
+
+        expected_residuals = {
+            "f": np.array([5.0, 6.0, 7.0]),
+            "g": np.array([8.0, 9.0, 10.0]),
+        }
+
+        client_mock.run_compute_residuals.return_value = expected_residuals
+
+        # creating instance of the class to be tested
+        mock_channel = Mock()
+        comp = RemoteImplicitComponent(channel=mock_channel)
+        comp._client = client_mock
+        # mock the component name
+        comp.name = 'test'
+
+        # inputs and outputs
+        inputs = {
+            "x": np.array([1.0, 2.0, 3.0, 4.0]).reshape(2, 2),
+        }
+
+        outputs = {
+            "f": np.array([5.0, 6.0, 7.0]),
+            "g": np.array([7.0, 6.0, 5.0]),
+        }
+        discrete_inputs = None
+        discrete_outputs = None
+
+        residuals = {
+            "f": np.zeros(3),
+            "g": np.zeros(3),
+        }
+
+        # calling the function to be tested
+        comp.apply_nonlinear(inputs, outputs, residuals, discrete_inputs, discrete_outputs)
+
+        # asserting that the method calls are made correctly
+        # client_mock.run_compute.assert_called_once_with({'input1': 10, 'input2': 20})
+        for output_name, expected_data in expected_residuals.items():
+            self.assertTrue(output_name in residuals)
+            np.testing.assert_array_equal(residuals[output_name], expected_data)
     #
     # def test_compute_partials_function(self, om_explicit_component_patch):
     #     # Mocking necessary objects
