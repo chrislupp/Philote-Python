@@ -5,12 +5,16 @@
 ### Features
 
 - Created a general implementation of the implicit discipline client for
-  OpenMDAO. The client creates an OpenMDAO ExplicitComponent which can
+  OpenMDAO. The client creates an OpenMDAO ImplicitComponent which can
   be added to any OpenMDAO model.
 
 ### Bug Fixes
 
-- None
+- Added a check if OpenMDAO is installed before defining any classes that use
+  OpenMDAO types. This is a bug that has never (to my knowlege) been
+  encountered, but could force non-OpenMDAO users to install the package, even
+  though they have no use for it.
+
 
 ## Version 0.6.0
 
