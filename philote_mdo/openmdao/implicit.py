@@ -99,7 +99,7 @@ class RemoteImplicitComponent(om.ImplicitComponent):
         """
         utils.client_setup_partials(self)
 
-    def apply_nonlinear(self, inputs, outputs, residuals, discrete_inputs, discrete_outputs):
+    def apply_nonlinear(self, inputs, outputs, residuals, discrete_inputs=None, discrete_outputs=None):
         """
         Compute the residual evaluation.
         """
@@ -109,13 +109,14 @@ class RemoteImplicitComponent(om.ImplicitComponent):
         res = self._client.run_compute_residuals(local_inputs, local_outputs)
         utils.assign_global_outputs(res, residuals)
 
-    # def solve_nonlinear(self, inputs, outputs):
-    #     """
-    #     Solves the residual for the implicit discipline.
-    #     """
-    #     local_inputs = create_local_inputs(inputs, self._client._var_meta)
-    #     out = self._client.run_solve_residuals(local_inputs)
-    #     assign_global_outputs(out, outputs)
+    def solve_nonlinear(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
+        """
+        Solves the residual for the implicit discipline.
+        """
+        local_inputs = utils.create_local_inputs(inputs, self._client._var_meta)
+        out = self._client.run_solve_residuals(local_inputs)
+        utils.assign_global_outputs(out, outputs)
+
     #
     # def linearize(self, inputs, outputs, partials):
     #     """
