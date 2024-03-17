@@ -32,6 +32,7 @@ try:
     omdao_installed = True
 except ImportError:
     omdao_installed = False
+    om = None
 import philote_mdo.general as pm
 import philote_mdo.openmdao.utils as utils
 

@@ -32,6 +32,7 @@ try:
     omdao_installed = True
 except ImportError:
     omdao_installed = False
+    om = None
 
 if omdao_installed:
     from .explicit import RemoteExplicitComponent

@@ -32,6 +32,7 @@ try:
     omdao_installed = True
 except ImportError:
     omdao_installed = False
+    om = None
 import philote_mdo.general as pm
 import philote_mdo.generated.data_pb2 as data
 import philote_mdo.openmdao.utils as utils
@@ -122,7 +123,7 @@ if omdao_installed:
             out = self._client.run_solve_residuals(local_inputs)
             utils.assign_global_outputs(out, outputs)
 
-        def linearize(self, inputs, outputs, partials):
+        def linearize(self, inputs, outputs, partials,  discrete_inputs=None, discrete_outputs=None):
             """
             Computes the residual gradients for the implicit discipline.
             """
