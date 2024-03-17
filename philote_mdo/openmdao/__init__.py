@@ -27,7 +27,14 @@
 # the linked websites, of the information, products, or services contained
 # therein. The DoD does not exercise any editorial, security, or other
 # control over the information you may find at these locations.
-from .explicit import RemoteExplicitComponent
-from .implicit import RemoteImplicitComponent
+try:
+    import openmdao.api as om
+    omdao_installed = True
+except ImportError:
+    omdao_installed = False
+
+if omdao_installed:
+    from .explicit import RemoteExplicitComponent
+    from .implicit import RemoteImplicitComponent
 
 # from .group import OpenMdaoSubProblem
