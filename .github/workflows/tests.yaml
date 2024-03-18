@@ -46,8 +46,7 @@ jobs:
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
     - name: Run Unit Tests with Coverage
       run: |
-        python -m coverage run --omit=philote_mdo/generated -m unittest discover -v -s philote_mdo/tests -p 'test_*.py'
-
+        python -m coverage run
     - name: Coveralls
       uses: coverallsapp/github-action@v2
       with:

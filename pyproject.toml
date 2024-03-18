@@ -27,3 +27,20 @@ build-backend = "poetry.core.masonry.api"
 [tool.poetry.build]
 generate-setup-file = false
 script = "utils/compile_proto.py"
+
+
+[tool.coverage.run]
+branch = true
+include = ["philote_mdo/*"]
+omit = ["*__init__*", "philote_mdo/generated/*"]
+command_line = "-m unittest discover -s tests/"
+
+
+[tool.coverage.report]
+fail_under = 80
+
+ignore_errors = true
+
+
+[tool.coverage.html]
+directory = "coverage_html_report"
