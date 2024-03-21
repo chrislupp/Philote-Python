@@ -46,9 +46,9 @@ jobs:
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
     - name: Run Unit Tests with Coverage
       run: |
-        python -m coverage run
+        python -m coverage run --omit=philote_mdo/generated -m unittest discover -v -s tests -p 'test_*.py'
     - name: Coveralls
-      if: ${{ matrix.python-version == '3.9' }}
+      if: ${{ matrix.python-version == '3.12' }}
       uses: coverallsapp/github-action@v2
       with:
         github-token: ${{ github.token }}
