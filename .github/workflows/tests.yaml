@@ -48,6 +48,7 @@ jobs:
       run: |
         python -m coverage run
     - name: Coveralls
+      if: ${{ matrix.python-version == '3.9' }}
       uses: coverallsapp/github-action@v2
       with:
         github-token: ${{ github.token }}
