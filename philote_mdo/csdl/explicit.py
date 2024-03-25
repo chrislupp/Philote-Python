@@ -34,7 +34,7 @@ except ImportError:
     csdl_installed = False
     om = None
 import philote_mdo.general as pm
-import philote_mdo.openmdao.utils as utils
+import philote_mdo.csdl.utils as utils
 
 
 class RemoteExplicitOperation(csdl.CustomExplicitOperation):

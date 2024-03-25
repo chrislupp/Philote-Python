@@ -7,6 +7,8 @@
 - Created a general implementation of the implicit discipline client for
   OpenMDAO. The client creates an OpenMDAO ImplicitComponent which can
   be added to any OpenMDAO model.
+- Implemented a CSDL CustomOperation for explicit Philote disciplines. This
+  is a client that can call explicit Philote disciplines.
 
 ### Bug Fixes
 
