@@ -39,16 +39,15 @@ import philote_mdo.csdl.utils as utils
 
 class RemoteExplicitOperation(csdl.CustomExplicitOperation):
     """
-    Custom explicit operation that interfaces with a Philote explicit component.
+    Custom CSDL explicit operation that interfaces with a Philote explicit component.
     """
 
-    def __init__(self, channel=None, num_par_fd=1, **kwargs):
+    def __init__(self, channel=None, **kwargs):
         """
         Initialize the component and client.
         """
         if not channel:
-            raise ValueError('No channel provided, the Philote client will not'
-                             'be able to connect.')
+            raise ValueError('No channel provided, the Philote client will not be able to connect.')
 
         # generic Philote client
         # The setting of OpenMDAO options requires the list of available
@@ -58,7 +57,7 @@ class RemoteExplicitOperation(csdl.CustomExplicitOperation):
         self._client = pm.ExplicitClient(channel=channel)
 
         # call the init function of the explicit component
-        super().__init__(num_par_fd=1, **kwargs)
+        super().__init__(**kwargs)
 
         # assign and send the option values to the server
         # this must be done here and not in initialize, as the values of the
@@ -72,7 +71,7 @@ class RemoteExplicitOperation(csdl.CustomExplicitOperation):
 
     def initialize(self):
         """
-        Define the OpenMDAO component options.
+        Define the CSDL component options.
         """
         # get the available options from the philote discipline
         self._client.get_available_options()
@@ -93,7 +92,7 @@ class RemoteExplicitOperation(csdl.CustomExplicitOperation):
 
     def define(self):
         """
-        Set up the OpenMDAO component.
+        Set up the CSDL component.
         """
         utils.client_setup(self)
         utils.client_setup_partials(self)

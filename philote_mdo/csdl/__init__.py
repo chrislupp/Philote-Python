@@ -27,3 +27,12 @@
 # the linked websites, of the information, products, or services contained
 # therein. The DoD does not exercise any editorial, security, or other
 # control over the information you may find at these locations.
+try:
+    import csdl
+    csdl_installed = True
+except ImportError:
+    csdl_installed = False
+    om = None
+
+if csdl_installed:
+    from .explicit import RemoteExplicitOperation
